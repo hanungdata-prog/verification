@@ -44,11 +44,11 @@ exports.handler = async (event, context) => {
 
     // Validate CAPTCHA token (using hCaptcha)
     console.log('Validating hCaptcha token...');
-    console.log('HCAPTCHA_SECRET_KEY exists:', !!process.env.HCAPTCHA_SECRET_KEY);
+    console.log('CAPTCHA_SECRET exists:', !!process.env.CAPTCHA_SECRET);
 
     // Temporarily skip hCaptcha validation for testing if secret key is not set
-    if (!process.env.HCAPTCHA_SECRET_KEY) {
-      console.log('WARNING: HCAPTCHA_SECRET_KEY not set, skipping CAPTCHA validation for testing');
+    if (!process.env.CAPTCHA_SECRET) {
+      console.log('WARNING: CAPTCHA_SECRET not set, skipping CAPTCHA validation for testing');
     } else {
       let captchaValid;
       try {
@@ -155,7 +155,7 @@ async function validateHcaptcha(token, ip) {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: `response=${token}&secret=${process.env.HCAPTCHA_SECRET_KEY}&remoteip=${ip}`
+      body: `response=${token}&secret=${process.env.CAPTCHA_SECRET}&remoteip=${ip}`
     });
 
     const result = await response.json();
