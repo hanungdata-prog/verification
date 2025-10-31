@@ -13,20 +13,20 @@
   PYTHON_VERSION = "3.9"
   PYTHONPATH = "/opt/buildhome/repo/netlify/functions"
 
-# Discord OAuth routes - MUST be first to take precedence
+# Discord OAuth routes - redirect to main API function
 [[redirects]]
   from = "/discord/login"
-  to = "/.netlify/functions/api/discord/login"
+  to = "/.netlify/functions/api"
   status = 200
 
 [[redirects]]
   from = "/discord/callback"
-  to = "/.netlify/functions/api/discord/callback"
+  to = "/.netlify/functions/api"
   status = 200
 
 [[redirects]]
   from = "/discord/*"
-  to = "/.netlify/functions/api/discord/:splat"
+  to = "/.netlify/functions/api"
   status = 200
 
 # Redirect API routes to serverless functions

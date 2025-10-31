@@ -1,7 +1,7 @@
-# Discord OAuth routes - MUST be first to take precedence
-/discord/login    /.netlify/functions/api/discord/login    200
-/discord/callback    /.netlify/functions/api/discord/callback    200
-/discord/*    /.netlify/functions/api/discord/:splat    200
+# Discord OAuth routes - redirect to main API function
+/discord/login    /.netlify/functions/api    200
+/discord/callback    /.netlify/functions/api    200
+/discord/*    /.netlify/functions/api    200
 
 # API routes to serverless functions
 /api/*    /.netlify/functions/api/:splat    200
