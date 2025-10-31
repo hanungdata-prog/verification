@@ -57,15 +57,28 @@ def handler(event, context):
         path = event.get('path', '/')
         http_method = event.get('httpMethod', 'GET')
 
+        # Check if this is a redirected request
+        headers = event.get('headers', {})
+        original_path = headers.get('x-original-path') or headers.get('origin-path')
+
         # Check for route override in query parameters (for Discord OAuth routes)
         query_params = event.get('queryStringParameters') or {}
         override_route = query_params.get('route')
 
-        if override_route:
+        # Handle specific redirects
+        if path == '/' and http_method == 'POST':
+            # This is likely a POST to /verify that was redirected
+            path = '/verify'
+            print(f"🔄 Detected redirected POST, setting path to: {path}")
+        elif override_route:
             path = override_route
             print(f"🔄 Route overridden to: {path}")
-            # Update the event path for Mangum
-            event['path'] = path
+        elif original_path:
+            path = original_path
+            print(f"🔄 Using original path: {path}")
+
+        # Update the event path for Mangum
+        event['path'] = path
 
         # Handle routing for Discord OAuth and other paths
         if path.startswith('/discord/'):

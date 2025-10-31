@@ -25,6 +25,12 @@
   to = "/.netlify/functions/api/:splat"
   status = 200
 
+# Direct verify route to serverless function
+[[redirects]]
+  from = "/verify"
+  to = "/.netlify/functions/api"
+  status = 200
+
 # Redirect verification routes to serverless functions
 [[redirects]]
   from = "/verify*"

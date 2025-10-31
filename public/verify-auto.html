@@ -246,21 +246,21 @@
         
         <h1>Verify Your Account</h1>
         <p class="subtitle">Complete verification to access the community</p>
-        
+
         <div class="user-info">
             <h3><i class="fab fa-discord"></i> Verified Discord Account</h3>
-            <p><strong>ID:</strong> <span id="userId">{{discord_id}}</span></p>
-            <p><strong>Username:</strong> <span id="userName">{{discord_username}}</span></p>
+            <p><strong>ID:</strong> <span id="userId">Loading...</span></p>
+            <p><strong>Username:</strong> <span id="userName">Loading...</span></p>
         </div>
-        
+
         <!-- Hidden fields for Discord ID and username -->
-        <input type="hidden" id="discordId" name="discordId" value="{{discord_id}}">
-        <input type="hidden" id="discordUsername" name="discordUsername" value="{{discord_username}}">
+        <input type="hidden" id="discordId" name="discordId" value="">
+        <input type="hidden" id="discordUsername" name="discordUsername" value="">
         
         <form id="verificationForm">
             <!-- Hidden fields for Discord ID and username -->
-            <input type="hidden" id="discordId" name="discordId" value="{{discord_id}}">
-            <input type="hidden" id="discordUsername" name="discordUsername" value="{{discord_username}}">
+            <input type="hidden" id="discordId" name="discordId" value="">
+            <input type="hidden" id="discordUsername" name="discordUsername" value="">
             
             <div class="form-group">
                 <div class="captcha-container" id="captchaContainer">
@@ -287,7 +287,46 @@
     <script>
         // Configuration - hCaptcha only
         const HCAPTCHA_SITE_KEY = "f9b8d3ba-9142-42c8-9ee6-57f23258f83a"; // Your hCaptcha site key
-        
+
+        // Function to extract URL parameters
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            const results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // Function to populate Discord user data
+        function populateDiscordData() {
+            const discordId = getUrlParameter('discord_id');
+            const discordUsername = getUrlParameter('discord_username');
+
+            console.log('Discord ID:', discordId);
+            console.log('Discord Username:', discordUsername);
+
+            if (discordId && discordUsername) {
+                // Update display elements
+                document.getElementById('userId').textContent = discordId;
+                document.getElementById('userName').textContent = discordUsername;
+
+                // Update all hidden fields with Discord ID
+                const discordIdFields = document.querySelectorAll('#discordId');
+                discordIdFields.forEach(field => {
+                    field.value = discordId;
+                });
+
+                // Update all hidden fields with Discord username
+                const discordUsernameFields = document.querySelectorAll('#discordUsername');
+                discordUsernameFields.forEach(field => {
+                    field.value = discordUsername;
+                });
+            } else {
+                document.getElementById('userId').textContent = 'Not available';
+                document.getElementById('userName').textContent = 'Not available';
+                showMessage('Discord user information not found. Please try logging in again.', 'error');
+            }
+        }
+
         // DOM elements
         const form = document.getElementById('verificationForm');
         const submitBtn = document.getElementById('submitBtn');
@@ -298,6 +337,9 @@
         
         // Load hCaptcha automatically when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            // Populate Discord user data from URL parameters
+            populateDiscordData();
+
             if (HCAPTCHA_SITE_KEY) {
                 loadHcaptcha();
             } else {
@@ -357,7 +399,7 @@
                     }
                 };
                 
-                // Send verification request
+                // Send verification request to serverless function
                 const response = await fetch('/verify', {
                     method: 'POST',
                     headers: {
@@ -411,13 +453,6 @@
             currentToken = token;
             console.log('hCaptcha verified:', token);
         }
-        
-        // On page load, try to auto-select hCaptcha if we have the key
-        document.addEventListener('DOMContentLoaded', function() {
-            if (HCAPTCHA_SITE_KEY) {
-                loadHcaptcha();
-            }
-        });
     </script>
 </body>
 </html>
