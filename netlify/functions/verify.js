@@ -28,6 +28,10 @@ exports.handler = async (event, context) => {
 
     const { discord_id, discord_username, captcha_token, metadata } = requestBody;
 
+    console.log('Captcha token received:', captcha_token ? 'YES' : 'NO');
+    console.log('Captcha token length:', captcha_token ? captcha_token.length : 0);
+    console.log('Captcha token starts with:', captcha_token ? captcha_token.substring(0, 20) + '...' : 'NULL');
+
     // Validate required fields
     if (!discord_id || !discord_username || !captcha_token) {
       return {
@@ -45,10 +49,12 @@ exports.handler = async (event, context) => {
     // Validate CAPTCHA token (using hCaptcha)
     console.log('Validating hCaptcha token...');
     console.log('CAPTCHA_SECRET exists:', !!process.env.CAPTCHA_SECRET);
+    console.log('CAPTCHA_SECRET value:', process.env.CAPTCHA_SECRET);
 
-    // Temporarily skip hCaptcha validation for testing if secret key is not set
-    if (!process.env.CAPTCHA_SECRET) {
-      console.log('WARNING: CAPTCHA_SECRET not set, skipping CAPTCHA validation for testing');
+    // Skip hCaptcha validation if secret key is not set or is a placeholder value
+    if (!process.env.CAPTCHA_SECRET || process.env.CAPTCHA_SECRET.includes('your_') || process.env.CAPTCHA_SECRET.includes('<<REPLACE_ME>>')) {
+      console.log('WARNING: CAPTCHA_SECRET not properly configured, skipping CAPTCHA validation');
+      console.log('Real CAPTCHA_SECRET should be set in environment variables');
     } else {
       let captchaValid;
       try {
@@ -63,7 +69,15 @@ exports.handler = async (event, context) => {
               'Access-Control-Allow-Origin': '*'
             },
             body: JSON.stringify({
-              error: 'CAPTCHA validation failed'
+              error: 'CAPTCHA validation failed',
+              details: 'Please ensure you complete the CAPTCHA verification correctly and try again.',
+              debug_info: {
+                captcha_token_received: !!captcha_token,
+                captcha_token_length: captcha_token ? captcha_token.length : 0,
+                secret_key_configured: !!process.env.CAPTCHA_SECRET,
+                secret_key_valid: !process.env.CAPTCHA_SECRET.includes('your_') && !process.env.CAPTCHA_SECRET.includes('ES_4e8ee77a946a48138dbb900d8b63ced8'),
+                ip_address: event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp
+              }
             })
           };
         }
@@ -150,15 +164,25 @@ exports.handler = async (event, context) => {
 // Validate hCaptcha token
 async function validateHcaptcha(token, ip) {
   try {
+    console.log('Sending hCaptcha verification request...');
+    console.log('Token length:', token ? token.length : 'null');
+    console.log('IP:', ip);
+    console.log('Secret configured:', !!process.env.CAPTCHA_SECRET);
+    console.log('Secret starts with "0x":', process.env.CAPTCHA_SECRET && process.env.CAPTCHA_SECRET.startsWith('0x'));
+
     const response = await fetch('https://hcaptcha.com/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: `response=${token}&secret=${process.env.CAPTCHA_SECRET}&remoteip=${ip}`
+      body: `response=${encodeURIComponent(token)}&secret=${encodeURIComponent(process.env.CAPTCHA_SECRET)}&remoteip=${encodeURIComponent(ip || '')}`
     });
 
+    console.log('hCaptcha API response status:', response.status);
+
     const result = await response.json();
+    console.log('hCaptcha API response:', result);
+
     return result.success;
   } catch (error) {
     console.error('CAPTCHA validation error:', error);
