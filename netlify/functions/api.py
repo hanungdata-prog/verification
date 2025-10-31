@@ -57,13 +57,15 @@ def handler(event, context):
         path = event.get('path', '/')
         http_method = event.get('httpMethod', 'GET')
 
-        # Check for path override in query parameters (for Discord OAuth routes)
+        # Check for route override in query parameters (for Discord OAuth routes)
         query_params = event.get('queryStringParameters') or {}
-        override_path = query_params.get('path')
+        override_route = query_params.get('route')
 
-        if override_path:
-            path = override_path
-            print(f"🔄 Path overridden to: {path}")
+        if override_route:
+            path = override_route
+            print(f"🔄 Route overridden to: {path}")
+            # Update the event path for Mangum
+            event['path'] = path
 
         # Handle routing for Discord OAuth and other paths
         if path.startswith('/discord/'):

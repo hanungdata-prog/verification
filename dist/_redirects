@@ -1,7 +1,7 @@
-# Discord OAuth routes - direct to function files
-/discord/login    /.netlify/functions/discord-login    200
-/discord/callback    /.netlify/functions/discord-callback    200
-/discord/*    /.netlify/functions/api    200
+# Discord OAuth routes - preserve path using query parameter
+/discord/login    /.netlify/functions/api?route=/discord/login    200
+/discord/callback    /.netlify/functions/api?route=/discord/callback    200
+/discord/*    /.netlify/functions/api?route=/discord/:splat    200
 
 # API routes to serverless functions
 /api/*    /.netlify/functions/api/:splat    200
