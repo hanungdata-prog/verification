@@ -1,0 +1,19 @@
+# API routes to serverless functions
+/api/*    /.netlify/functions/:splat    200
+/discord/*    /.netlify/functions/:splat    200
+
+# Verification routes to serverless functions
+/verify*    /.netlify/functions/:splat    200
+/admin/*    /.netlify/functions/:splat    200
+
+# Static files - serve directly
+/static/*    /static/:splat    200
+/public/*    /public/:splat    200
+
+# Privacy policy and other static pages
+/privacy    /privacy.html    200
+/verify.html    /verify.html    200
+/verify-auto.html    /verify-auto.html    200
+
+# Default fallback for SPA routing (index.html)
+/*    /index.html    200

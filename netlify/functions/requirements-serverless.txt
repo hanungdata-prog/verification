@@ -1,0 +1,36 @@
+# Core FastAPI dependencies for serverless deployment
+fastapi>=0.104.0
+uvicorn>=0.24.0
+
+# Serverless adapters
+mangum>=0.17.0
+
+# Data validation
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+
+# HTTP client for Discord API
+httpx>=0.25.0
+
+# Security and encryption
+cryptography>=41.0.0
+passlib>=1.7.4
+
+# Rate limiting
+slowapi>=0.1.9
+
+# Form data handling
+python-multipart>=0.0.6
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# JSON handling
+orjson>=3.9.0
+
+# Utilities
+email-validator>=2.0.0
+jinja2>=3.1.0
+
+# Logging
+structlog>=23.0.0
