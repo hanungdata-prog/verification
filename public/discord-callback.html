@@ -108,36 +108,67 @@
 
             try {
                 // Send the code to our serverless function
-                const response = await fetch('/.netlify/functions/discord_callback?code=' + encodeURIComponent(code), {
+                const response = await fetch('/.netlify/functions/discord?code=' + encodeURIComponent(code), {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 });
 
-                if (response.ok) {
-                    // If the serverless function responds correctly, it should redirect
-                    // to the verification page with user data
-                    const data = await response.json();
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
 
-                    if (data.redirect_url) {
-                        window.location.href = data.redirect_url;
+                // Check if the response is a redirect (302)
+                if (response.status === 302) {
+                    const redirectUrl = response.headers.get('Location');
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                        return;
+                    }
+                }
+
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    console.log('Content type:', contentType);
+
+                    if (contentType && contentType.includes('application/json')) {
+                        // Try to parse as JSON
+                        const data = await response.json();
+                        console.log('Received JSON data:', data);
+
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                        } else if (data.success) {
+                            // Test response - show success message
+                            document.getElementById('loader').style.display = 'none';
+                            document.getElementById('message').textContent = `Success! Received code: ${data.code.substring(0, 10)}...`;
+                            // For now, redirect to main page
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 3000);
+                        } else {
+                            document.getElementById('message').textContent = 'Login successful! Redirecting...';
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 2000);
+                        }
                     } else {
-                        document.getElementById('message').textContent = 'Login successful! Redirecting...';
-                        setTimeout(() => {
-                            window.location.href = '/';
-                        }, 2000);
+                        // Got HTML instead of JSON - likely an error page
+                        const htmlText = await response.text();
+                        console.log('Received HTML instead of JSON:', htmlText.substring(0, 200));
+                        throw new Error('Server returned HTML instead of JSON. Function may not be deployed correctly.');
                     }
                 } else {
                     const errorText = await response.text();
-                    throw new Error(`Server responded with ${response.status}: ${errorText}`);
+                    console.log('Error response:', errorText);
+                    throw new Error(`Server responded with ${response.status}: ${errorText.substring(0, 100)}`);
                 }
             } catch (error) {
                 console.error('Error during Discord callback:', error);
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('message').style.display = 'none';
                 document.getElementById('error').style.display = 'block';
-                document.getElementById('error').textContent = `Failed to process Discord login: ${error.message}`;
+                document.getElementById('error').innerHTML = `Failed to process Discord login: ${error.message}<br><br>Please try again or contact support.`;
             }
         }
 
