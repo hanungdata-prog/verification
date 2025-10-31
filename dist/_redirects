@@ -17,8 +17,12 @@
 /verify.html    /verify.html    200
 /verify-auto.html    /verify-auto.html    200
 
-# Root route
+# Root route - main page is verify.html (served as index.html)
 /    /index.html    200
+
+# Specific routes for verification pages
+/verify    /index.html    200
+/verify-auto    /verify-auto.html    200
 
 # Default fallback for SPA routing (index.html)
 /*    /index.html    200

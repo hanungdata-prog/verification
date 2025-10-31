@@ -43,7 +43,7 @@
   to = "/static/:splat"
   status = 200
 
-# Handle root and fallback
+# Handle root and fallback - main page is verify.html (served as index.html)
 [[redirects]]
   from = "/"
   to = "/index.html"
@@ -53,6 +53,17 @@
 [[redirects]]
   from = "/*"
   to = "/index.html"
+  status = 200
+
+# Specific routes for verification pages
+[[redirects]]
+  from = "/verify"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/verify-auto"
+  to = "/verify-auto.html"
   status = 200
 
 # Headers for security
