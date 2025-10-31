@@ -1,0 +1,59 @@
+[build]
+  # Build command
+  command = "npm run build"
+
+  # Publish directory for static files
+  publish = "public"
+
+  # Functions directory for serverless functions
+  functions = "api"
+
+[build.environment]
+  NODE_VERSION = "18"
+  PYTHON_VERSION = "3.9"
+
+# Redirect API routes to serverless functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Redirect Discord OAuth routes
+[[redirects]]
+  from = "/discord/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Redirect verification routes
+[[redirects]]
+  from = "/verify*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Redirect admin routes
+[[redirects]]
+  from = "/admin/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Handle all other routes to static files
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"

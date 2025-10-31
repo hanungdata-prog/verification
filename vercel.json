@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "name": "authgateway",
+  "builds": [
+    {
+      "src": "api/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/discord/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/verify(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/api/index.py"
+    },
+    {
+      "src": "/privacy",
+      "dest": "/public/privacy.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.9",
+      "includeFiles": "api/**"
+    }
+  },
+  "env": {
+    "PYTHONPATH": "$PYTHONPATH:/var/task",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "build": {
+    "env": {
+      "PYTHONPATH": "$PYTHONPATH:/var/task"
+    }
+  }
+}
