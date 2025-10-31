@@ -13,20 +13,10 @@
   PYTHON_VERSION = "3.9"
   PYTHONPATH = "/opt/buildhome/repo/netlify/functions"
 
-# Discord OAuth routes - preserve path using query parameter
-[[redirects]]
-  from = "/discord/login"
-  to = "/.netlify/functions/api?route=/discord/login"
-  status = 200
-
+# Discord OAuth routes - serve callback page directly
 [[redirects]]
   from = "/discord/callback"
-  to = "/.netlify/functions/api?route=/discord/callback"
-  status = 200
-
-[[redirects]]
-  from = "/discord/*"
-  to = "/.netlify/functions/api?route=/discord/:splat"
+  to = "/discord-callback.html"
   status = 200
 
 # API routes to serverless functions
