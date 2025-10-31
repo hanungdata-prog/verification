@@ -446,7 +446,8 @@
                 }
                 
                 const result = await response.json();
-                
+                console.log('Verification response:', result);
+
                 if (response.ok) {
                     console.log('Verification response:', result);
                     showMessage(result.message || 'Verification successful! Redirecting to Discord...', 'success');
@@ -455,7 +456,10 @@
                         window.location.href = result.redirect_url || 'https://discord.gg/UNpRpJMt';
                     }, 2000);
                 } else {
-                    showMessage(result.message || 'Verification failed', 'error');
+                    console.error('Verification failed:', result);
+                    const errorMessage = result.error || result.message || 'Verification failed';
+                    const details = result.details ? ` (${result.details})` : '';
+                    showMessage(`${errorMessage}${details}`, 'error');
                 }
             } catch (error) {
                 console.error('Verification error:', error);

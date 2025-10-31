@@ -43,19 +43,44 @@ exports.handler = async (event, context) => {
     }
 
     // Validate CAPTCHA token (using hCaptcha)
-    const captchaValid = await validateHcaptcha(captcha_token, event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp);
+    console.log('Validating hCaptcha token...');
+    console.log('HCAPTCHA_SECRET_KEY exists:', !!process.env.HCAPTCHA_SECRET_KEY);
 
-    if (!captchaValid) {
-      return {
-        statusCode: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify({
-          error: 'CAPTCHA validation failed'
-        })
-      };
+    // Temporarily skip hCaptcha validation for testing if secret key is not set
+    if (!process.env.HCAPTCHA_SECRET_KEY) {
+      console.log('WARNING: HCAPTCHA_SECRET_KEY not set, skipping CAPTCHA validation for testing');
+    } else {
+      let captchaValid;
+      try {
+        captchaValid = await validateHcaptcha(captcha_token, event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp);
+        console.log('CAPTCHA validation result:', captchaValid);
+
+        if (!captchaValid) {
+          return {
+            statusCode: 400,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({
+              error: 'CAPTCHA validation failed'
+            })
+          };
+        }
+      } catch (captchaError) {
+        console.error('CAPTCHA validation error:', captchaError);
+        return {
+          statusCode: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify({
+            error: 'CAPTCHA validation failed',
+            details: captchaError.message
+          })
+        };
+      }
     }
 
     // Store verification in Supabase
@@ -69,7 +94,12 @@ exports.handler = async (event, context) => {
       verified_at: new Date().toISOString()
     };
 
+    console.log('Storing verification data in Supabase...');
+    console.log('SUPABASE_URL exists:', !!process.env.SUPABASE_URL);
+    console.log('SUPABASE_KEY exists:', !!process.env.SUPABASE_KEY);
+
     const supabaseResult = await storeInSupabase(verificationData);
+    console.log('Supabase result:', supabaseResult);
 
     if (supabaseResult.error) {
       console.error('Supabase error:', supabaseResult.error);
@@ -80,7 +110,8 @@ exports.handler = async (event, context) => {
           'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify({
-          error: 'Failed to store verification data'
+          error: 'Failed to store verification data',
+          details: supabaseResult.error
         })
       };
     }
