@@ -4,11 +4,11 @@
 # API routes to serverless functions
 /api/*    /.netlify/functions/api/:splat    200
 
-# Direct verify route to serverless function
-/verify    /.netlify/functions/api    200
+# Direct verify route to dedicated serverless function
+/verify    /.netlify/functions/verify    200
 
-# Verification routes to serverless functions
-/verify*    /.netlify/functions/api/:splat    200
+# Other verification routes to serverless functions (but not /verify itself)
+/verify/*    /.netlify/functions/api/:splat    200
 /admin/*    /.netlify/functions/api/:splat    200
 
 # Static files - serve directly

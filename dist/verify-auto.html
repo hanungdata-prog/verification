@@ -400,13 +400,50 @@
                 };
                 
                 // Send verification request to serverless function
-                const response = await fetch('/verify', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestData)
-                });
+                console.log('Sending verification request:', requestData);
+                console.log('Request URL: /verify');
+
+                let response;
+                try {
+                    // Try the main endpoint first
+                    response = await fetch('/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestData)
+                    });
+
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+
+                    // If the main endpoint fails, try the direct function endpoint
+                    if (!response.ok) {
+                        console.log('Main endpoint failed, trying direct function endpoint...');
+                        response = await fetch('/.netlify/functions/verify', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(requestData)
+                        });
+
+                        console.log('Direct function response status:', response.status);
+                        console.log('Direct function response headers:', response.headers);
+                    }
+                } catch (fetchError) {
+                    console.error('Fetch error, trying direct function endpoint:', fetchError);
+                    response = await fetch('/.netlify/functions/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestData)
+                    });
+
+                    console.log('Fallback response status:', response.status);
+                    console.log('Fallback response headers:', response.headers);
+                }
                 
                 const result = await response.json();
                 

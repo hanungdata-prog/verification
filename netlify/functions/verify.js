@@ -2,8 +2,11 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
   try {
-    console.log('Verification function called');
+    console.log('=== VERIFICATION FUNCTION CALLED ===');
     console.log('HTTP Method:', event.httpMethod);
+    console.log('Path:', event.path);
+    console.log('Headers:', JSON.stringify(event.headers, null, 2));
+    console.log('Body:', event.body);
 
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
