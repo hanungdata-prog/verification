@@ -22,7 +22,7 @@ if not os.getenv('BASE_URL'):
 
 # Set Discord redirect URI if not already set
 if not os.getenv('DISCORD_REDIRECT_URI'):
-    base_url = os.getenv('BASE_URL', 'https://verification-gateway.netlify.app')
+    base_url = os.getenv('BASE_URL', 'https://verification-gateway.netlify.app/discord/callback')
     discord_redirect_uri = f"{base_url}/discord/callback"
     os.environ.setdefault('DISCORD_REDIRECT_URI', discord_redirect_uri)
 
