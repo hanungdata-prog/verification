@@ -42,13 +42,14 @@ async function buildFunctions() {
       }
     }
 
-    // Create main serverless function
+    // Create main serverless function with improved routing
     const mainFunction = `#!/usr/bin/env python3
 """
 Netlify serverless function for AuthGateway
 """
 import sys
 import os
+import json
 from pathlib import Path
 
 # Add the app directory to Python path
@@ -77,23 +78,64 @@ except ImportError as e:
 # AWS Lambda / Netlify Functions handler
 def handler(event, context):
     """
-    Netlify Functions handler
+    Netlify Functions handler with path routing support
     """
     try:
-        # Parse the event for AWS Lambda format
+        # Import mangum for FastAPI adapter
         from mangum import Mangum
+
+        # Extract path from event
+        path = event.get('path', '/')
+        http_method = event.get('httpMethod', 'GET')
+
+        # Handle routing for Discord OAuth and other paths
+        if path.startswith('/discord/'):
+            # Discord OAuth routes
+            print(f"🔗 Discord OAuth route: {http_method} {path}")
+        elif path.startswith('/api/'):
+            # API routes
+            print(f"🔌 API route: {http_method} {path}")
+        elif path.startswith('/verify') or path.startswith('/admin'):
+            # Verification and admin routes
+            print(f"✅ Verification route: {http_method} {path}")
+        else:
+            # Root and other routes
+            print(f"🏠 Root route: {http_method} {path}")
+
+        # Use Mangum to handle FastAPI app
         mangum_handler = Mangum(app)
         return mangum_handler(event, context)
+
     except ImportError:
         # Fallback without mangum
-        import json
+        print("⚠️ Mangum not available, using fallback mode")
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
             'body': json.dumps({
                 "message": "AuthGateway is running",
                 "status": "serverless fallback mode",
-                "note": "Install mangum for full functionality"
+                "note": "Install mangum for full functionality",
+                "path": event.get('path', '/'),
+                "method": event.get('httpMethod', 'GET')
+            })
+        }
+    except Exception as e:
+        # Error handling
+        print(f"❌ Error in handler: {e}")
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                "error": "Internal server error",
+                "message": str(e),
+                "path": event.get('path', '/')
             })
         }
 

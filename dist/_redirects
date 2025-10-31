@@ -1,10 +1,14 @@
+# Discord OAuth routes - MUST be first to take precedence
+/discord/login    /.netlify/functions/api/discord/login    200
+/discord/callback    /.netlify/functions/api/discord/callback    200
+/discord/*    /.netlify/functions/api/discord/:splat    200
+
 # API routes to serverless functions
-/api/*    /.netlify/functions/:splat    200
-/discord/*    /.netlify/functions/:splat    200
+/api/*    /.netlify/functions/api/:splat    200
 
 # Verification routes to serverless functions
-/verify*    /.netlify/functions/:splat    200
-/admin/*    /.netlify/functions/:splat    200
+/verify*    /.netlify/functions/api/:splat    200
+/admin/*    /.netlify/functions/api/:splat    200
 
 # Static files - serve directly
 /static/*    /static/:splat    200
@@ -14,6 +18,9 @@
 /privacy    /privacy.html    200
 /verify.html    /verify.html    200
 /verify-auto.html    /verify-auto.html    200
+
+# Root route
+/    /index.html    200
 
 # Default fallback for SPA routing (index.html)
 /*    /index.html    200
