@@ -52,7 +52,7 @@ exports.handler = async (event, context) => {
     console.log('CAPTCHA_SECRET value:', process.env.CAPTCHA_SECRET);
 
     // Skip hCaptcha validation if secret key is not set or is a placeholder value
-    if (!process.env.CAPTCHA_SECRET || process.env.CAPTCHA_SECRET.includes('your_') || process.env.CAPTCHA_SECRET.includes('<<REPLACE_ME>>')) {
+    if (!process.env.CAPTCHA_SECRET || process.env.CAPTCHA_SECRET.includes('your_') || process.env.CAPTCHA_SECRET.includes('ES_4e8ee77a946a48138dbb900d8b63ced8')) {
       console.log('WARNING: CAPTCHA_SECRET not properly configured, skipping CAPTCHA validation');
       console.log('Real CAPTCHA_SECRET should be set in environment variables');
     } else {
