@@ -57,6 +57,14 @@ def handler(event, context):
         path = event.get('path', '/')
         http_method = event.get('httpMethod', 'GET')
 
+        # Check for path override in query parameters (for Discord OAuth routes)
+        query_params = event.get('queryStringParameters') or {}
+        override_path = query_params.get('path')
+
+        if override_path:
+            path = override_path
+            print(f"🔄 Path overridden to: {path}")
+
         # Handle routing for Discord OAuth and other paths
         if path.startswith('/discord/'):
             # Discord OAuth routes

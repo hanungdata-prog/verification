@@ -102,6 +102,14 @@ def handler(event, context):
         path = event.get('path', '/')
         http_method = event.get('httpMethod', 'GET')
 
+        # Check for path override in query parameters (for Discord OAuth routes)
+        query_params = event.get('queryStringParameters') or {}
+        override_path = query_params.get('path')
+
+        if override_path:
+            path = override_path
+            print(f"🔄 Path overridden to: {path}")
+
         # Handle routing for Discord OAuth and other paths
         if path.startswith('/discord/'):
             # Discord OAuth routes
@@ -164,6 +172,140 @@ if __name__ == "__main__":
 
     await fs.writeFile('netlify/functions/api.py', mainFunction);
     log.success('Created main serverless function');
+
+    // Create Discord login function
+    const discordLoginFunction = `#!/usr/bin/env python3
+"""
+Netlify serverless function for Discord OAuth login
+"""
+import sys
+import os
+import json
+from pathlib import Path
+
+# Add the app directory to Python path
+current_dir = Path(__file__).parent
+sys.path.insert(0, str(current_dir))
+
+# Set environment variables for serverless
+os.environ.setdefault('PYTHONPATH', str(current_dir))
+os.environ.setdefault('PYTHONUNBUFFERED', '1')
+
+# Set BASE_URL for Netlify deployment
+if not os.getenv('BASE_URL'):
+    netlify_url = os.getenv('URL') or os.getenv('NETLIFY_URL') or 'https://verification-gateway-joblow.netlify.app'
+    os.environ.setdefault('BASE_URL', netlify_url)
+
+# Set Discord redirect URI if not already set
+if not os.getenv('DISCORD_REDIRECT_URI'):
+    base_url = os.getenv('BASE_URL', 'https://verification-gateway-joblow.netlify.app')
+    discord_redirect_uri = f"{base_url}/discord/callback"
+    os.environ.setdefault('DISCORD_REDIRECT_URI', discord_redirect_uri)
+
+# Import the FastAPI app
+try:
+    from app.main import app
+    from mangum import Mangum
+
+    # Create a handler that specifically handles the Discord login path
+    def handler(event, context):
+        # Override the path to /discord/login
+        event['path'] = '/discord/login'
+
+        # Use Mangum to handle FastAPI app
+        mangum_handler = Mangum(app)
+        return mangum_handler(event, context)
+
+    # Export for Netlify
+    lambda_handler = handler
+
+except ImportError as e:
+    # Fallback response
+    def handler(event, context):
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                "error": "Serverless function not properly configured",
+                "message": str(e)
+            })
+        }
+
+    lambda_handler = handler
+`;
+
+    await fs.writeFile('netlify/functions/discord-login.py', discordLoginFunction);
+    log.success('Created Discord login function');
+
+    // Create Discord callback function
+    const discordCallbackFunction = `#!/usr/bin/env python3
+"""
+Netlify serverless function for Discord OAuth callback
+"""
+import sys
+import os
+import json
+from pathlib import Path
+
+# Add the app directory to Python path
+current_dir = Path(__file__).parent
+sys.path.insert(0, str(current_dir))
+
+# Set environment variables for serverless
+os.environ.setdefault('PYTHONPATH', str(current_dir))
+os.environ.setdefault('PYTHONUNBUFFERED', '1')
+
+# Set BASE_URL for Netlify deployment
+if not os.getenv('BASE_URL'):
+    netlify_url = os.getenv('URL') or os.getenv('NETLIFY_URL') or 'https://verification-gateway-joblow.netlify.app'
+    os.environ.setdefault('BASE_URL', netlify_url)
+
+# Set Discord redirect URI if not already set
+if not os.getenv('DISCORD_REDIRECT_URI'):
+    base_url = os.getenv('BASE_URL', 'https://verification-gateway-joblow.netlify.app')
+    discord_redirect_uri = f"{base_url}/discord/callback"
+    os.environ.setdefault('DISCORD_REDIRECT_URI', discord_redirect_uri)
+
+# Import the FastAPI app
+try:
+    from app.main import app
+    from mangum import Mangum
+
+    # Create a handler that specifically handles the Discord callback path
+    def handler(event, context):
+        # Override the path to /discord/callback
+        event['path'] = '/discord/callback'
+
+        # Use Mangum to handle FastAPI app
+        mangum_handler = Mangum(app)
+        return mangum_handler(event, context)
+
+    # Export for Netlify
+    lambda_handler = handler
+
+except ImportError as e:
+    # Fallback response
+    def handler(event, context):
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                "error": "Serverless function not properly configured",
+                "message": str(e)
+            })
+        }
+
+    lambda_handler = handler
+`;
+
+    await fs.writeFile('netlify/functions/discord-callback.py', discordCallbackFunction);
+    log.success('Created Discord callback function');
 
     log.success('Serverless functions build completed!');
     log.info('Functions ready in netlify/functions/ directory');
