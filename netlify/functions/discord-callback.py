@@ -17,7 +17,7 @@ os.environ.setdefault('PYTHONUNBUFFERED', '1')
 
 # Set BASE_URL for Netlify deployment
 if not os.getenv('BASE_URL'):
-    netlify_url = os.getenv('URL') or os.getenv('NETLIFY_URL') or 'https://verification-gateway.netlify.app'
+    netlify_url = os.getenv('URL') or os.getenv('NETLIFY_URL') or 'https://verification-gateway.netlify.app/discord/callback'
     os.environ.setdefault('BASE_URL', netlify_url)
 
 # Set Discord redirect URI if not already set
