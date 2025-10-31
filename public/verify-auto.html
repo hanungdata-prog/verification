@@ -411,22 +411,22 @@
                 const result = await response.json();
                 
                 if (response.ok) {
+                    console.log('Verification response:', result);
                     showMessage(result.message || 'Verification successful! Redirecting to Discord...', 'success');
                     // Redirect to Discord after success
                     setTimeout(() => {
-                        // You should replace this with your actual Discord server invite link
-                        window.open('https://discord.gg/wfsh9cH7', '_blank');
-                        // Optionally close the current window/tab after a delay
-                        setTimeout(() => {
-                            window.close(); // This may not work in all browsers for security reasons
-                        }, 3000);
+                        window.location.href = result.redirect_url || 'https://discord.gg/UNpRpJMt';
                     }, 2000);
                 } else {
                     showMessage(result.message || 'Verification failed', 'error');
                 }
             } catch (error) {
                 console.error('Verification error:', error);
-                showMessage('An error occurred. Please try again.', 'error');
+                if (error.message.includes('Unexpected token')) {
+                    showMessage('Server error: Invalid response format. The /verify endpoint may not be configured correctly.', 'error');
+                } else {
+                    showMessage(`Verification error: ${error.message}`, 'error');
+                }
             } finally {
                 // Re-enable submit button and hide loading
                 submitBtn.disabled = false;
