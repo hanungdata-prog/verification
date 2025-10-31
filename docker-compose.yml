@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  fastapi:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/verifications
+      - FERNET_KEY=IiJpVyDpFqGvWrHtKsLmNjByQzXcVbAeOdRgTfSpJkLmNpQrStUvWxYzAbCdEfGh
+      - CAPTCHA_PROVIDER=recaptcha
+      - CAPTCHA_SECRET=your_captcha_secret
+      - DISCORD_WEBHOOK_URL=your_discord_webhook_url
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=securepassword
+    depends_on:
+      - db
+    volumes:
+      - ./logs:/app/logs  # Mount logs directory for persistence
+    restart: unless-stopped
+    networks:
+      - app-network
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    environment:
+      - TZ=UTC
+    command: python run_server.py
+
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=verifications
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    environment:
+      - TZ=UTC
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
