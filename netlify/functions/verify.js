@@ -52,14 +52,155 @@ exports.handler = async (event, context) => {
     console.log('CAPTCHA_SECRET value:', process.env.CAPTCHA_SECRET);
 
     // Skip hCaptcha validation if secret key is not set or is a placeholder value
-    if (!process.env.CAPTCHA_SECRET || process.env.CAPTCHA_SECRET.includes('your_') || process.env.CAPTCHA_SECRET.includes('ES_4e8ee77a946a48138dbb900d8b63ced8')) {
+    const isPlaceholderSecret = !process.env.CAPTCHA_SECRET || 
+                               process.env.CAPTCHA_SECRET.includes('ES_67a2630d8c19468297fa9832fb8966c6') || 
+                               process.env.CAPTCHA_SECRET.includes('ES_67a2630d8c19468297fa9832fb8966c6') ||
+                               process.env.CAPTCHA_SECRET.trim() === '';
+                               
+    console.log('CAPTCHA_SECRET analysis:');
+    console.log('- CAPTCHA_SECRET exists:', !!process.env.CAPTCHA_SECRET);
+    console.log('- CAPTCHA_SECRET length:', process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.length : 0);
+    console.log('- Is placeholder:', isPlaceholderSecret);
+    console.log('- CAPTCHA_SECRET preview:', process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.substring(0, 10) + '...' : 'N/A');
+    
+    // Check if we have a standard hCaptcha token (starts with 0x and reasonable length)
+    // Or a custom token (starts with P1_ or similar)
+    const isStandardHcaptchaToken = captcha_token && 
+                                   captcha_token.startsWith('0x') && 
+                                   captcha_token.length > 20 && 
+                                   captcha_token.length < 200;
+                                   
+    const isCustomToken = captcha_token && captcha_token.startsWith('P1_');
+
+    console.log('Token analysis:');
+    console.log('- Standard hCaptcha format:', isStandardHcaptchaToken);
+    console.log('- Custom token format:', isCustomToken);
+    console.log('- Token length:', captcha_token ? captcha_token.length : 0);
+    console.log('- Token starts with:', captcha_token ? captcha_token.substring(0, 5) : 'N/A');
+
+    if (isPlaceholderSecret) {
       console.log('WARNING: CAPTCHA_SECRET not properly configured, skipping CAPTCHA validation');
       console.log('Real CAPTCHA_SECRET should be set in environment variables');
+    } else if (isCustomToken) {
+      // If this is a custom token (P1_ format), we need to extract the actual hCaptcha token
+      console.log('Processing custom token format - attempting to extract hCaptcha token');
+      
+      // The format appears to be P1_.[JWT_HEADER].[JWT_PAYLOAD].[JWT_SIGNATURE]
+      // Let's try to decode the JWT payload to see if it contains the original hCaptcha token
+      let extractedToken = captcha_token;
+      let useCustom = true;
+      
+      if (captcha_token.startsWith('P1_')) {
+        try {
+          const tokenWithoutPrefix = captcha_token.substring(3); // Remove "P1_" prefix
+          const parts = tokenWithoutPrefix.split('.');
+          
+          if (parts.length === 3) {
+            // Decode the JWT payload (middle part) to check for hCaptcha token
+            const payloadB64 = parts[1];
+            // Add padding if necessary
+            const padding = '='.repeat((4 - payloadB64.length % 4) % 4);
+            const payloadPadded = payloadB64 + padding;
+            const payloadDecoded = Buffer.from(payloadPadded, 'base64').toString('utf8');
+            const payloadObj = JSON.parse(payloadDecoded);
+            
+            console.log('Decoded JWT payload:', payloadObj);
+            
+            // Check if the payload contains the original hCaptcha token
+            // Common field names where it might be stored
+            if (payloadObj.original_token || payloadObj.hcaptcha_token || payloadObj.token) {
+              const originalHcaptchaToken = payloadObj.original_token || 
+                                           payloadObj.hcaptcha_token || 
+                                           payloadObj.token;
+              
+              console.log('Found potential hCaptcha token inside JWT:', originalHcaptchaToken.substring(0, 20) + '...');
+              
+              // Validate the original hCaptcha token instead
+              let captchaValid = await validateHcaptcha(originalHcaptchaToken, event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp);
+              console.log('Original hCaptcha token validation result:', captchaValid);
+              
+              if (!captchaValid) {
+                return {
+                  statusCode: 400,
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                  },
+                  body: JSON.stringify({
+                    error: 'CAPTCHA validation failed',
+                    details: 'Please ensure you complete the CAPTCHA verification correctly and try again.',
+                    debug_info: {
+                      captcha_token_received: !!captcha_token,
+                      captcha_token_length: captcha_token ? captcha_token.length : 0,
+                      captcha_token_format: isStandardHcaptchaToken ? 'standard' : isCustomToken ? 'custom' : 'unknown',
+                      original_hcaptcha_token_found: !!originalHcaptchaToken,
+                      original_hcaptcha_token_length: originalHcaptchaToken ? originalHcaptchaToken.length : 0,
+                      original_token_format_valid: originalHcaptchaToken?.startsWith('0x') || false,
+                      secret_key_configured: !!process.env.CAPTCHA_SECRET,
+                      secret_key_length: process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.length : 0,
+                      secret_key_is_placeholder: isPlaceholderSecret,
+                      ip_address: event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp
+                    }
+                  })
+                };
+              } else {
+                console.log('Original hCaptcha token validation successful');
+              }
+              useCustom = false; // We've already validated with the original token
+            } else {
+              console.log('No hCaptcha token found inside JWT payload');
+            }
+          }
+        } catch (decodeError) {
+          console.error('Error decoding custom token:', decodeError);
+          // If decoding fails, proceed with the original custom token
+        }
+      }
+      
+      // If we didn't find and validate an original hCaptcha token inside the JWT,
+      // try validating the custom token as-is (which will likely fail)
+      if (useCustom) {
+        let captchaValid = false;
+        try {
+          captchaValid = await validateHcaptcha(extractedToken, event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp);
+          console.log('Custom token validation result:', captchaValid);
+        } catch (captchaError) {
+          console.error('Custom token validation error:', captchaError);
+        }
+        
+        if (!captchaValid) {
+          return {
+            statusCode: 400,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            },
+            body: JSON.stringify({
+              error: 'CAPTCHA validation failed',
+              details: 'Please ensure you complete the CAPTCHA verification correctly and try again. Custom token format detected.',
+              debug_info: {
+                captcha_token_received: !!captcha_token,
+                captcha_token_length: captcha_token ? captcha_token.length : 0,
+                captcha_token_format: isStandardHcaptchaToken ? 'standard' : isCustomToken ? 'custom' : 'unknown',
+                secret_key_configured: !!process.env.CAPTCHA_SECRET,
+                secret_key_length: process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.length : 0,
+                secret_key_is_placeholder: isPlaceholderSecret,
+                secret_key_preview: process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.substring(0, 15) + '...' : 'N/A',
+                ip_address: event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp
+              }
+            })
+          };
+        } else {
+          console.log('Custom token validation successful');
+        }
+      }
     } else {
+      // Process as standard hCaptcha token
       let captchaValid;
       try {
+        console.log('Starting standard CAPTCHA validation with token length:', captcha_token ? captcha_token.length : 0);
         captchaValid = await validateHcaptcha(captcha_token, event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp);
-        console.log('CAPTCHA validation result:', captchaValid);
+        console.log('Standard CAPTCHA validation result:', captchaValid);
 
         if (!captchaValid) {
           return {
@@ -74,15 +215,20 @@ exports.handler = async (event, context) => {
               debug_info: {
                 captcha_token_received: !!captcha_token,
                 captcha_token_length: captcha_token ? captcha_token.length : 0,
+                captcha_token_format: isStandardHcaptchaToken ? 'standard' : isCustomToken ? 'custom' : 'unknown',
                 secret_key_configured: !!process.env.CAPTCHA_SECRET,
-                secret_key_valid: !process.env.CAPTCHA_SECRET.includes('your_') && !process.env.CAPTCHA_SECRET.includes('ES_4e8ee77a946a48138dbb900d8b63ced8'),
+                secret_key_length: process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.length : 0,
+                secret_key_is_placeholder: isPlaceholderSecret,
+                secret_key_preview: process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.substring(0, 15) + '...' : 'N/A',
                 ip_address: event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp
               }
             })
           };
+        } else {
+          console.log('Standard CAPTCHA validation successful');
         }
       } catch (captchaError) {
-        console.error('CAPTCHA validation error:', captchaError);
+        console.error('Standard CAPTCHA validation error:', captchaError);
         return {
           statusCode: 400,
           headers: {
@@ -170,7 +316,7 @@ async function validateHcaptcha(token, ip) {
     console.log('Secret configured:', !!process.env.CAPTCHA_SECRET);
     console.log('Secret starts with "0x":', process.env.CAPTCHA_SECRET && process.env.CAPTCHA_SECRET.startsWith('0x'));
 
-    const response = await fetch('https://hcaptcha.com/siteverify', {
+    const response = await fetch('https://api.hcaptcha.com/siteverify', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
