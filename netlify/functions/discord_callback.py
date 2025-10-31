@@ -55,7 +55,7 @@ async def handler(event, context):
         # Discord OAuth configuration
         client_id = os.getenv("DISCORD_CLIENT_ID")
         client_secret = os.getenv("DISCORD_CLIENT_SECRET")
-        redirect_uri = os.getenv("DISCORD_REDIRECT_URI", f"{os.getenv('BASE_URL', 'https://verification-gateway-joblow.netlify.app')}/discord/callback")
+        redirect_uri = os.getenv("DISCORD_REDIRECT_URI", f"{os.getenv('BASE_URL', 'https://verification-gateway.netlify.app')}/discord/callback")
 
         if not client_id or not client_secret:
             return {
