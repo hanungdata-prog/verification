@@ -133,8 +133,10 @@ async def discord_login():
     return RedirectResponse(url=discord_auth_url)
 
 @app.get("/discord/callback")
-async def discord_callback(code: str = Query(...), error: str = None, error_description: str = None):
+async def discord_callback(request: Request, code: str = Query(None), error: str = None, error_description: str = None):
     """Handle Discord OAuth2 callback and redirect to verification page"""
+    logger.info(f"Discord callback received - Code: {code[:20] if code else 'None'}..., Error: {error}")
+
     if error:
         logger.error(f"Discord OAuth2 error: {error} - {error_description}")
         return HTMLResponse(content=f"""
@@ -147,12 +149,57 @@ async def discord_callback(code: str = Query(...), error: str = None, error_desc
         </html>
         """)
 
+    if not code:
+        logger.error("No authorization code received from Discord")
+        return HTMLResponse(content=f"""
+        <html>
+        <body style="font-family: Arial; text-align: center; margin: 50px;">
+            <h1 style="color: red;">❌ Authorization Failed</h1>
+            <p>No authorization code received from Discord.</p>
+            <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+        </body>
+        </html>
+        """)
+
+    # Get environment variables
     client_id = os.getenv("DISCORD_CLIENT_ID")
     client_secret = os.getenv("DISCORD_CLIENT_SECRET")
     redirect_uri = os.getenv("DISCORD_REDIRECT_URI")
 
-    if not client_id or not client_secret:
-        raise HTTPException(status_code=500, detail="Discord credentials not configured")
+    logger.info(f"Discord credentials - Client ID: {client_id}, Redirect URI: {redirect_uri}")
+
+    if not client_id:
+        logger.error("DISCORD_CLIENT_ID not configured")
+        return HTMLResponse(content="""
+        <html>
+        <body style="font-family: Arial; text-align: center; margin: 50px;">
+            <h1 style="color: red;">❌ Configuration Error</h1>
+            <p>Discord client ID not configured.</p>
+        </body>
+        </html>
+        """)
+
+    if not client_secret:
+        logger.error("DISCORD_CLIENT_SECRET not configured")
+        return HTMLResponse(content="""
+        <html>
+        <body style="font-family: Arial; text-align: center; margin: 50px;">
+            <h1 style="color: red;">❌ Configuration Error</h1>
+            <p>Discord client secret not configured.</p>
+        </body>
+        </html>
+        """)
+
+    if not redirect_uri:
+        logger.error("DISCORD_REDIRECT_URI not configured")
+        return HTMLResponse(content="""
+        <html>
+        <body style="font-family: Arial; text-align: center; margin: 50px;">
+            <h1 style="color: red;">❌ Configuration Error</h1>
+            <p>Discord redirect URI not configured.</p>
+        </body>
+        </html>
+        """)
 
     # Exchange code for access token
     token_data = {
@@ -164,51 +211,151 @@ async def discord_callback(code: str = Query(...), error: str = None, error_desc
     }
 
     try:
-        async with httpx.AsyncClient() as client:
-            token_response = await client.post("https://discord.com/api/oauth2/token", data=token_data)
+        logger.info("Exchanging authorization code for access token...")
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            token_response = await client.post(
+                "https://discord.com/api/oauth2/token",
+                data=token_data,
+                headers={"Content-Type": "application/x-www-form-urlencoded"}
+            )
+
+            logger.info(f"Token response status: {token_response.status_code}")
+            logger.info(f"Token response: {token_response.text[:200]}...")
 
             if token_response.status_code != 200:
-                logger.error(f"Failed to get access token from Discord: {token_response.text}")
-                raise HTTPException(status_code=400, detail="Failed to get access token from Discord")
+                error_msg = f"Failed to get access token from Discord: {token_response.text}"
+                logger.error(error_msg)
+                return HTMLResponse(content=f"""
+                <html>
+                <body style="font-family: Arial; text-align: center; margin: 50px;">
+                    <h1 style="color: red;">❌ Token Exchange Failed</h1>
+                    <p>Failed to get access token from Discord.</p>
+                    <p><small>Status: {token_response.status_code}</small></p>
+                    <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+                </body>
+                </html>
+                """)
 
-            token_json = token_response.json()
+            try:
+                token_json = token_response.json()
+            except Exception as e:
+                logger.error(f"Failed to parse token response JSON: {e}")
+                return HTMLResponse(content=f"""
+                <html>
+                <body style="font-family: Arial; text-align: center; margin: 50px;">
+                    <h1 style="color: red;">❌ Token Response Error</h1>
+                    <p>Invalid response from Discord token endpoint.</p>
+                    <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+                </body>
+                </html>
+                """)
+
             access_token = token_json.get("access_token")
 
             if not access_token:
-                raise HTTPException(status_code=400, detail="No access token received from Discord")
+                logger.error(f"No access token in response: {token_json}")
+                return HTMLResponse(content=f"""
+                <html>
+                <body style="font-family: Arial; text-align: center; margin: 50px;">
+                    <h1 style="color: red;">❌ Token Missing</h1>
+                    <p>No access token received from Discord.</p>
+                    <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+                </body>
+                </html>
+                """)
+
+            logger.info("Successfully obtained access token")
 
             # Get user info
+            logger.info("Fetching user information from Discord...")
             user_response = await client.get(
                 "https://discord.com/api/users/@me",
                 headers={"Authorization": f"Bearer {access_token}"}
             )
 
-            if user_response.status_code != 200:
-                logger.error(f"Failed to get user info from Discord: {user_response.text}")
-                raise HTTPException(status_code=400, detail="Failed to get user info from Discord")
+            logger.info(f"User response status: {user_response.status_code}")
+            logger.info(f"User response: {user_response.text[:200]}...")
 
-            user_data = user_response.json()
+            if user_response.status_code != 200:
+                error_msg = f"Failed to get user info from Discord: {user_response.text}"
+                logger.error(error_msg)
+                return HTMLResponse(content=f"""
+                <html>
+                <body style="font-family: Arial; text-align: center; margin: 50px;">
+                    <h1 style="color: red;">❌ User Info Failed</h1>
+                    <p>Failed to get user information from Discord.</p>
+                    <p><small>Status: {user_response.status_code}</small></p>
+                    <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+                </body>
+                </html>
+                """)
+
+            try:
+                user_data = user_response.json()
+            except Exception as e:
+                logger.error(f"Failed to parse user response JSON: {e}")
+                return HTMLResponse(content=f"""
+                <html>
+                <body style="font-family: Arial; text-align: center; margin: 50px;">
+                    <h1 style="color: red;">❌ User Response Error</h1>
+                    <p>Invalid response from Discord user endpoint.</p>
+                    <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+                </body>
+                </html>
+                """)
+
+            logger.info(f"Successfully retrieved user data: {user_data}")
 
             # Prepare user data
             discord_user = {
-                "id": user_data["id"],
-                "username": user_data["username"],
-                "discriminator": user_data["discriminator"],
+                "id": user_data.get("id", ""),
+                "username": user_data.get("username", ""),
+                "discriminator": user_data.get("discriminator", ""),
                 "avatar": user_data.get("avatar"),
-                "full_username": f"{user_data['username']}#{user_data['discriminator']}"
+                "full_username": f"{user_data.get('username', '')}#{user_data.get('discriminator', '')}"
             }
+
+            # Validate required fields
+            if not discord_user["id"] or not discord_user["username"]:
+                logger.error(f"Invalid user data received: {discord_user}")
+                return HTMLResponse(content=f"""
+                <html>
+                <body style="font-family: Arial; text-align: center; margin: 50px;">
+                    <h1 style="color: red;">❌ Invalid User Data</h1>
+                    <p>Received invalid user data from Discord.</p>
+                    <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+                </body>
+                </html>
+                """)
 
             # Redirect to auto-verification page with user data
             redirect_url = f"/verify-auto.html?discord_id={discord_user['id']}&discord_username={discord_user['full_username']}"
-            logger.info(f"Redirecting to: {redirect_url}")
+            logger.info(f"Successfully authenticated user {discord_user['full_username']}, redirecting to: {redirect_url}")
             return RedirectResponse(url=redirect_url)
 
     except httpx.RequestError as e:
         logger.error(f"HTTP request error during Discord OAuth2: {str(e)}")
-        raise HTTPException(status_code=500, detail="Network error during Discord authentication")
+        return HTMLResponse(content=f"""
+        <html>
+        <body style="font-family: Arial; text-align: center; margin: 50px;">
+            <h1 style="color: red;">❌ Network Error</h1>
+            <p>Network error during Discord authentication: {str(e)}</p>
+            <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+        </body>
+        </html>
+        """)
     except Exception as e:
-        logger.error(f"Unexpected error during Discord OAuth2: {str(e)}")
-        raise HTTPException(status_code=500, detail="Internal server error during Discord authentication")
+        logger.error(f"Unexpected error during Discord OAuth2: {str(e)}", exc_info=True)
+        return HTMLResponse(content=f"""
+        <html>
+        <body style="font-family: Arial; text-align: center; margin: 50px;">
+            <h1 style="color: red;">❌ Unexpected Error</h1>
+            <p>An unexpected error occurred: {str(e)}</p>
+            <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+        </body>
+        </html>
+        """)
 
 @app.post("/verify", response_model=VerificationResponse)
 @limiter.limit("5 per 10 minutes")
