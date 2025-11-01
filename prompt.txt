@@ -1,0 +1,229 @@
+FIX THIS ERROR USE CONTEXT7.
+
+Nov 02 01:48:18.74
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.ico
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:18.51
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.png
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:16.64
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/verify.html
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:14.93
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.ico
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:14.85
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.png
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:14.01
+GET
+307
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/
+Nov 02 01:48:13.20
+GET
+401
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/
+Nov 02 01:48:12.07
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.png
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:10.37
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.ico
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:06.60
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.ico
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:02.08
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.ico
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue. 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:01.70
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Python process exited with exit status: 1. The logs above can help with debugging the issue. 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:48:01.67
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Python process exited with exit status: 1. The logs above can help with debugging the issue. Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-cpzxnmvw6.vercel.app ✅ FastAPI app imported successfully Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:40.72
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.ico
+🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:38.84
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/verify.html
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:31.24
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.png
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:27.78
+GET
+401
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/verify.html
+Nov 02 01:41:27.67
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.png
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:25.72
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:25.02
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.png
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:23.69
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/verify.html
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:23.39
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:21.21
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:20.18
+GET
+307
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/
+Nov 02 01:41:19.73
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:19.39
+GET
+401
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/
+Nov 02 01:41:17.09
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:16.70
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue. Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:41:16.13
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue. Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-bl7mrf0s3.vercel.app Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:40:27.31
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/favicon.png
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:40:23.61
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/favicon.png
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:40:20.95
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/favicon.png
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:40:19.33
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:40:15.51
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:40:12.78
+GET
+---
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:39:45.23
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue. Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:39:45.21
+GET
+500
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/favicon.ico
+Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue. Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 38, in <module> __vc_spec.loader.exec_module(__vc_module) File "<frozen importlib._bootstrap_external>", line 999, in exec_module File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed File "/var/task/api/index.py", line 36, in <module> from app.main import app File "/var/task/api/app/main.py", line 95, in <module> app.mount("/static", StaticFiles(directory="static"), name="static") ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app File "/var/task/_vendor/starlette/staticfiles.py", line 56, in __init__ raise RuntimeError(f"Directory '{directory}' does not exist") RuntimeError: Directory 'static' does not exist Python process exited with exit status: 1. The logs above can help with debugging the issue.
+Nov 02 01:39:45.07
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/
+Nov 02 01:39:44.80
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-eivtmyp5s.vercel.app
+/
