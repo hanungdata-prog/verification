@@ -11,7 +11,6 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 import httpx
 from pydantic import BaseModel
@@ -174,9 +173,31 @@ async def get_verify_page():
     """
     Serve the verification page (Discord OAuth only)
     """
-    with open("static/verify.html", "r") as file:
-        content = file.read()
-    return HTMLResponse(content=content)
+    try:
+        # Try multiple paths for the HTML file
+        file_paths = [
+            "public/verify.html",
+            "../public/verify.html",
+            "verify.html",
+            "../../public/verify.html"
+        ]
+
+        content = None
+        for file_path in file_paths:
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    content = file.read()
+                    break
+            except FileNotFoundError:
+                continue
+
+        if content is None:
+            raise HTTPException(status_code=404, detail="Verification page not found")
+
+        return HTMLResponse(content=content)
+    except Exception as e:
+        logger.error(f"Error serving verification page: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error loading verification page")
 
 @app.get("/privacy")
 async def privacy_policy():
