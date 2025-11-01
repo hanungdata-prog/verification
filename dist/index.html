@@ -3,124 +3,307 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuthGateway - Discord Verification</title>
+    <title>AuthGateway - Professional Identity Verification</title>
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style">
+
+    <!-- External stylesheets -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet" href="css/authgateway-styles.css">
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    <!-- Meta tags for better SEO -->
+    <meta name="description" content="Professional identity verification platform for Discord communities. Secure, fast, and privacy-focused authentication.">
+    <meta name="keywords" content="Discord verification, identity verification, community authentication, secure access">
+    <meta name="author" content="AuthGateway">
 
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-        }
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="AuthGateway - Professional Identity Verification">
+    <meta property="og:description" content="Secure and professional identity verification for Discord communities">
+    <meta property="og:type" content="website">
 
-        .logo {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: #6a11cb;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 1rem;
-            font-size: 2rem;
-        }
-
-        p {
-            color: #666;
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(106, 17, 203, 0.3);
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-
-        .feature {
-            background: rgba(106, 17, 203, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
-            color: #6a11cb;
-        }
-
-        .feature i {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-    </style>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <i class="fas fa-shield-alt"></i>
-        </div>
-        <h1>AuthGateway</h1>
-        <p>Secure Discord verification service for communities. Verify your identity to access exclusive content and features.</p>
-
-        <a href="/verify.html" class="btn-primary">
-            <i class="fas fa-discord"></i> Verify with Discord
-        </a>
-
-        <div class="features">
-            <div class="feature">
-                <i class="fas fa-lock"></i>
-                <div>Secure Verification</div>
-            </div>
-            <div class="feature">
-                <i class="fas fa-user-shield"></i>
-                <div>Privacy Protected</div>
-            </div>
-            <div class="feature">
-                <i class="fas fa-bolt"></i>
-                <div>Instant Access</div>
-            </div>
+    <!-- Professional loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner-lg"></div>
+            <p class="loading-text">Initializing secure connection...</p>
         </div>
     </div>
 
+    <main class="container">
+        <div class="card animate-fade-in">
+            <!-- Logo Section -->
+            <div class="logo animate-slide-up">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <div class="logo-text">AuthGateway</div>
+            </div>
+
+            <!-- Hero Section -->
+            <section class="hero-section animate-slide-up" style="animation-delay: 0.2s;">
+                <h1 class="text-center">Professional Identity Verification</h1>
+                <p class="text-center text-lg">
+                    Enterprise-grade authentication platform designed for modern communities.
+                    Verify your identity securely and access exclusive features with confidence.
+                </p>
+            </section>
+
+            <!-- Primary Action -->
+            <div class="cta-section animate-slide-up" style="animation-delay: 0.4s;">
+                <a href="/verify.html" class="btn btn-primary btn-lg btn-block">
+                    <i class="fas fa-discord"></i>
+                    <span>Continue with Discord</span>
+                    <i class="fas fa-arrow-right" style="margin-left: auto;"></i>
+                </a>
+
+                <div class="countdown mt-6 animate-pulse">
+                    <i class="fas fa-clock"></i>
+                    <span>Auto-redirect in </span>
+                    <span class="countdown-number" id="countdown">5</span>
+                    <span> seconds</span>
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <section class="features-section animate-slide-up" style="animation-delay: 0.6s;">
+                <div class="feature-grid">
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-halved"></i>
+                        </div>
+                        <h3 class="feature-title">Enterprise Security</h3>
+                        <p class="feature-description">
+                            Bank-level encryption and security protocols to protect your identity and data.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-lock"></i>
+                        </div>
+                        <h3 class="feature-title">Privacy First</h3>
+                        <p class="feature-description">
+                            Your privacy is paramount. We only collect essential information for verification.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt-lightning"></i>
+                        </div>
+                        <h3 class="feature-title">Lightning Fast</h3>
+                        <p class="feature-description">
+                            Complete verification in seconds with our optimized authentication flow.
+                        </p>
+                    </article>
+
+                    <article class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-certificate"></i>
+                        </div>
+                        <h3 class="feature-title">Verified Access</h3>
+                        <p class="feature-description">
+                            Gain trusted access to exclusive content and community features.
+                        </p>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Trust Indicators -->
+            <section class="trust-section animate-slide-up" style="animation-delay: 0.8s;">
+                <div class="trust-indicators">
+                    <div class="trust-item">
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <span>GDPR Compliant</span>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <span>SSL Encrypted</span>
+                    </div>
+                    <div class="trust-item">
+                        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                        <span>Audit Ready</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Professional JavaScript -->
     <script>
-        // Auto-redirect to verification page after 5 seconds
-        setTimeout(() => {
-            window.location.href = '/verify.html';
-        }, 5000);
+        // Enhanced loading experience
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading overlay after content loads
+            setTimeout(() => {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    overlay.style.transition = 'opacity 0.5s ease-out';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 500);
+                }
+            }, 800);
+
+            // Smooth countdown with professional messaging
+            let countdown = 5;
+            const countdownElement = document.getElementById('countdown');
+            const countdownInterval = setInterval(() => {
+                countdown--;
+                if (countdownElement) {
+                    countdownElement.textContent = countdown;
+                    countdownElement.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        countdownElement.style.transform = 'scale(1)';
+                    }, 100);
+                }
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    // Show loading state before redirect
+                    document.body.style.cursor = 'wait';
+                    window.location.href = '/verify.html';
+                }
+            }, 1000);
+
+            // Add interactive hover effects
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach((card, index) => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Professional button ripple effect
+            const mainButton = document.querySelector('.btn-primary');
+            mainButton.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+
+            // Keyboard navigation support
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const focusedElement = document.activeElement;
+                    if (focusedElement.classList.contains('btn')) {
+                        focusedElement.click();
+                    }
+                }
+            });
+        });
+
+        // Performance monitoring
+        window.addEventListener('load', function() {
+            const loadTime = performance.now();
+            console.log(`Page loaded in ${loadTime.toFixed(2)}ms`);
+        });
     </script>
+
+    <!-- Additional styles for animations -->
+    <style>
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-900);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .loading-text {
+            margin-top: var(--space-4);
+            font-size: 1.125rem;
+            color: var(--gray-300);
+        }
+
+        .trust-indicators {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-6);
+            margin-top: var(--space-8);
+            padding-top: var(--space-6);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 0.875rem;
+            color: var(--gray-300);
+        }
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        .hero-section {
+            margin-bottom: var(--space-8);
+        }
+
+        .cta-section {
+            margin-bottom: var(--space-10);
+        }
+
+        .trust-section {
+            margin-top: var(--space-8);
+        }
+
+        @media (max-width: 768px) {
+            .trust-indicators {
+                gap: var(--space-4);
+            }
+
+            .trust-item {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
 </body>
 </html>

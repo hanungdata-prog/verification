@@ -3,262 +3,460 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Access Verification</title>
+    <title>Community Access Verification - AuthGateway</title>
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style">
+
+    <!-- External stylesheets -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link rel="stylesheet" href="css/authgateway-styles.css">
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    <!-- Meta tags -->
+    <meta name="description" content="Secure community access verification through Discord OAuth2. Professional identity verification platform.">
+    <meta name="robots" content="noindex, nofollow">
 
-        .container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 480px;
-            padding: 40px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, #6a11cb, #2575fc);
-        }
-
-        .logo {
-            margin-bottom: 24px;
-        }
-
-        .logo i {
-            font-size: 48px;
-            color: #5865F2;
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        h1 {
-            color: #2c2f33;
-            font-size: 28px;
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-
-        .subtitle {
-            color: #72767d;
-            font-size: 16px;
-            margin-bottom: 32px;
-            line-height: 1.5;
-        }
-
-        .feature-list {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 32px;
-            text-align: left;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            color: #36393f;
-            font-size: 14px;
-        }
-
-        .feature-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .feature-item i {
-            color: #5865F2;
-            margin-right: 12px;
-            font-size: 16px;
-        }
-
-        .discord-login {
-            background: #5865F2;
-            color: white;
-            border: none;
-            padding: 16px 24px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
-            font-family: inherit;
-            text-decoration: none;
-        }
-
-        .discord-login:hover {
-            background: #4752c4;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(88, 101, 242, 0.4);
-        }
-
-        .discord-login:active {
-            transform: translateY(0);
-        }
-
-        .message {
-            margin: 20px 0;
-            padding: 12px;
-            border-radius: 8px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .privacy-link {
-            margin-top: 24px;
-            font-size: 13px;
-            color: #72767d;
-        }
-
-        .privacy-link a {
-            color: #5865F2;
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-
-        .privacy-link a:hover {
-            color: #4752c4;
-            text-decoration: underline;
-        }
-
-        .security-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #e3e5e8;
-            color: #36393f;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-top: 16px;
-        }
-
-        .security-badge i {
-            color: #43b581;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            h1 {
-                font-size: 24px;
-            }
-        }
-    </style>
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
 </head>
 <body>
-    <div class="container">
-        <div class="logo">
-            <i class="fas fa-shield-alt"></i>
-        </div>
-        
-        <h1>Community Access Verification</h1>
-        <p class="subtitle">Verify your identity to join our exclusive Discord community</p>
-        
-        <div class="feature-list">
-            <div class="feature-item">
-                <i class="fas fa-user-check"></i>
-                <span>Secure Discord authentication</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-lock"></i>
-                <span>No manual ID entry required</span>
-            </div>
-            <div class="feature-item">
-                <i class="fas fa-shield-alt"></i>
-                <span>Protected by advanced security</span>
-            </div>
-        </div>
-        
-        <!-- Discord OAuth2 Login Button -->
-        <button class="discord-login" onclick="redirectToDiscord()">
-            <i class="fab fa-discord"></i>
-            Continue with Discord
-        </button>
-        
-        <div class="security-badge">
-            <i class="fas fa-shield-alt"></i>
-            Secure & Encrypted
-        </div>
-        
-        <div class="message" id="message"></div>
-        
-        <div class="privacy-link">
-            <a href="/privacy"><i class="fas fa-user-shield"></i> Privacy Policy</a>
+    <!-- Professional loading overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner-lg"></div>
+            <p class="loading-text">Preparing secure verification...</p>
         </div>
     </div>
 
+    <main class="container">
+        <div class="card animate-fade-in">
+            <!-- Logo and Branding -->
+            <div class="logo animate-slide-up">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <div class="logo-text">AuthGateway</div>
+            </div>
+
+            <!-- Header Section -->
+            <header class="animate-slide-up" style="animation-delay: 0.2s;">
+                <h1 class="text-center">Community Access Verification</h1>
+                <p class="subtitle text-center text-lg">
+                    Join our exclusive community with secure Discord authentication.
+                    Your privacy and security are our top priorities.
+                </p>
+            </header>
+
+            <!-- Trust Indicators -->
+            <section class="trust-badges animate-slide-up" style="animation-delay: 0.3s;">
+                <div class="trust-grid">
+                    <div class="trust-badge">
+                        <i class="fas fa-lock"></i>
+                        <span>256-bit Encryption</span>
+                    </div>
+                    <div class="trust-badge">
+                        <i class="fas fa-shield-halved"></i>
+                        <span>Privacy Protected</span>
+                    </div>
+                    <div class="trust-badge">
+                        <i class="fas fa-certificate"></i>
+                        <span>Enterprise Grade</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features List -->
+            <section class="features-section animate-slide-up" style="animation-delay: 0.4s;">
+                <div class="feature-list-enhanced">
+                    <div class="feature-item-enhanced">
+                        <div class="feature-icon-enhanced">
+                            <i class="fab fa-discord"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Official Discord Integration</h4>
+                            <p>Direct authentication through Discord's secure OAuth2 system</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item-enhanced">
+                        <div class="feature-icon-enhanced">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Identity Verification</h4>
+                            <p>Quick and secure verification without manual data entry</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item-enhanced">
+                        <div class="feature-icon-enhanced">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="feature-content">
+                            <h4>Instant Access</h4>
+                            <p>Gain immediate access to community features upon verification</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Discord OAuth Button -->
+            <section class="cta-section animate-slide-up" style="animation-delay: 0.5s;">
+                <button class="btn btn-discord btn-lg btn-block" onclick="handleDiscordAuth()">
+                    <i class="fab fa-discord"></i>
+                    <span>Continue with Discord</span>
+                    <i class="fas fa-arrow-right" style="margin-left: auto;"></i>
+                </button>
+
+                <!-- Security Badge -->
+                <div class="security-indicator">
+                    <i class="fas fa-shield-check"></i>
+                    <span>Secure & Encrypted Connection</span>
+                </div>
+            </section>
+
+            <!-- Status Messages -->
+            <section id="statusContainer" class="status-container animate-slide-up" style="animation-delay: 0.6s;">
+                <div id="message" class="status-message hidden"></div>
+            </section>
+
+            <!-- Privacy and Legal -->
+            <footer class="footer-section animate-slide-up" style="animation-delay: 0.7s;">
+                <div class="privacy-links">
+                    <a href="/privacy" class="privacy-link">
+                        <i class="fas fa-user-shield"></i>
+                        Privacy Policy
+                    </a>
+                    <a href="/terms" class="privacy-link">
+                        <i class="fas fa-file-contract"></i>
+                        Terms of Service
+                    </a>
+                    <a href="/security" class="privacy-link">
+                        <i class="fas fa-lock"></i>
+                        Security
+                    </a>
+                </div>
+
+                <div class="compliance-badges">
+                    <div class="compliance-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>GDPR Compliant</span>
+                    </div>
+                    <div class="compliance-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>CCPA Compliant</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Enhanced JavaScript -->
     <script>
-        // Discord OAuth redirect function
-        function redirectToDiscord() {
-            const clientId = '1230795947257368606';
-            const redirectUri = encodeURIComponent(window.location.origin + '/discord/callback');
-            const scopes = 'identify';
+        // Enhanced loading experience
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading overlay after content loads
+            setTimeout(() => {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    overlay.style.transition = 'opacity 0.5s ease-out';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 500);
+                }
+            }, 600);
 
-            const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}`;
+            // Add interactive hover effects
+            const featureItems = document.querySelectorAll('.feature-item-enhanced');
+            featureItems.forEach((item, index) => {
+                item.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(8px)';
+                });
+                item.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
 
-            window.location.href = discordAuthUrl;
+            // Button interaction feedback
+            const discordButton = document.querySelector('.btn-discord');
+            discordButton.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) scale(1.02)';
+            });
+            discordButton.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && document.activeElement === discordButton) {
+                    handleDiscordAuth();
+                }
+            });
+        });
+
+        // Enhanced Discord OAuth redirect
+        function handleDiscordAuth() {
+            const button = document.querySelector('.btn-discord');
+            const originalContent = button.innerHTML;
+
+            // Show loading state
+            button.innerHTML = '<div class="loading-spinner"></div><span>Connecting to Discord...</span>';
+            button.disabled = true;
+            button.style.cursor = 'wait';
+
+            // Simulate connection process for better UX
+            setTimeout(() => {
+                const clientId = '1230795947257368606';
+                const redirectUri = encodeURIComponent(window.location.origin + '/discord/callback');
+                const scopes = 'identify';
+
+                const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}`;
+
+                window.location.href = discordAuthUrl;
+            }, 1500);
         }
 
-        // Simple script to handle any messages if needed
-        function showMessage(text, type) {
+        // Enhanced message system
+        function showMessage(text, type = 'info') {
             const messageEl = document.getElementById('message');
-            messageEl.textContent = text;
-            messageEl.className = 'message ' + type;
-            messageEl.style.display = 'block';
+            const container = document.getElementById('statusContainer');
 
-            // Auto-hide success messages after 5 seconds
+            messageEl.textContent = text;
+            messageEl.className = `status-message status-${type}`;
+            messageEl.classList.remove('hidden');
+
+            // Animate in
+            messageEl.style.opacity = '0';
+            messageEl.style.transform = 'translateY(-10px)';
+
+            setTimeout(() => {
+                messageEl.style.opacity = '1';
+                messageEl.style.transform = 'translateY(0)';
+                messageEl.style.transition = 'all 0.3s ease-out';
+            }, 100);
+
+            // Auto-hide messages
             if (type === 'success') {
                 setTimeout(() => {
-                    messageEl.style.display = 'none';
+                    hideMessage();
                 }, 5000);
+            } else if (type === 'error') {
+                setTimeout(() => {
+                    hideMessage();
+                }, 8000);
             }
         }
+
+        function hideMessage() {
+            const messageEl = document.getElementById('message');
+            messageEl.style.opacity = '0';
+            messageEl.style.transform = 'translateY(-10px)';
+
+            setTimeout(() => {
+                messageEl.classList.add('hidden');
+            }, 300);
+        }
+
+        // Check for URL parameters and show appropriate messages
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const status = urlParams.get('status');
+            const message = urlParams.get('message');
+
+            if (status && message) {
+                showMessage(decodeURIComponent(message), status);
+            }
+
+            // Performance monitoring
+            const loadTime = performance.now();
+            console.log(`Verification page loaded in ${loadTime.toFixed(2)}ms`);
+        });
+
+        // Error handling for failed authentication
+        window.addEventListener('error', function(e) {
+            console.error('Authentication error:', e);
+            showMessage('An error occurred during authentication. Please try again.', 'error');
+        });
     </script>
+
+    <!-- Additional styles for this page -->
+    <style>
+        .subtitle {
+            color: var(--gray-300);
+            margin-bottom: var(--space-8);
+        }
+
+        .trust-badges {
+            margin-bottom: var(--space-8);
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: var(--space-4);
+        }
+
+        .trust-badge {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            color: var(--gray-300);
+            transition: all var(--transition-fast);
+        }
+
+        .trust-badge:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .trust-badge i {
+            color: var(--primary-400);
+        }
+
+        .feature-list-enhanced {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+            margin-bottom: var(--space-8);
+        }
+
+        .feature-item-enhanced {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            transition: all var(--transition-normal);
+        }
+
+        .feature-item-enhanced:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(8px);
+        }
+
+        .feature-icon-enhanced {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-500), var(--secondary-500));
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .feature-content h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+            margin-bottom: var(--space-1);
+        }
+
+        .feature-content p {
+            font-size: 0.875rem;
+            color: var(--gray-400);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .security-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            margin-top: var(--space-4);
+            padding: var(--space-2) var(--space-4);
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            color: #34d399;
+        }
+
+        .status-container {
+            margin-bottom: var(--space-6);
+        }
+
+        .privacy-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-6);
+            margin-bottom: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .privacy-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--gray-400);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color var(--transition-fast);
+        }
+
+        .privacy-link:hover {
+            color: var(--primary-400);
+        }
+
+        .compliance-badges {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .compliance-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        .compliance-item i {
+            color: var(--success);
+        }
+
+        @media (max-width: 768px) {
+            .trust-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .privacy-links {
+                flex-direction: column;
+                gap: var(--space-3);
+                align-items: center;
+            }
+
+            .compliance-badges {
+                gap: var(--space-3);
+            }
+
+            .feature-item-enhanced {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .feature-item-enhanced:hover {
+                transform: translateY(-4px);
+            }
+        }
+    </style>
 </body>
 </html>
