@@ -88,6 +88,7 @@ try:
     from webhooks import send_webhook
     from utils import validate_discord_id, get_user_agent, get_client_ip
     from supabase_db import get_supabase_client
+    logger.info("Successfully imported all modules")
 except ImportError as e:
     logger.error(f"Failed to import modules: {e}")
     # Define minimal classes if import fails
@@ -105,6 +106,10 @@ except ImportError as e:
 
     def get_user_agent(request: Request) -> Optional[str]:
         return request.headers.get("user-agent", "")
+
+    # Create dummy get_supabase_client function
+    def get_supabase_client():
+        return None
 
 class VerifyRequest(BaseModel):
     discord_id: str
@@ -375,40 +380,60 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
     # For now, skip captcha validation and just log the request
     logger.info(f"CAPTCHA token received: {verify_request.captcha_token[:20]}...")
 
-    # Encrypt IP address (simple mock for now)
-    encrypted_ip = f"encrypted_{client_ip}"
+    # Encrypt IP address (try to use real encryption, fallback to simple encryption)
+    try:
+        encrypted_ip = encrypt_ip(client_ip)
+        logger.info(f"IP encrypted successfully")
+    except Exception as e:
+        logger.warning(f"Failed to encrypt IP, using simple encryption: {str(e)}")
+        encrypted_ip = f"encrypted_{client_ip}"
 
-    # Prepare verification data
+    # Prepare verification data for Supabase (matching your schema)
     verification_data = {
-        "id": secrets.token_urlsafe(16),
         "discord_id": verify_request.discord_id,
         "discord_username": verify_request.discord_username,
         "ip_address": encrypted_ip,
         "user_agent": user_agent,
         "method": "captcha",
-        "extra_data": verify_request.metadata,
-        "verified_at": datetime.utcnow().isoformat(),
-        "created_at": datetime.utcnow().isoformat()
+        "extra_data": verify_request.metadata
     }
 
+    logger.info(f"Prepared verification data: {verification_data}")
+
     # Try to save to Supabase
+    supabase_success = False
     try:
         supabase_client = get_supabase_client()
-        success = await supabase_client.insert_verification(verification_data)
-        if success:
-            logger.info(f"Verification saved to Supabase for user: {verify_request.discord_id}")
+        if supabase_client:
+            logger.info("Attempting to save to Supabase...")
+            success = await supabase_client.insert_verification(verification_data)
+            if success:
+                logger.info(f"✅ Verification saved to Supabase for user: {verify_request.discord_id}")
+                supabase_success = True
+            else:
+                logger.error(f"❌ Failed to save verification to Supabase")
         else:
-            logger.warning(f"Failed to save to Supabase, continuing with verification")
+            logger.error("❌ Supabase client is None")
     except Exception as e:
-        logger.warning(f"Supabase not available: {str(e)}, continuing with verification")
+        logger.error(f"❌ Supabase error: {str(e)}", exc_info=True)
 
-    logger.info(f"Successfully verified user: {verify_request.discord_id}")
+    if not supabase_success:
+        logger.error("❌ Verification was NOT saved to Supabase")
+        # Still return success but indicate database issue
+        return VerificationResponse(
+            success=True,
+            message="Verification successful! (Note: Database save failed)",
+            verification_id="local_only",
+            redirect_url="https://discord.gg/9ZmvQFsP"
+        )
+
+    logger.info(f"✅ Successfully verified user: {verify_request.discord_id}")
 
     # Return success
     return VerificationResponse(
         success=True,
-        message="Verification successful! Redirecting to Discord...",
-        verification_id=verification_data["id"],
+        message="Verification successful! Data saved to database.",
+        verification_id="saved_to_supabase",
         redirect_url="https://discord.gg/9ZmvQFsP"
     )
 
@@ -419,5 +444,32 @@ async def root():
 @app.get("/health")
 async def health():
     return {"status": "healthy"}
+
+@app.get("/test-supabase")
+async def test_supabase():
+    """Test Supabase connection"""
+    try:
+        supabase_client = get_supabase_client()
+        if not supabase_client:
+            return {"status": "error", "message": "Supabase client not initialized"}
+
+        # Test data
+        test_data = {
+            "discord_id": "123456789012345678",
+            "discord_username": "TestUser#1234",
+            "ip_address": "encrypted_test_ip",
+            "user_agent": "test_user_agent",
+            "method": "test",
+            "extra_data": {"test": True}
+        }
+
+        success = await supabase_client.insert_verification(test_data)
+        if success:
+            return {"status": "success", "message": "Test data inserted to Supabase"}
+        else:
+            return {"status": "error", "message": "Failed to insert test data"}
+
+    except Exception as e:
+        return {"status": "error", "message": f"Supabase test failed: {str(e)}"}
 
 print("AuthGateway FastAPI app loaded successfully")
