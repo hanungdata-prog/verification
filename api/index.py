@@ -369,8 +369,16 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
     client_ip = get_client_ip(request)
     user_agent = get_user_agent(request)
 
-    logger.info(f"Verification attempt from IP: {client_ip}")
-    logger.info(f"Discord ID: {verify_request.discord_id}, Username: {verify_request.discord_username}")
+    logger.info(f"🔄 Verification attempt from IP: {client_ip}")
+    logger.info(f"👤 Discord ID: {verify_request.discord_id}, Username: {verify_request.discord_username}")
+
+    # Log environment variables (safely)
+    supabase_url = os.getenv("SUPABASE_URL")
+    supabase_key = os.getenv("SUPABASE_KEY")
+    logger.info(f"🔧 Supabase URL configured: {'Yes' if supabase_url else 'NO'}")
+    logger.info(f"🔑 Supabase Key configured: {'Yes' if supabase_key else 'NO'}")
+    if supabase_url:
+        logger.info(f"🌐 Supabase URL: {supabase_url[:30]}...")
 
     # Validate Discord ID format
     if not validate_discord_id(verify_request.discord_id):
@@ -380,42 +388,39 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
     # For now, skip captcha validation and just log the request
     logger.info(f"CAPTCHA token received: {verify_request.captcha_token[:20]}...")
 
-    # Encrypt IP address (try to use real encryption, fallback to simple encryption)
-    try:
-        encrypted_ip = encrypt_ip(client_ip)
-        logger.info(f"IP encrypted successfully")
-    except Exception as e:
-        logger.warning(f"Failed to encrypt IP, using simple encryption: {str(e)}")
-        encrypted_ip = f"encrypted_{client_ip}"
+    # Use plain IP address (no encryption as requested)
+    ip_address = client_ip
+    logger.info(f"🔍 Using plain IP address: {ip_address}")
 
     # Prepare verification data for Supabase (matching your schema)
     verification_data = {
         "discord_id": verify_request.discord_id,
         "discord_username": verify_request.discord_username,
-        "ip_address": encrypted_ip,
+        "ip_address": ip_address,  # Plain IP address (not encrypted)
         "user_agent": user_agent,
         "method": "captcha",
         "extra_data": verify_request.metadata
     }
 
-    logger.info(f"Prepared verification data: {verification_data}")
+    logger.info(f"📝 Prepared verification data: {verification_data}")
 
     # Try to save to Supabase
     supabase_success = False
     try:
+        logger.info("🔌 Getting Supabase client...")
         supabase_client = get_supabase_client()
         if supabase_client:
-            logger.info("Attempting to save to Supabase...")
+            logger.info("✅ Supabase client obtained, attempting to save...")
             success = await supabase_client.insert_verification(verification_data)
             if success:
-                logger.info(f"✅ Verification saved to Supabase for user: {verify_request.discord_id}")
+                logger.info(f"✅ SUCCESS: Verification saved to Supabase for Discord ID: {verify_request.discord_id}")
                 supabase_success = True
             else:
-                logger.error(f"❌ Failed to save verification to Supabase")
+                logger.error(f"❌ FAILED: Could not save verification to Supabase")
         else:
-            logger.error("❌ Supabase client is None")
+            logger.error("❌ CRITICAL: Supabase client is None - check environment variables")
     except Exception as e:
-        logger.error(f"❌ Supabase error: {str(e)}", exc_info=True)
+        logger.error(f"❌ EXCEPTION: Supabase error - {str(e)}", exc_info=True)
 
     if not supabase_success:
         logger.error("❌ Verification was NOT saved to Supabase")

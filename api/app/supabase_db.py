@@ -49,6 +49,7 @@ class SupabaseClient:
         """
         try:
             logger.info("🔄 Starting Supabase insertion process")
+            logger.info(f"📥 Input verification_data: {verification_data}")
 
             # Validate required fields
             required_fields = ["discord_id", "discord_username", "ip_address"]
@@ -61,7 +62,7 @@ class SupabaseClient:
             supabase_data = {
                 "discord_id": verification_data["discord_id"],
                 "discord_username": verification_data["discord_username"],
-                "ip_address": verification_data["ip_address"],  # Already encrypted
+                "ip_address": verification_data["ip_address"],  # Plain IP address (not encrypted)
                 "user_agent": verification_data.get("user_agent", ""),
                 "method": verification_data.get("method", "captcha"),
                 "extra_data": verification_data.get("extra_data", {}),
@@ -88,24 +89,24 @@ class SupabaseClient:
                 logger.info(f"✅ Successfully saved verification to Supabase for Discord ID: {verification_data['discord_id']}")
                 return True
             else:
-                logger.error(f"❌ Failed to save verification to Supabase")
-                logger.error(f"❌ Status: {response.status_code}")
-                logger.error(f"❌ Response: {response.text}")
+                logger.error(f"❌ FAILED to save verification to Supabase")
+                logger.error(f"❌ HTTP Status: {response.status_code}")
+                logger.error(f"❌ Response Text: {response.text}")
 
                 # Try to parse error response for more details
                 try:
                     error_data = response.json()
-                    logger.error(f"❌ Error details: {error_data}")
+                    logger.error(f"❌ Parsed Error Details: {error_data}")
                 except:
                     logger.error(f"❌ Could not parse error response as JSON")
 
                 return False
 
         except httpx.RequestError as e:
-            logger.error(f"❌ HTTP request error during Supabase insertion: {str(e)}")
+            logger.error(f"❌ HTTP Request Error during Supabase insertion: {str(e)}")
             return False
         except Exception as e:
-            logger.error(f"❌ Unexpected error during Supabase insertion: {str(e)}", exc_info=True)
+            logger.error(f"❌ Unexpected Error during Supabase insertion: {str(e)}", exc_info=True)
             return False
 
     async def check_existing_verification(self, discord_id: str) -> Optional[Dict[str, Any]]:
