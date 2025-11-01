@@ -26,15 +26,29 @@
     },
     {
       "src": "/privacy",
-      "dest": "/public/privacy.html"
+      "dest": "/privacy.html"
+    },
+    {
+      "src": "/discord-callback.html",
+      "dest": "/discord-callback.html"
+    },
+    {
+      "src": "/verify.html",
+      "dest": "/verify.html"
+    },
+    {
+      "src": "/verify-auto.html",
+      "dest": "/verify-auto.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/public/$1"
+      "dest": "/$1"
     }
   ],
   "env": {
-    "PYTHONPATH": "$PYTHONPATH:/var/task",
-    "PYTHONUNBUFFERED": "1"
+    "PYTHONPATH": "/var/task",
+    "PYTHONUNBUFFERED": "1",
+    "BASE_URL": "https://verification-gateway-joblow.vercel.app",
+    "DISCORD_REDIRECT_URI": "https://verification-gateway-joblow.vercel.app/discord/callback"
   }
 }

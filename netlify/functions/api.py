@@ -15,16 +15,18 @@ sys.path.insert(0, str(current_dir))
 os.environ.setdefault('PYTHONPATH', str(current_dir))
 os.environ.setdefault('PYTHONUNBUFFERED', '1')
 
-# Set BASE_URL for Netlify deployment
+# Set BASE_URL for deployment
 if not os.getenv('BASE_URL'):
     # Try to detect the base URL from the environment or use a default
-    netlify_url = os.getenv('URL') or os.getenv('NETLIFY_URL') or 'https://verification-gateway-joblow.netlify.app'
-    os.environ.setdefault('BASE_URL', netlify_url)
-    print(f"🌐 Setting BASE_URL to: {netlify_url}")
+    deployment_url = os.getenv('URL') or os.getenv('VERCEL_URL') or os.getenv('NETLIFY_URL') or 'https://verification-gateway-joblow.vercel.app'
+    if deployment_url and not deployment_url.startswith('http'):
+        deployment_url = f"https://{deployment_url}"
+    os.environ.setdefault('BASE_URL', deployment_url)
+    print(f"🌐 Setting BASE_URL to: {deployment_url}")
 
 # Set Discord redirect URI if not already set
 if not os.getenv('DISCORD_REDIRECT_URI'):
-    base_url = os.getenv('BASE_URL', 'https://verification-gateway-joblow.netlify.app')
+    base_url = os.getenv('BASE_URL', 'https://verification-gateway-joblow.vercel.app')
     discord_redirect_uri = f"{base_url}/discord/callback"
     os.environ.setdefault('DISCORD_REDIRECT_URI', discord_redirect_uri)
     print(f"🔗 Setting DISCORD_REDIRECT_URI to: {discord_redirect_uri}")
@@ -57,28 +59,13 @@ def handler(event, context):
         path = event.get('path', '/')
         http_method = event.get('httpMethod', 'GET')
 
-        # Check if this is a redirected request
-        headers = event.get('headers', {})
-        original_path = headers.get('x-original-path') or headers.get('origin-path')
-
-        # Check for route override in query parameters (for Discord OAuth routes)
+        # Check for path override in query parameters (for Discord OAuth routes)
         query_params = event.get('queryStringParameters') or {}
-        override_route = query_params.get('route')
+        override_path = query_params.get('path')
 
-        # Handle specific redirects
-        if path == '/' and http_method == 'POST':
-            # This is likely a POST to /verify that was redirected
-            path = '/verify'
-            print(f"🔄 Detected redirected POST, setting path to: {path}")
-        elif override_route:
-            path = override_route
-            print(f"🔄 Route overridden to: {path}")
-        elif original_path:
-            path = original_path
-            print(f"🔄 Using original path: {path}")
-
-        # Update the event path for Mangum
-        event['path'] = path
+        if override_path:
+            path = override_path
+            print(f"🔄 Path overridden to: {path}")
 
         # Handle routing for Discord OAuth and other paths
         if path.startswith('/discord/'):

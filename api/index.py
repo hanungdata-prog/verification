@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Serverless entry point for Vercel/Netlify deployment
+Netlify serverless function for AuthGateway
 """
 import sys
 import os
@@ -15,6 +15,22 @@ sys.path.insert(0, str(current_dir))
 os.environ.setdefault('PYTHONPATH', str(current_dir))
 os.environ.setdefault('PYTHONUNBUFFERED', '1')
 
+# Set BASE_URL for deployment
+if not os.getenv('BASE_URL'):
+    # Try to detect the base URL from the environment or use a default
+    deployment_url = os.getenv('URL') or os.getenv('VERCEL_URL') or os.getenv('NETLIFY_URL') or 'https://verification-gateway-joblow.vercel.app'
+    if deployment_url and not deployment_url.startswith('http'):
+        deployment_url = f"https://{deployment_url}"
+    os.environ.setdefault('BASE_URL', deployment_url)
+    print(f"🌐 Setting BASE_URL to: {deployment_url}")
+
+# Set Discord redirect URI if not already set
+if not os.getenv('DISCORD_REDIRECT_URI'):
+    base_url = os.getenv('BASE_URL', 'https://verification-gateway-joblow.vercel.app')
+    discord_redirect_uri = f"{base_url}/discord/callback"
+    os.environ.setdefault('DISCORD_REDIRECT_URI', discord_redirect_uri)
+    print(f"🔗 Setting DISCORD_REDIRECT_URI to: {discord_redirect_uri}")
+
 # Import the FastAPI app
 try:
     from app.main import app
@@ -28,41 +44,84 @@ except ImportError as e:
 
     @app.get("/")
     async def root():
-        return {"message": "AuthGateway is running", "status": "fallback mode"}
+        return {"message": "AuthGateway is running", "status": "serverless mode"}
 
-# Vercel entry point
-def handler(request):
+# AWS Lambda / Netlify Functions handler
+def handler(event, context):
     """
-    Vercel serverless function handler
-    """
-    return app
-
-# Alternative handler for other platforms
-def lambda_handler(event, context):
-    """
-    AWS Lambda / Netlify Functions handler
+    Netlify Functions handler with path routing support
     """
     try:
-        # Parse the event for AWS Lambda format
+        # Import mangum for FastAPI adapter
         from mangum import Mangum
-        handler = Mangum(app)
-        return handler(event, context)
+
+        # Extract path from event
+        path = event.get('path', '/')
+        http_method = event.get('httpMethod', 'GET')
+
+        # Check for path override in query parameters (for Discord OAuth routes)
+        query_params = event.get('queryStringParameters') or {}
+        override_path = query_params.get('path')
+
+        if override_path:
+            path = override_path
+            print(f"🔄 Path overridden to: {path}")
+
+        # Handle routing for Discord OAuth and other paths
+        if path.startswith('/discord/'):
+            # Discord OAuth routes
+            print(f"🔗 Discord OAuth route: {http_method} {path}")
+        elif path.startswith('/api/'):
+            # API routes
+            print(f"🔌 API route: {http_method} {path}")
+        elif path.startswith('/verify') or path.startswith('/admin'):
+            # Verification and admin routes
+            print(f"✅ Verification route: {http_method} {path}")
+        else:
+            # Root and other routes
+            print(f"🏠 Root route: {http_method} {path}")
+
+        # Use Mangum to handle FastAPI app
+        mangum_handler = Mangum(app)
+        return mangum_handler(event, context)
+
     except ImportError:
         # Fallback without mangum
+        print("⚠️ Mangum not available, using fallback mode")
         return {
             'statusCode': 200,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
             'body': json.dumps({
                 "message": "AuthGateway is running",
-                "status": "serverless mode"
+                "status": "serverless fallback mode",
+                "note": "Install mangum for full functionality",
+                "path": event.get('path', '/'),
+                "method": event.get('httpMethod', 'GET')
+            })
+        }
+    except Exception as e:
+        # Error handling
+        print(f"❌ Error in handler: {e}")
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                "error": "Internal server error",
+                "message": str(e),
+                "path": event.get('path', '/')
             })
         }
 
-# Export for different platforms
+# Export for Netlify
+lambda_handler = handler
+
+# Local testing
 if __name__ == "__main__":
-    # For local testing
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-else:
-    # For serverless deployment
-    export_app = app
