@@ -1,92 +1,51 @@
-FIX THIS ERROR USE CONTEXT7.
+SEKARANG MALAH SEPERTI INI LOG NYA
 
-You are an expert AI DevOps and Python FastAPI engineer. 
-Your task is to automatically analyze and fix a FastAPI deployment error on Vercel.
-The current Vercel logs show the following recurring error:
+Nov 02 02:14:47.05
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-ns6rdcjrq.vercel.app
+/favicon.png
+Nov 02 02:14:47.05
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-ns6rdcjrq.vercel.app
+/favicon.ico
+Nov 02 02:14:46.86
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-ns6rdcjrq.vercel.app
+/
+Nov 02 02:14:37.03
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-ns6rdcjrq.vercel.app
+/favicon.ico
+Nov 02 02:14:36.89
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-ns6rdcjrq.vercel.app
+/
+Nov 02 02:14:36.88
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-ns6rdcjrq.vercel.app
+/
+Nov 02 02:14:36.63
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-ns6rdcjrq.vercel.app
+/
+Nov 02 02:14:36.62
+GET
+404
+apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-ns6rdcjrq.vercel.app
+/
 
-TypeError: issubclass() arg 1 must be a class
-File "/var/task/vc__handler__python.py", line 242
-if not issubclass(base, BaseHTTPRequestHandler):
+DAN TAMPILANNYA 
+404: NOT_FOUND
+Code: NOT_FOUND
+ID: sin1::vh867-1762024494787-ba436bfeffef
 
-yaml
-Salin kode
+Read our documentation to learn more about this error.
 
----
-
-### 🧩 CONTEXT:
-The app is deployed at:
-https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-7gx2dt5eq.vercel.app
-
-Vercel runs this Python app using the internal `vc__handler__python.py`, 
-which expects the Python entrypoint file to expose a **FastAPI instance named `app`** — not a function, not a module, not a class.
-
-Current error indicates that `base` is not a class, meaning the FastAPI handler was incorrectly declared or exported.
-
----
-
-### 🧰 TECH SPEC:
-Your job:
-1. Scan and fix all files under `/api/` that are used as Python entrypoints.
-2. Ensure that each API route (e.g., `api/index.py`, `api/verify.py`, etc.) exports a **FastAPI instance** correctly:
-   ```python
-   from fastapi import FastAPI
-   app = FastAPI()
-Verify all route definitions use the proper decorator syntax:
-
-python
-Salin kode
-@app.get("/")
-async def root():
-    return {"status": "ok"}
-Ensure HTML routes (like /verify.html) use:
-
-python
-Salin kode
-from fastapi.responses import HTMLResponse
-@app.get("/verify.html", response_class=HTMLResponse)
-def verify_page():
-    return "<h1>Verification Page</h1>"
-Check for any line like app = FastAPI or def app(): and convert them into:
-
-python
-Salin kode
-app = FastAPI()
-Create or fix the vercel.json configuration file as follows:
-
-json
-Salin kode
-{
-  "version": 2,
-  "builds": [
-    { "src": "api/index.py", "use": "@vercel/python" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "api/index.py" }
-  ]
-}
-Move static files like /favicon.ico, /favicon.png, and /verify.html to a /public folder so Vercel serves them directly instead of being routed to Python.
-
-After fixing, print out a short summary of what was changed, including:
-
-Which files were modified
-
-How app was corrected
-
-Whether vercel.json was created or updated
-
-If static routes were moved
-
-🎯 GOAL:
-Make the FastAPI app successfully run on Vercel without the issubclass() arg 1 must be a class error.
-Ensure visiting / and /verify.html returns valid responses (JSON and HTML respectively).
-
-If you find multiple potential entrypoints, consolidate them so that only one FastAPI instance (app) is deployed as the main handler.
-
-✅ OUTPUT REQUIREMENT:
-Show corrected code files (with before/after diff if possible)
-
-Show updated vercel.json
-
-Summarize what was fixed and why it solves the problem
-
-Do not include unrelated code or extra commentary
+use context7
