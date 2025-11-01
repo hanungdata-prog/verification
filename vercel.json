@@ -36,10 +36,5 @@
   "env": {
     "PYTHONPATH": "$PYTHONPATH:/var/task",
     "PYTHONUNBUFFERED": "1"
-  },
-  "build": {
-    "env": {
-      "PYTHONPATH": "$PYTHONPATH:/var/task"
-    }
   }
 }
