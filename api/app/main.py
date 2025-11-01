@@ -136,13 +136,22 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
     # Save to Supabase database
     try:
         supabase_client = get_supabase_client()
+        if supabase_client is None:
+            logger.error("❌ CRITICAL: Supabase client is None - initialization failed")
+            raise HTTPException(status_code=500, detail="Database connection failed")
+
+        logger.info(f"🔄 Attempting to save verification data: {verification_data}")
         success = await supabase_client.insert_verification(verification_data)
+
         if not success:
-            logger.error(f"Failed to save verification to Supabase for user: {verify_request.discord_id}")
+            logger.error(f"❌ FAILED: Verification was NOT saved to Supabase for user: {verify_request.discord_id}")
+            logger.error(f"❌ Data that failed to save: {verification_data}")
             raise HTTPException(status_code=500, detail="Error saving verification to database")
-        logger.info(f"Verification saved to Supabase for user: {verify_request.discord_id}")
+
+        logger.info(f"✅ SUCCESS: Verification saved to Supabase for user: {verify_request.discord_id}")
     except Exception as e:
-        logger.error(f"Error saving verification to Supabase: {str(e)}")
+        logger.error(f"❌ CRITICAL ERROR during Supabase insertion: {str(e)}", exc_info=True)
+        logger.error(f"❌ FINAL: Verification was NOT saved to Supabase by any method")
         raise HTTPException(status_code=500, detail="Error saving verification to database")
     
     # Send webhook to Discord bot

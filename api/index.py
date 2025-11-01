@@ -394,6 +394,7 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
 
     # Prepare verification data for Supabase (matching your schema)
     verification_data = {
+        "verification_id": secrets.token_urlsafe(16),  # Add required verification_id field
         "discord_id": verify_request.discord_id,
         "discord_username": verify_request.discord_username,
         "ip_address": ip_address,  # Plain IP address (not encrypted)
@@ -528,6 +529,7 @@ async def test_supabase():
 
         # Test data
         test_data = {
+            "verification_id": "test_" + secrets.token_urlsafe(16),
             "discord_id": "123456789012345678",
             "discord_username": "TestUser#1234",
             "ip_address": "test_ip_address",  # Plain IP
@@ -581,6 +583,7 @@ async def direct_test():
 
         # Test direct connection
         test_data = {
+            "verification_id": "direct_" + secrets.token_urlsafe(16),
             "discord_id": "888888888888888888",
             "discord_username": "DirectTest#9999",
             "ip_address": "direct_test_ip",
@@ -714,6 +717,7 @@ async def debug_supabase():
         # Test actual insert
         try:
             test_data = {
+                "verification_id": "debug_" + secrets.token_urlsafe(16),
                 "discord_id": "999999999999999999",
                 "discord_username": "DebugUser#0001",
                 "ip_address": "127.0.0.1",

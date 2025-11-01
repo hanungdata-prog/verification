@@ -245,6 +245,7 @@ exports.handler = async (event, context) => {
 
     // Store verification in Supabase
     const verificationData = {
+      verification_id: 'ver_' + Math.random().toString(36).substr(2, 16) + Date.now().toString(36),
       discord_id,
       discord_username,
       ip_address: event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp,

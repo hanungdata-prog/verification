@@ -45,7 +45,7 @@ class SupabaseClient:
             logger.info("🔄 Starting Supabase insertion process")
             
             # Validate required fields
-            required_fields = ["discord_id", "discord_username", "ip_address"]
+            required_fields = ["id", "discord_id", "discord_username", "ip_address"]
             for field in required_fields:
                 if field not in verification_data:
                     logger.error(f"❌ Missing required field: {field}")
@@ -53,6 +53,7 @@ class SupabaseClient:
 
             # Prepare the data for Supabase
             supabase_data = {
+                "verification_id": verification_data["id"],  # Map 'id' to 'verification_id'
                 "discord_id": verification_data["discord_id"],
                 "discord_username": verification_data["discord_username"],
                 "ip_address": verification_data["ip_address"],
