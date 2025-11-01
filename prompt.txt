@@ -1,93 +1,92 @@
 FIX THIS ERROR USE CONTEXT7.
 
-Nov 02 01:53:16.68
-GET
-500
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/favicon.png
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:16.65
-GET
-500
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n.vercel.app
-/favicon.ico
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:14.84
-GET
-500
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n.vercel.app
-/verify.html
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:14.05
-GET
-500
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n.vercel.app
-/favicon.ico
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:14.01
-GET
+You are an expert AI DevOps and Python FastAPI engineer. 
+Your task is to automatically analyze and fix a FastAPI deployment error on Vercel.
+The current Vercel logs show the following recurring error:
+
+TypeError: issubclass() arg 1 must be a class
+File "/var/task/vc__handler__python.py", line 242
+if not issubclass(base, BaseHTTPRequestHandler):
+
+yaml
+Salin kode
+
 ---
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/favicon.png
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:12.39
-GET
-500
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/favicon.ico
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:08.69
-GET
+
+### 🧩 CONTEXT:
+The app is deployed at:
+https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-7gx2dt5eq.vercel.app
+
+Vercel runs this Python app using the internal `vc__handler__python.py`, 
+which expects the Python entrypoint file to expose a **FastAPI instance named `app`** — not a function, not a module, not a class.
+
+Current error indicates that `base` is not a class, meaning the FastAPI handler was incorrectly declared or exported.
+
 ---
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/favicon.ico
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:07.51
-GET
-500
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/favicon.ico
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:06.59
-GET
-307
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/
-Nov 02 01:53:05.82
-GET
-401
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/
-Nov 02 01:53:05.70
-GET
-500
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/favicon.ico
-Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:04.05
-GET
----
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/favicon.ico
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue. 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
-Nov 02 01:53:03.81
-GET
----
-apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app
-/favicon.ico
-🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue. 🌐 Setting BASE_URL to: https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-28o2p2v95.vercel.app ✅ FastAPI app imported successfully Traceback (most recent call last): File "/var/task/vc__handler__python.py", line 242, in <module> if not issubclass(base, BaseHTTPRequestHandler): ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ TypeError: issubclass() arg 1 must be a class Python process exited with exit status: 1. The logs above can help with debugging the issue.
 
+### 🧰 TECH SPEC:
+Your job:
+1. Scan and fix all files under `/api/` that are used as Python entrypoints.
+2. Ensure that each API route (e.g., `api/index.py`, `api/verify.py`, etc.) exports a **FastAPI instance** correctly:
+   ```python
+   from fastapi import FastAPI
+   app = FastAPI()
+Verify all route definitions use the proper decorator syntax:
 
-IN WEBSITE https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n.vercel.app/verify.html
-This Serverless Function has crashed.
+python
+Salin kode
+@app.get("/")
+async def root():
+    return {"status": "ok"}
+Ensure HTML routes (like /verify.html) use:
 
-Your connection is working correctly.
+python
+Salin kode
+from fastapi.responses import HTMLResponse
+@app.get("/verify.html", response_class=HTMLResponse)
+def verify_page():
+    return "<h1>Verification Page</h1>"
+Check for any line like app = FastAPI or def app(): and convert them into:
 
-Vercel is working correctly.
+python
+Salin kode
+app = FastAPI()
+Create or fix the vercel.json configuration file as follows:
 
-500: INTERNAL_SERVER_ERROR
-Code: FUNCTION_INVOCATION_FAILED
-ID: sin1::4bm7v-1762023194846-5735fccf7b0f
+json
+Salin kode
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/index.py", "use": "@vercel/python" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "api/index.py" }
+  ]
+}
+Move static files like /favicon.ico, /favicon.png, and /verify.html to a /public folder so Vercel serves them directly instead of being routed to Python.
 
-If you are a visitor, contact the website owner or try again later.
-If you are the owner, learn how to fix the error and check the logs.
+After fixing, print out a short summary of what was changed, including:
+
+Which files were modified
+
+How app was corrected
+
+Whether vercel.json was created or updated
+
+If static routes were moved
+
+🎯 GOAL:
+Make the FastAPI app successfully run on Vercel without the issubclass() arg 1 must be a class error.
+Ensure visiting / and /verify.html returns valid responses (JSON and HTML respectively).
+
+If you find multiple potential entrypoints, consolidate them so that only one FastAPI instance (app) is deployed as the main handler.
+
+✅ OUTPUT REQUIREMENT:
+Show corrected code files (with before/after diff if possible)
+
+Show updated vercel.json
+
+Summarize what was fixed and why it solves the problem
+
+Do not include unrelated code or extra commentary

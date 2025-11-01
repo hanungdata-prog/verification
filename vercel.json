@@ -1,70 +1,15 @@
 {
   "version": 2,
-  "name": "authgateway",
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install && pip install -r api/requirements.txt",
   "builds": [
     {
       "src": "api/index.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
     }
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/discord/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/verify(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/admin/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/privacy",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/static/(.*)",
-      "dest": "/$1"
-    },
-    {
-      "src": "/verify.html",
-      "dest": "/verify.html"
-    },
-    {
-      "src": "/discord-callback.html",
-      "dest": "/discord-callback.html"
-    },
-    {
-      "src": "/verify-auto.html",
-      "dest": "/verify-auto.html"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/api/index.py"
+      "dest": "api/index.py"
     }
-  ],
-  "env": {
-    "PYTHONPATH": "/var/task",
-    "PYTHONUNBUFFERED": "1"
-  }
+  ]
 }
