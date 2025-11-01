@@ -4,6 +4,13 @@
     {
       "src": "api/index.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "routes": [
@@ -13,35 +20,35 @@
     },
     {
       "src": "/verify.html",
-      "dest": "public/verify.html"
+      "dest": "verify.html"
     },
     {
       "src": "/verify-auto.html",
-      "dest": "public/verify-auto.html"
+      "dest": "verify-auto.html"
     },
     {
       "src": "/discord-callback.html",
-      "dest": "public/discord-callback.html"
+      "dest": "discord-callback.html"
     },
     {
       "src": "/index.html",
-      "dest": "public/index.html"
+      "dest": "index.html"
     },
     {
       "src": "/",
-      "dest": "public/index.html"
+      "dest": "index.html"
     },
     {
       "src": "/favicon.ico",
-      "dest": "public/favicon.ico"
+      "dest": "favicon.ico"
     },
     {
       "src": "/favicon.png",
-      "dest": "public/favicon.png"
+      "dest": "favicon.png"
     },
     {
       "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico))",
-      "dest": "public/$1"
+      "dest": "$1"
     },
     {
       "src": "/(.*)",
