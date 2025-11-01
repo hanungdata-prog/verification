@@ -5,368 +5,171 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AuthGateway - Discord Verification</title>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="styles.css">
-
-    <!-- Theme Management -->
     <script src="theme.js"></script>
 
     <style>
         body {
-            background: var(--gradient-primary);
+            background: var(--color-bg-primary);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Background animation */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(30, 64, 175, 0.2) 0%, transparent 50%);
-            animation: backgroundShift 20s ease-in-out infinite;
-        }
-
-        @keyframes backgroundShift {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-20px, -20px) scale(1.1); }
-            66% { transform: translate(20px, -10px) scale(0.9); }
         }
 
         .hero-card {
-            background: var(--color-surface-glass);
-            backdrop-filter: blur(20px);
+            background: var(--color-surface);
             border: 1px solid var(--color-border-secondary);
-            border-radius: var(--radius-3xl);
-            padding: var(--space-12);
-            max-width: 600px;
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            max-width: 520px;
             width: 90%;
-            box-shadow: var(--shadow-2xl);
-            position: relative;
-            z-index: 1;
-            animation: fadeInUp 0.8s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            box-shadow: var(--shadow-md);
+            text-align: center;
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto var(--space-6);
-            background: var(--gradient-primary);
-            border-radius: var(--radius-2xl);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--font-size-3xl);
-            color: white;
-            box-shadow: var(--shadow-accent);
-            animation: logoFloat 3s ease-in-out infinite;
-        }
-
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        h1 {
-            background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-accent-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: var(--space-4);
-            font-size: var(--font-size-5xl);
-            font-weight: var(--font-weight-bold);
-        }
-
-        .subtitle {
-            color: var(--color-text-secondary);
-            font-size: var(--font-size-lg);
-            line-height: var(--line-height-relaxed);
-            margin-bottom: var(--space-8);
-        }
-
-        .discord-button {
-            background: #5865F2;
-            color: white;
-            padding: var(--space-4) var(--space-8);
-            border-radius: var(--radius-2xl);
-            font-size: var(--font-size-lg);
-            font-weight: var(--font-weight-semibold);
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-3);
-            text-decoration: none;
-            transition: all var(--transition-normal);
-            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .discord-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .discord-button:hover::before {
-            left: 100%;
-        }
-
-        .discord-button:hover {
-            background: #4752C4;
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
-        }
-
-        .discord-button i {
-            font-size: var(--font-size-xl);
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: var(--space-4);
-            margin-top: var(--space-8);
-        }
-
-        .feature {
-            background: var(--color-surface-elevated);
-            border: 1px solid var(--color-border-primary);
-            border-radius: var(--radius-xl);
-            padding: var(--space-6);
-            text-align: center;
-            transition: all var(--transition-normal);
-            animation: fadeIn 0.6s ease-out backwards;
-        }
-
-        .feature:nth-child(1) { animation-delay: 0.2s; }
-        .feature:nth-child(2) { animation-delay: 0.4s; }
-        .feature:nth-child(3) { animation-delay: 0.6s; }
-
-        .feature:hover {
-            transform: translateY(-4px);
-            border-color: var(--color-accent);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto var(--space-3);
-            background: var(--gradient-primary);
+            width: 64px; height: 64px;
+            margin: 0 auto var(--space-4);
+            background: var(--color-accent);
             border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--font-size-xl);
+            font-size: var(--font-size-2xl);
+            color: white;
+        }
+
+        h1 {
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-4);
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .subtitle {
+            color: var(--color-text-secondary);
+            font-size: var(--font-size-base);
+            margin-bottom: var(--space-6);
+        }
+
+        .discord-button {
+            background: var(--color-accent);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+            transition: background var(--transition-fast);
+        }
+
+        .discord-button:hover {
+            background: var(--color-accent-hover);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-6);
+        }
+
+        .feature {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 40px; height: 40px;
+            margin: 0 auto var(--space-2);
+            background: var(--color-accent);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-lg);
             color: white;
         }
 
         .feature-title {
-            font-size: var(--font-size-base);
-            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
             color: var(--color-text-primary);
             margin-bottom: var(--space-1);
         }
 
         .feature-description {
-            font-size: var(--font-size-sm);
+            font-size: var(--font-size-xs);
             color: var(--color-text-muted);
-            line-height: var(--line-height-snug);
         }
 
         .countdown {
-            margin-top: var(--space-6);
+            margin-top: var(--space-4);
             font-size: var(--font-size-sm);
             color: var(--color-text-muted);
         }
 
         .countdown-number {
-            font-weight: var(--font-weight-semibold);
-            color: var(--color-accent-light);
-        }
-
-        /* Loading dots animation */
-        .loading-dots {
-            display: inline-flex;
-            gap: 4px;
-        }
-
-        .loading-dots span {
-            width: 8px;
-            height: 8px;
-            background: var(--color-accent);
-            border-radius: 50%;
-            animation: bounce 1.4s ease-in-out infinite both;
-        }
-
-        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-        .loading-dots span:nth-child(3) { animation-delay: 0; }
-
-        @keyframes bounce {
-            0%, 80%, 100% {
-                transform: scale(0);
-            }
-            40% {
-                transform: scale(1);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            .hero-card {
-                padding: var(--space-8);
-                margin: var(--space-4);
-            }
-
-            h1 {
-                font-size: var(--font-size-4xl);
-            }
-
-            .features {
-                grid-template-columns: 1fr;
-                gap: var(--space-3);
-            }
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-primary);
         }
     </style>
 </head>
 <body>
     <div class="hero-card">
-        <div class="logo">
-            <i class="fas fa-shield-halved"></i>
-        </div>
-
+        <div class="logo"><i class="fas fa-shield-halved"></i></div>
         <h1>AuthGateway</h1>
-        <p class="subtitle">
-            Enterprise-grade Discord verification service for modern communities.
-            Secure, fast, and privacy-focused authentication.
-        </p>
+        <p class="subtitle">Secure Discord verification for modern communities. Fast, reliable, and privacy-focused.</p>
 
         <a href="/verify.html" class="discord-button">
-            <i class="fab fa-discord"></i>
-            Verify with Discord
+            <i class="fab fa-discord"></i> Verify with Discord
         </a>
 
         <div class="features">
             <div class="feature">
-                <div class="feature-icon">
-                    <i class="fas fa-lock"></i>
-                </div>
-                <div class="feature-title">Secure Verification</div>
-                <div class="feature-description">Bank-level encryption for your data</div>
+                <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                <div class="feature-title">Secure</div>
+                <div class="feature-description">Enterprise encryption</div>
             </div>
-
             <div class="feature">
-                <div class="feature-icon">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <div class="feature-title">Privacy First</div>
-                <div class="feature-description">Your data stays private</div>
+                <div class="feature-icon"><i class="fas fa-user-shield"></i></div>
+                <div class="feature-title">Private</div>
+                <div class="feature-description">Data protected</div>
             </div>
-
             <div class="feature">
-                <div class="feature-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <div class="feature-title">Instant Access</div>
-                <div class="feature-description">Get verified in seconds</div>
+                <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                <div class="feature-title">Fast</div>
+                <div class="feature-description">Instant access</div>
             </div>
         </div>
 
         <div class="countdown">
-            Auto-redirecting in <span class="countdown-number" id="countdown">5</span> seconds
-            <div class="loading-dots" style="margin-top: 8px;">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            Redirecting in <span class="countdown-number" id="countdown">5</span> seconds
         </div>
     </div>
 
     <script>
-        // Enhanced countdown with smooth animation
         let countdown = 5;
-        const countdownElement = document.getElementById('countdown');
-
-        const countdownInterval = setInterval(() => {
+        const el = document.getElementById('countdown');
+        const interval = setInterval(() => {
             countdown--;
-            countdownElement.textContent = countdown;
-
-            // Add pulse animation when countdown reaches 1
-            if (countdown === 1) {
-                countdownElement.classList.add('animate-pulse');
-            }
-
+            el.textContent = countdown;
             if (countdown <= 0) {
-                clearInterval(countdownInterval);
-                // Add fade out effect before redirect
-                document.body.style.opacity = '0';
-                document.body.style.transition = 'opacity 0.5s ease-out';
-
-                setTimeout(() => {
-                    window.location.href = '/verify.html';
-                }, 500);
+                clearInterval(interval);
+                window.location.href = '/verify.html';
             }
         }, 1000);
-
-        // Cancel redirect on user interaction
-        let redirectEnabled = true;
-
-        const cancelRedirect = () => {
-            if (redirectEnabled) {
-                redirectEnabled = false;
-                clearInterval(countdownInterval);
-                document.querySelector('.countdown').innerHTML =
-                    '<span style="color: var(--color-success);">Auto-redirect cancelled</span>';
-            }
-        };
-
-        // Add event listeners to cancel redirect on user interaction
-        document.addEventListener('click', cancelRedirect);
-        document.addEventListener('keypress', cancelRedirect);
-        document.addEventListener('touchstart', cancelRedirect);
-
-        // Add keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                document.querySelector('.discord-button').click();
-            }
-        });
     </script>
 </body>
 </html>
