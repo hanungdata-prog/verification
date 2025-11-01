@@ -42,6 +42,8 @@ async function buildFunctions() {
       }
     }
 
+    // Note: Static files are served by Vercel, not by FastAPI
+
     // Create main serverless function with improved routing
     const mainFunction = `#!/usr/bin/env python3
 """

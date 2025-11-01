@@ -91,8 +91,7 @@ app.add_middleware(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+# Static files are served by Vercel routing, no need to mount here
 
 class VerifyRequest(BaseModel):
     discord_id: str
