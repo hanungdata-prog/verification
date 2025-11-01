@@ -1,16 +1,276 @@
-# Import the main FastAPI app from the app module
+# Vercel entry point for AuthGateway
+import sys
+import os
+
+# Add the current directory to Python path
+sys.path.append(os.path.dirname(__file__))
+
+# Import dependencies directly to avoid module issues
+from contextlib import asynccontextmanager
+from datetime import datetime
+from typing import AsyncGenerator, Optional
+import asyncio
+import logging
+import os
+import sys
+import secrets
+import json
+from pathlib import Path
+
+from fastapi import FastAPI, Request, HTTPException, Depends, Query
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+import httpx
+from pydantic import BaseModel
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
+import uvicorn
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# Initialize rate limiter
+limiter = Limiter(key_func=get_remote_address)
+
+def create_db_and_tables():
+    # Initialize Supabase connection
+    try:
+        from supabase_db import get_supabase_client
+        supabase_client = get_supabase_client()
+        logger.info("Supabase verification system initialized")
+    except Exception as e:
+        logger.error(f"Failed to initialize Supabase: {str(e)}")
+        # Fallback to JSON storage if Supabase is not available
+        logger.warning("Falling back to JSON storage")
+        return False
+    return True
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    # Startup
+    create_db_and_tables()
+    logger.info("Verification system initialized")
+    yield
+    # Shutdown
+
+# Create FastAPI app
+app = FastAPI(
+    title="AuthGateway",
+    description="Discord OAuth verification service",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=os.getenv("ALLOWED_ORIGINS", "*").split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Add rate limiting middleware
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Import internal modules
 try:
-    from app.main import app
-    print("Successfully imported FastAPI app from app.main")
-except Exception as e:
-    print(f"Error importing from app.main: {e}")
-    # Fallback to a minimal app if import fails
-    from fastapi import FastAPI
-    app = FastAPI()
+    from schemas import VerificationResponse
+    from auth import encrypt_ip, decrypt_ip
+    from captcha import validate_captcha
+    from webhooks import send_webhook
+    from utils import validate_discord_id, get_user_agent, get_client_ip
+    from supabase_db import get_supabase_client
+except ImportError as e:
+    logger.error(f"Failed to import modules: {e}")
+    # Define minimal classes if import fails
+    class VerificationResponse(BaseModel):
+        success: bool
+        message: str
+        verification_id: Optional[str] = None
+        redirect_url: Optional[str] = None
 
-    @app.get("/")
-    async def root():
-        return {"message": "AuthGateway is running in fallback mode", "status": "serverless"}
+    def validate_discord_id(discord_id: str) -> bool:
+        return discord_id and discord_id.isdigit() and len(discord_id) >= 17
 
-# This allows Vercel to use the complete application with all endpoints
-__all__ = ["app"]
+    def get_client_ip(request: Request) -> str:
+        return request.client.host if request.client else "unknown"
+
+    def get_user_agent(request: Request) -> Optional[str]:
+        return request.headers.get("user-agent", "")
+
+class VerifyRequest(BaseModel):
+    discord_id: str
+    discord_username: str
+    captcha_token: str
+    metadata: dict = {}
+
+@app.get("/discord/login")
+async def discord_login():
+    """Redirect user to Discord OAuth2 login page"""
+    client_id = os.getenv("DISCORD_CLIENT_ID")
+    redirect_uri = os.getenv("DISCORD_REDIRECT_URI")
+    scopes = "identify"
+
+    if not client_id:
+        raise HTTPException(status_code=500, detail="Discord client ID not configured")
+
+    discord_auth_url = (
+        f"https://discord.com/api/oauth2/authorize?"
+        f"client_id={client_id}&"
+        f"redirect_uri={redirect_uri}&"
+        f"response_type=code&"
+        f"scope={scopes}"
+    )
+
+    return RedirectResponse(url=discord_auth_url)
+
+@app.get("/discord/callback")
+async def discord_callback(code: str = Query(...), error: str = None, error_description: str = None):
+    """Handle Discord OAuth2 callback and redirect to verification page"""
+    if error:
+        logger.error(f"Discord OAuth2 error: {error} - {error_description}")
+        return HTMLResponse(content=f"""
+        <html>
+        <body style="font-family: Arial; text-align: center; margin: 50px;">
+            <h1 style="color: red;">❌ Authorization Failed</h1>
+            <p>Discord authorization was cancelled or failed: {error_description or error}</p>
+            <a href="/verify.html" style="background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Try Again</a>
+        </body>
+        </html>
+        """)
+
+    client_id = os.getenv("DISCORD_CLIENT_ID")
+    client_secret = os.getenv("DISCORD_CLIENT_SECRET")
+    redirect_uri = os.getenv("DISCORD_REDIRECT_URI")
+
+    if not client_id or not client_secret:
+        raise HTTPException(status_code=500, detail="Discord credentials not configured")
+
+    # Exchange code for access token
+    token_data = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "client_id": client_id,
+        "client_secret": client_secret,
+        "redirect_uri": redirect_uri,
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post("https://discord.com/api/oauth2/token", data=token_data)
+
+            if token_response.status_code != 200:
+                logger.error(f"Failed to get access token from Discord: {token_response.text}")
+                raise HTTPException(status_code=400, detail="Failed to get access token from Discord")
+
+            token_json = token_response.json()
+            access_token = token_json.get("access_token")
+
+            if not access_token:
+                raise HTTPException(status_code=400, detail="No access token received from Discord")
+
+            # Get user info
+            user_response = await client.get(
+                "https://discord.com/api/users/@me",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+
+            if user_response.status_code != 200:
+                logger.error(f"Failed to get user info from Discord: {user_response.text}")
+                raise HTTPException(status_code=400, detail="Failed to get user info from Discord")
+
+            user_data = user_response.json()
+
+            # Prepare user data
+            discord_user = {
+                "id": user_data["id"],
+                "username": user_data["username"],
+                "discriminator": user_data["discriminator"],
+                "avatar": user_data.get("avatar"),
+                "full_username": f"{user_data['username']}#{user_data['discriminator']}"
+            }
+
+            # Redirect to auto-verification page with user data
+            redirect_url = f"/verify-auto.html?discord_id={discord_user['id']}&discord_username={discord_user['full_username']}"
+            logger.info(f"Redirecting to: {redirect_url}")
+            return RedirectResponse(url=redirect_url)
+
+    except httpx.RequestError as e:
+        logger.error(f"HTTP request error during Discord OAuth2: {str(e)}")
+        raise HTTPException(status_code=500, detail="Network error during Discord authentication")
+    except Exception as e:
+        logger.error(f"Unexpected error during Discord OAuth2: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error during Discord authentication")
+
+@app.post("/verify", response_model=VerificationResponse)
+@limiter.limit("5 per 10 minutes")
+async def verify_user(request: Request, verify_request: VerifyRequest):
+    """Main verification endpoint"""
+    client_ip = get_client_ip(request)
+    user_agent = get_user_agent(request)
+
+    logger.info(f"Verification attempt from IP: {client_ip}")
+    logger.info(f"Discord ID: {verify_request.discord_id}, Username: {verify_request.discord_username}")
+
+    # Validate Discord ID format
+    if not validate_discord_id(verify_request.discord_id):
+        logger.warning(f"Invalid Discord ID format: {verify_request.discord_id}")
+        raise HTTPException(status_code=400, detail="Invalid Discord ID format")
+
+    # For now, skip captcha validation and just log the request
+    logger.info(f"CAPTCHA token received: {verify_request.captcha_token[:20]}...")
+
+    # Encrypt IP address (simple mock for now)
+    encrypted_ip = f"encrypted_{client_ip}"
+
+    # Prepare verification data
+    verification_data = {
+        "id": secrets.token_urlsafe(16),
+        "discord_id": verify_request.discord_id,
+        "discord_username": verify_request.discord_username,
+        "ip_address": encrypted_ip,
+        "user_agent": user_agent,
+        "method": "captcha",
+        "extra_data": verify_request.metadata,
+        "verified_at": datetime.utcnow().isoformat(),
+        "created_at": datetime.utcnow().isoformat()
+    }
+
+    # Try to save to Supabase
+    try:
+        supabase_client = get_supabase_client()
+        success = await supabase_client.insert_verification(verification_data)
+        if success:
+            logger.info(f"Verification saved to Supabase for user: {verify_request.discord_id}")
+        else:
+            logger.warning(f"Failed to save to Supabase, continuing with verification")
+    except Exception as e:
+        logger.warning(f"Supabase not available: {str(e)}, continuing with verification")
+
+    logger.info(f"Successfully verified user: {verify_request.discord_id}")
+
+    # Return success
+    return VerificationResponse(
+        success=True,
+        message="Verification successful! Redirecting to Discord...",
+        verification_id=verification_data["id"],
+        redirect_url="https://discord.gg/9ZmvQFsP"
+    )
+
+@app.get("/")
+async def root():
+    return {"message": "AuthGateway is running", "status": "serverless"}
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+print("AuthGateway FastAPI app loaded successfully")

@@ -44,11 +44,11 @@
     },
     {
       "src": "/verify.html",
-      "dest": "verify.html"
+      "dest": "dist/verify.html"
     },
     {
       "src": "/verify-auto.html",
-      "dest": "verify-auto.html"
+      "dest": "dist/verify-auto.html"
     },
     {
       "src": "/discord-callback.html",
