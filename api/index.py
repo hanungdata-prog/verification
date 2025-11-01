@@ -404,26 +404,76 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
 
     logger.info(f"📝 Prepared verification data: {verification_data}")
 
-    # Try to save to Supabase
+    # DIRECT Supabase insertion without using the client
     supabase_success = False
     try:
-        logger.info("🔌 Getting Supabase client...")
-        supabase_client = get_supabase_client()
-        if supabase_client:
-            logger.info("✅ Supabase client obtained, attempting to save...")
-            success = await supabase_client.insert_verification(verification_data)
-            if success:
-                logger.info(f"✅ SUCCESS: Verification saved to Supabase for Discord ID: {verify_request.discord_id}")
-                supabase_success = True
-            else:
-                logger.error(f"❌ FAILED: Could not save verification to Supabase")
+        logger.info("🚀 Attempting DIRECT Supabase insertion...")
+
+        if not supabase_url or not supabase_key:
+            logger.error("❌ CRITICAL: Missing Supabase environment variables")
+            raise Exception("Missing Supabase configuration")
+
+        # Direct HTTP POST to Supabase
+        url = f"{supabase_url}/rest/v1/verifications"
+        headers = {
+            "apikey": supabase_key,
+            "Authorization": f"Bearer {supabase_key}",
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+        }
+
+        logger.info(f"🌐 Sending POST to: {url}")
+        logger.info(f"🔑 Headers: {headers}")
+        logger.info(f"📦 Data: {verification_data}")
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                url,
+                headers=headers,
+                json=verification_data
+            )
+
+        logger.info(f"📋 Response status: {response.status_code}")
+        logger.info(f"📋 Response body: {response.text}")
+
+        if response.status_code in [200, 201]:
+            logger.info(f"✅ SUCCESS: Direct Supabase insertion successful for Discord ID: {verify_request.discord_id}")
+            supabase_success = True
         else:
-            logger.error("❌ CRITICAL: Supabase client is None - check environment variables")
+            logger.error(f"❌ FAILED: Direct Supabase insertion failed")
+            logger.error(f"❌ Status: {response.status_code}")
+            logger.error(f"❌ Response: {response.text}")
+
+            # Try to parse error
+            try:
+                error_data = response.json()
+                logger.error(f"❌ Error details: {error_data}")
+            except:
+                logger.error(f"❌ Could not parse error response")
+
     except Exception as e:
-        logger.error(f"❌ EXCEPTION: Supabase error - {str(e)}", exc_info=True)
+        logger.error(f"❌ EXCEPTION during direct Supabase insertion: {str(e)}", exc_info=True)
+
+    # Fallback: Try using client if direct method fails
+    if not supabase_success:
+        try:
+            logger.info("🔄 Attempting fallback with Supabase client...")
+            supabase_client = get_supabase_client()
+            if supabase_client:
+                logger.info("✅ Supabase client obtained, attempting to save...")
+                success = await supabase_client.insert_verification(verification_data)
+                if success:
+                    logger.info(f"✅ SUCCESS: Verification saved to Supabase via client for Discord ID: {verify_request.discord_id}")
+                    supabase_success = True
+                else:
+                    logger.error(f"❌ FAILED: Could not save verification via Supabase client")
+            else:
+                logger.error("❌ CRITICAL: Supabase client is None")
+        except Exception as e:
+            logger.error(f"❌ EXCEPTION: Supabase client error - {str(e)}", exc_info=True)
 
     if not supabase_success:
-        logger.error("❌ Verification was NOT saved to Supabase")
+        logger.error("❌ FINAL: Verification was NOT saved to Supabase by any method")
         # Still return success but indicate database issue
         return VerificationResponse(
             success=True,
@@ -432,7 +482,7 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
             redirect_url="https://discord.gg/9ZmvQFsP"
         )
 
-    logger.info(f"✅ Successfully verified user: {verify_request.discord_id}")
+    logger.info(f"✅ FINAL: Successfully verified and saved user: {verify_request.discord_id}")
 
     # Return success
     return VerificationResponse(
@@ -509,6 +559,71 @@ async def test_supabase():
         return {
             "status": "error",
             "message": f"Supabase test failed: {str(e)}",
+            "error_type": type(e).__name__
+        }
+
+@app.get("/direct-test")
+async def direct_test():
+    """Direct test of Supabase connection"""
+    try:
+        logger.info("🚀 Starting DIRECT Supabase test")
+
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_KEY")
+
+        if not supabase_url or not supabase_key:
+            return {
+                "status": "error",
+                "message": "Missing Supabase environment variables",
+                "supabase_url_set": supabase_url is not None,
+                "supabase_key_set": supabase_key is not None
+            }
+
+        # Test direct connection
+        test_data = {
+            "discord_id": "888888888888888888",
+            "discord_username": "DirectTest#9999",
+            "ip_address": "direct_test_ip",
+            "user_agent": "direct_test_ua",
+            "method": "direct_test",
+            "extra_data": {"test": True, "method": "direct"}
+        }
+
+        url = f"{supabase_url}/rest/v1/verifications"
+        headers = {
+            "apikey": supabase_key,
+            "Authorization": f"Bearer {supabase_key}",
+            "Content-Type": "application/json",
+            "Prefer": "return=minimal"
+        }
+
+        logger.info(f"🌐 Direct test POST to: {url}")
+        logger.info(f"📦 Direct test data: {test_data}")
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                url,
+                headers=headers,
+                json=test_data
+            )
+
+        logger.info(f"📋 Direct test response status: {response.status_code}")
+        logger.info(f"📋 Direct test response body: {response.text}")
+
+        return {
+            "status": "success" if response.status_code in [200, 201] else "error",
+            "response_status": response.status_code,
+            "response_body": response.text,
+            "test_data": test_data,
+            "url": url,
+            "success": response.status_code in [200, 201]
+        }
+
+    except Exception as e:
+        logger.error(f"❌ Direct test exception: {str(e)}", exc_info=True)
+        return {
+            "status": "error",
+            "message": f"Direct test failed: {str(e)}",
             "error_type": type(e).__name__
         }
 
