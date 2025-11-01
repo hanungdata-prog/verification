@@ -287,7 +287,7 @@ async def discord_callback(code: str = Query(...), error: str = None, error_desc
             }
             
             # Redirect to auto-verification page with user data
-            redirect_url = f"/verify-auto?discord_id={discord_user['id']}&discord_username={discord_user['full_username']}"
+            redirect_url = f"/verify-auto.html?discord_id={discord_user['id']}&discord_username={discord_user['full_username']}"
             return RedirectResponse(url=redirect_url)
             
     except httpx.RequestError as e:
@@ -297,17 +297,6 @@ async def discord_callback(code: str = Query(...), error: str = None, error_desc
         logger.error(f"Unexpected error during Discord OAuth2: {str(e)}")
         raise HTTPException(status_code=500, detail="Internal server error during Discord authentication")
 
-@app.get("/verify-auto")
-async def auto_verify_page(request: Request, discord_id: str, discord_username: str):
-    """
-    Auto-verification page that pre-fills Discord user info
-    """
-    with open("static/verify-auto.html", "r") as file:
-        content = file.read()
-        # Replace placeholders with actual values
-        content = content.replace("{{discord_id}}", discord_id)
-        content = content.replace("{{discord_username}}", discord_username)
-    return HTMLResponse(content=content)
 
 @app.get("/admin/verifications")
 async def get_verifications(username: str, password: str):

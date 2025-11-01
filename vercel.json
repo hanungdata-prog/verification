@@ -31,10 +31,6 @@
       "dest": "api/index.py"
     },
     {
-      "src": "/verify-auto",
-      "dest": "api/index.py"
-    },
-    {
       "src": "/privacy",
       "dest": "api/index.py"
     },
