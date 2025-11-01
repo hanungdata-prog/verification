@@ -31,6 +31,10 @@
       "dest": "api/index.py"
     },
     {
+      "src": "/discord/callback(.*)",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/privacy",
       "dest": "api/index.py"
     },
