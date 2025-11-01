@@ -26,6 +26,7 @@ from .auth import encrypt_ip, decrypt_ip
 from .captcha import validate_captcha
 from .webhooks import send_webhook
 from .utils import validate_discord_id, get_user_agent, get_client_ip
+from .supabase_db import get_supabase_client
 
 # Load environment variables
 load_dotenv()
@@ -37,30 +38,17 @@ logger = logging.getLogger(__name__)
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
 
-# JSON storage for verifications
-VERIFICATION_FILE = "verifications.json"
-
-def load_verifications():
-    """Load verifications from JSON file"""
-    if Path(VERIFICATION_FILE).exists():
-        with open(VERIFICATION_FILE, "r", encoding="utf-8") as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return []
-    return []
-
-def save_verifications(verifications):
-    """Save verifications to JSON file"""
-    with open(VERIFICATION_FILE, "w", encoding="utf-8") as f:
-        json.dump(verifications, f, indent=2, ensure_ascii=False, default=str)
-
 def create_db_and_tables():
-    # With JSON storage, we don't need to create database tables
-    # But we'll ensure the JSON file exists with empty array
-    if not Path(VERIFICATION_FILE).exists():
-        save_verifications([])
-    logger.info("JSON verification system initialized")
+    # Initialize Supabase connection
+    try:
+        supabase_client = get_supabase_client()
+        logger.info("Supabase verification system initialized")
+    except Exception as e:
+        logger.error(f"Failed to initialize Supabase: {str(e)}")
+        # Fallback to JSON storage if Supabase is not available
+        logger.warning("Falling back to JSON storage")
+        return False
+    return True
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
@@ -146,15 +134,17 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
         "created_at": datetime.utcnow().isoformat()
     }
     
-    # Save to JSON file
+    # Save to Supabase database
     try:
-        verifications = load_verifications()
-        verifications.append(verification_data)
-        save_verifications(verifications)
-        logger.info(f"Verification saved to JSON for user: {verify_request.discord_id}")
+        supabase_client = get_supabase_client()
+        success = await supabase_client.insert_verification(verification_data)
+        if not success:
+            logger.error(f"Failed to save verification to Supabase for user: {verify_request.discord_id}")
+            raise HTTPException(status_code=500, detail="Error saving verification to database")
+        logger.info(f"Verification saved to Supabase for user: {verify_request.discord_id}")
     except Exception as e:
-        logger.error(f"Error saving verification to JSON: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error saving verification")
+        logger.error(f"Error saving verification to Supabase: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error saving verification to database")
     
     # Send webhook to Discord bot
     try:
@@ -328,18 +318,34 @@ async def get_verifications(username: str, password: str):
     # Basic authentication check
     admin_username = os.getenv("ADMIN_USERNAME")
     admin_password = os.getenv("ADMIN_PASSWORD")
-    
+
     if username != admin_username or password != admin_password:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    # Fetch verifications from JSON file
+
+    # Fetch verifications from Supabase
     try:
-        verifications = load_verifications()
-        # Only return successful verifications
-        successful_verifications = [v for v in verifications if 'verified_at' in v]
-        return successful_verifications
+        supabase_client = get_supabase_client()
+        url = f"{supabase_client.supabase_url}/rest/v1/verifications"
+        params = {
+            "select": "*",
+            "order": "created_at.desc",
+            "limit": 100  # Limit to last 100 verifications
+        }
+
+        headers = supabase_client.headers.copy()
+        headers.pop("Prefer", None)  # Remove Prefer header for GET requests
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers=headers, params=params)
+
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(f"Failed to fetch verifications from Supabase: {response.status_code} - {response.text}")
+                raise HTTPException(status_code=500, detail="Error reading verification data")
+
     except Exception as e:
-        logger.error(f"Error reading verifications from JSON: {str(e)}")
+        logger.error(f"Error reading verifications from Supabase: {str(e)}")
         raise HTTPException(status_code=500, detail="Error reading verification data")
 
 if __name__ == "__main__":
