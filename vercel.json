@@ -48,7 +48,7 @@
   "env": {
     "PYTHONPATH": "/var/task",
     "PYTHONUNBUFFERED": "1",
-    "BASE_URL": "https://verification-gateway-joblow.vercel.app",
-    "DISCORD_REDIRECT_URI": "https://verification-gateway-joblow.vercel.app/discord/callback"
+    "BASE_URL": "https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-a64eej8it.vercel.app",
+    "DISCORD_REDIRECT_URI": "https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-a64eej8it.vercel.app/discord/callback"
   }
 }

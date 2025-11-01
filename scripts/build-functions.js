@@ -63,7 +63,7 @@ os.environ.setdefault('PYTHONUNBUFFERED', '1')
 # Set BASE_URL for deployment
 if not os.getenv('BASE_URL'):
     # Try to detect the base URL from the environment or use a default
-    deployment_url = os.getenv('URL') or os.getenv('VERCEL_URL') or os.getenv('NETLIFY_URL') or 'https://verification-gateway-joblow.vercel.app'
+    deployment_url = os.getenv('URL') or os.getenv('VERCEL_URL') or os.getenv('NETLIFY_URL') or 'https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-a64eej8it.vercel.app'
     if deployment_url and not deployment_url.startswith('http'):
         deployment_url = f"https://{deployment_url}"
     os.environ.setdefault('BASE_URL', deployment_url)
@@ -71,7 +71,7 @@ if not os.getenv('BASE_URL'):
 
 # Set Discord redirect URI if not already set
 if not os.getenv('DISCORD_REDIRECT_URI'):
-    base_url = os.getenv('BASE_URL', 'https://verification-gateway-joblow.vercel.app')
+    base_url = os.getenv('BASE_URL', 'https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-a64eej8it.vercel.app')
     discord_redirect_uri = f"{base_url}/discord/callback"
     os.environ.setdefault('DISCORD_REDIRECT_URI', discord_redirect_uri)
     print(f"🔗 Setting DISCORD_REDIRECT_URI to: {discord_redirect_uri}")
