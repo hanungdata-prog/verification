@@ -447,11 +447,29 @@ async def health():
 
 @app.get("/test-supabase")
 async def test_supabase():
-    """Test Supabase connection"""
+    """Test Supabase connection and debugging"""
     try:
+        logger.info("🧪 Starting Supabase connection test")
+
+        # Check environment variables
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_KEY")
+
+        result = {
+            "env_vars": {
+                "SUPABASE_URL": f"{supabase_url[:20]}..." if supabase_url else "NOT_SET",
+                "SUPABASE_KEY": f"{'Yes' if supabase_key else 'NOT_SET'}"
+            }
+        }
+
         supabase_client = get_supabase_client()
         if not supabase_client:
-            return {"status": "error", "message": "Supabase client not initialized"}
+            result["status"] = "error"
+            result["message"] = "Supabase client not initialized"
+            logger.error("❌ Supabase client is None")
+            return result
+
+        logger.info("✅ Supabase client initialized successfully")
 
         # Test data
         test_data = {
@@ -460,16 +478,68 @@ async def test_supabase():
             "ip_address": "encrypted_test_ip",
             "user_agent": "test_user_agent",
             "method": "test",
-            "extra_data": {"test": True}
+            "extra_data": {"test": True, "timestamp": datetime.utcnow().isoformat()}
         }
 
+        logger.info(f"🧪 Test data prepared: {test_data}")
+
         success = await supabase_client.insert_verification(test_data)
+
+        result["insert_success"] = success
+        result["test_data"] = test_data
+
         if success:
-            return {"status": "success", "message": "Test data inserted to Supabase"}
+            result["status"] = "success"
+            result["message"] = "✅ Test data inserted to Supabase successfully"
+            logger.info("✅ Supabase test successful")
         else:
-            return {"status": "error", "message": "Failed to insert test data"}
+            result["status"] = "error"
+            result["message"] = "❌ Failed to insert test data to Supabase"
+            logger.error("❌ Supabase test failed")
+
+        return result
 
     except Exception as e:
-        return {"status": "error", "message": f"Supabase test failed: {str(e)}"}
+        logger.error(f"❌ Supabase test exception: {str(e)}", exc_info=True)
+        return {
+            "status": "error",
+            "message": f"Supabase test failed: {str(e)}",
+            "error_type": type(e).__name__
+        }
+
+@app.get("/check-db")
+async def check_db():
+    """Check database connection and table structure"""
+    try:
+        supabase_client = get_supabase_client()
+        if not supabase_client:
+            return {"status": "error", "message": "Supabase client not initialized"}
+
+        # Test simple GET request to check table exists
+        url = f"{supabase_client.supabase_url}/rest/v1/verifications?limit=1"
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                url,
+                headers={
+                    "apikey": supabase_client.supabase_key,
+                    "Authorization": f"Bearer {supabase_client.supabase_key}"
+                }
+            )
+
+        return {
+            "status": "success",
+            "table_exists": response.status_code == 200,
+            "response_status": response.status_code,
+            "response_headers": dict(response.headers),
+            "response_body": response.text[:200] + "..." if len(response.text) > 200 else response.text
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Database check failed: {str(e)}",
+            "error_type": type(e).__name__
+        }
 
 print("AuthGateway FastAPI app loaded successfully")

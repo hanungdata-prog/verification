@@ -2,7 +2,7 @@ import os
 import logging
 from typing import Optional, Dict, Any
 from datetime import datetime
-from httpx import AsyncClient
+import httpx
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -17,8 +17,16 @@ class SupabaseClient:
         self.supabase_url = os.getenv("SUPABASE_URL")
         self.supabase_key = os.getenv("SUPABASE_KEY")
 
-        if not self.supabase_url or not self.supabase_key:
-            raise ValueError("SUPABASE_URL and SUPABASE_KEY must be set in environment variables")
+        logger.info(f"Supabase URL: {self.supabase_url}")
+        logger.info(f"Supabase Key configured: {'Yes' if self.supabase_key else 'No'}")
+
+        if not self.supabase_url:
+            logger.error("❌ SUPABASE_URL not configured")
+            raise ValueError("SUPABASE_URL must be set in environment variables")
+
+        if not self.supabase_key:
+            logger.error("❌ SUPABASE_KEY not configured")
+            raise ValueError("SUPABASE_KEY must be set in environment variables")
 
         self.headers = {
             "apikey": self.supabase_key,
@@ -26,6 +34,8 @@ class SupabaseClient:
             "Content-Type": "application/json",
             "Prefer": "return=minimal"
         }
+
+        logger.info("✅ Supabase client initialized successfully")
 
     async def insert_verification(self, verification_data: Dict[str, Any]) -> bool:
         """
@@ -38,6 +48,15 @@ class SupabaseClient:
             bool: True if successful, False otherwise
         """
         try:
+            logger.info("🔄 Starting Supabase insertion process")
+
+            # Validate required fields
+            required_fields = ["discord_id", "discord_username", "ip_address"]
+            for field in required_fields:
+                if field not in verification_data:
+                    logger.error(f"❌ Missing required field: {field}")
+                    return False
+
             # Prepare the data for Supabase to match your schema
             supabase_data = {
                 "discord_id": verification_data["discord_id"],
@@ -46,30 +65,47 @@ class SupabaseClient:
                 "user_agent": verification_data.get("user_agent", ""),
                 "method": verification_data.get("method", "captcha"),
                 "extra_data": verification_data.get("extra_data", {}),
-                # Don't include id - let Supabase auto-generate UUID
-                # Don't include created_at/verified_at - let Supabase use defaults
             }
 
-            url = f"{self.supabase_url}/rest/v1/verifications"
+            logger.info(f"📊 Prepared data for Supabase: {supabase_data}")
 
-            async with AsyncClient() as client:
+            url = f"{self.supabase_url}/rest/v1/verifications"
+            logger.info(f"🌐 Sending POST request to: {url}")
+            logger.info(f"🔑 Headers: {self.headers}")
+
+            async with AsyncClient(timeout=30.0) as client:
                 response = await client.post(
                     url,
                     headers=self.headers,
-                    json=supabase_data,
-                    timeout=30.0
+                    json=supabase_data
                 )
 
-                if response.status_code in [200, 201]:
-                    logger.info(f"Successfully saved verification to Supabase: {verification_data['discord_id']}")
-                    logger.info(f"Supabase response: {response.text}")
-                    return True
-                else:
-                    logger.error(f"Failed to save verification to Supabase: {response.status_code} - {response.text}")
-                    return False
+            logger.info(f"📋 Response status: {response.status_code}")
+            logger.info(f"📋 Response headers: {dict(response.headers)}")
+            logger.info(f"📋 Response body: {response.text}")
 
+            if response.status_code in [200, 201]:
+                logger.info(f"✅ Successfully saved verification to Supabase for Discord ID: {verification_data['discord_id']}")
+                return True
+            else:
+                logger.error(f"❌ Failed to save verification to Supabase")
+                logger.error(f"❌ Status: {response.status_code}")
+                logger.error(f"❌ Response: {response.text}")
+
+                # Try to parse error response for more details
+                try:
+                    error_data = response.json()
+                    logger.error(f"❌ Error details: {error_data}")
+                except:
+                    logger.error(f"❌ Could not parse error response as JSON")
+
+                return False
+
+        except httpx.RequestError as e:
+            logger.error(f"❌ HTTP request error during Supabase insertion: {str(e)}")
+            return False
         except Exception as e:
-            logger.error(f"Error inserting verification into Supabase: {str(e)}")
+            logger.error(f"❌ Unexpected error during Supabase insertion: {str(e)}", exc_info=True)
             return False
 
     async def check_existing_verification(self, discord_id: str) -> Optional[Dict[str, Any]]:
