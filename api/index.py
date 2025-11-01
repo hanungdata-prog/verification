@@ -480,7 +480,7 @@ async def test_supabase():
         test_data = {
             "discord_id": "123456789012345678",
             "discord_username": "TestUser#1234",
-            "ip_address": "encrypted_test_ip",
+            "ip_address": "test_ip_address",  # Plain IP
             "user_agent": "test_user_agent",
             "method": "test",
             "extra_data": {"test": True, "timestamp": datetime.utcnow().isoformat()}
@@ -509,6 +509,123 @@ async def test_supabase():
         return {
             "status": "error",
             "message": f"Supabase test failed: {str(e)}",
+            "error_type": type(e).__name__
+        }
+
+@app.get("/debug-supabase")
+async def debug_supabase():
+    """Debug Supabase connection in detail"""
+    try:
+        logger.info("🔍 Starting detailed Supabase debugging")
+
+        # Check all environment variables
+        supabase_url = os.getenv("SUPABASE_URL")
+        supabase_key = os.getenv("SUPABASE_KEY")
+
+        debug_info = {
+            "environment": {
+                "SUPABASE_URL": {
+                    "set": supabase_url is not None,
+                    "value": supabase_url[:50] + "..." if supabase_url and len(supabase_url) > 50 else supabase_url,
+                    "length": len(supabase_url) if supabase_url else 0
+                },
+                "SUPABASE_KEY": {
+                    "set": supabase_key is not None,
+                    "length": len(supabase_key) if supabase_key else 0,
+                    "starts_with": supabase_key[:20] + "..." if supabase_key and len(supabase_key) > 20 else supabase_key
+                }
+            }
+        }
+
+        if not supabase_url or not supabase_key:
+            debug_info["status"] = "error"
+            debug_info["message"] = "Missing environment variables"
+            return debug_info
+
+        # Try to initialize client
+        try:
+            supabase_client = get_supabase_client()
+            debug_info["client_init"] = "success"
+        except Exception as e:
+            debug_info["client_init"] = "failed"
+            debug_info["client_error"] = str(e)
+            return debug_info
+
+        # Test basic connection to Supabase REST API
+        try:
+            import httpx
+            test_url = f"{supabase_url}/rest/v1/"
+            headers = {
+                "apikey": supabase_key,
+                "Authorization": f"Bearer {supabase_key}"
+            }
+
+            async with httpx.AsyncClient() as client:
+                response = await client.get(test_url, headers=headers, timeout=10.0)
+
+            debug_info["basic_connection"] = {
+                "status": response.status_code,
+                "success": response.status_code == 200
+            }
+        except Exception as e:
+            debug_info["basic_connection"] = {
+                "error": str(e),
+                "success": False
+            }
+
+        # Test table existence
+        try:
+            import httpx
+            table_url = f"{supabase_url}/rest/v1/verifications?limit=1"
+            headers = {
+                "apikey": supabase_key,
+                "Authorization": f"Bearer {supabase_key}"
+            }
+
+            async with httpx.AsyncClient() as client:
+                response = await client.get(table_url, headers=headers, timeout=10.0)
+
+            debug_info["table_check"] = {
+                "status": response.status_code,
+                "success": response.status_code == 200,
+                "response_preview": response.text[:200] + "..." if len(response.text) > 200 else response.text
+            }
+        except Exception as e:
+            debug_info["table_check"] = {
+                "error": str(e),
+                "success": False
+            }
+
+        # Test actual insert
+        try:
+            test_data = {
+                "discord_id": "999999999999999999",
+                "discord_username": "DebugUser#0001",
+                "ip_address": "127.0.0.1",
+                "user_agent": "debug_test",
+                "method": "debug",
+                "extra_data": {"debug": True, "timestamp": datetime.utcnow().isoformat()}
+            }
+
+            success = await supabase_client.insert_verification(test_data)
+            debug_info["insert_test"] = {
+                "success": success,
+                "test_data": test_data
+            }
+        except Exception as e:
+            debug_info["insert_test"] = {
+                "error": str(e),
+                "success": False
+            }
+
+        debug_info["status"] = "completed"
+        return debug_info
+
+    except Exception as e:
+        logger.error(f"❌ Debug Supabase exception: {str(e)}", exc_info=True)
+        return {
+            "status": "error",
+            "message": f"Debug failed: {str(e)}",
             "error_type": type(e).__name__
         }
 
