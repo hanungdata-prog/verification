@@ -83,75 +83,22 @@ async def info():
         ]
     }
 
-# Verification routes
+# API-only verification routes
 @app.get("/verify")
-async def verify_redirect():
+async def verify_info():
     return {
-        "message": "Verification endpoint",
+        "message": "Verification API endpoint",
         "redirect_to": "/verify.html",
         "base_url": os.getenv('BASE_URL')
     }
 
-@app.get("/verify.html", response_class=HTMLResponse)
-async def verify_page():
-    """Serve verify.html page"""
-    try:
-        # Try to read from public directory
-        verify_path = Path(__file__).parent.parent / "public" / "verify.html"
-        if verify_path.exists():
-            with open(verify_path, 'r', encoding='utf-8') as f:
-                return f.read()
-        else:
-            # Fallback HTML
-            return """
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Discord Verification</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
-                    .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-                    h1 { color: #7289DA; }
-                    .btn { background: #7289DA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; display: inline-block; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>🔐 Discord Verification</h1>
-                    <p>Welcome to the Discord verification service.</p>
-                    <p>Click the button below to verify your account:</p>
-                    <br>
-                    <a href="#" class="btn">Verify with Discord</a>
-                    <br><br>
-                    <p><small>Service is running in serverless mode</small></p>
-                </div>
-            </body>
-            </html>
-            """
-    except Exception as e:
-        return f"""
-        <!DOCTYPE html>
-        <html><body>
-            <h1>Error</h1>
-            <p>Could not load verification page: {str(e)}</p>
-        </body></html>
-        """
-
 @app.get("/admin")
 async def admin_info():
     return {
-        "message": "Admin endpoint",
+        "message": "Admin API endpoint",
         "status": "requires authentication",
         "base_url": os.getenv('BASE_URL')
     }
-
-# Handle favicon requests
-@app.get("/favicon.ico")
-@app.get("/favicon.png")
-async def favicon():
-    return JSONResponse({"status": "no favicon"}, status_code=204)
 
 # Discord OAuth placeholder routes
 @app.get("/discord/auth")

@@ -8,6 +8,42 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/verify.html",
+      "dest": "public/verify.html"
+    },
+    {
+      "src": "/verify-auto.html",
+      "dest": "public/verify-auto.html"
+    },
+    {
+      "src": "/discord-callback.html",
+      "dest": "public/discord-callback.html"
+    },
+    {
+      "src": "/index.html",
+      "dest": "public/index.html"
+    },
+    {
+      "src": "/",
+      "dest": "public/index.html"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "public/favicon.ico"
+    },
+    {
+      "src": "/favicon.png",
+      "dest": "public/favicon.png"
+    },
+    {
+      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico))",
+      "dest": "public/$1"
+    },
+    {
       "src": "/(.*)",
       "dest": "api/index.py"
     }
