@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
-Vercel FastAPI application for AuthGateway
+Netlify serverless function for AuthGateway
 """
 import sys
 import os
+import json
 from pathlib import Path
 
 # Add the app directory to Python path
@@ -16,7 +17,8 @@ os.environ.setdefault('PYTHONUNBUFFERED', '1')
 
 # Set BASE_URL for deployment
 if not os.getenv('BASE_URL'):
-    deployment_url = os.getenv('URL') or os.getenv('VERCEL_URL') or os.getenv('NETLIFY_URL') or 'https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-7gx2dt5eq.vercel.app'
+    # Try to detect the base URL from the environment or use a default
+    deployment_url = os.getenv('URL') or os.getenv('VERCEL_URL') or os.getenv('NETLIFY_URL') or 'https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-a64eej8it.vercel.app'
     if deployment_url and not deployment_url.startswith('http'):
         deployment_url = f"https://{deployment_url}"
     os.environ.setdefault('BASE_URL', deployment_url)
@@ -24,90 +26,100 @@ if not os.getenv('BASE_URL'):
 
 # Set Discord redirect URI if not already set
 if not os.getenv('DISCORD_REDIRECT_URI'):
-    base_url = os.getenv('BASE_URL', 'https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-7gx2dt5eq.vercel.app')
+    base_url = os.getenv('BASE_URL', 'https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-a64eej8it.vercel.app')
     discord_redirect_uri = f"{base_url}/discord/callback"
     os.environ.setdefault('DISCORD_REDIRECT_URI', discord_redirect_uri)
     print(f"🔗 Setting DISCORD_REDIRECT_URI to: {discord_redirect_uri}")
 
-# Import FastAPI and create app instance
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, HTMLResponse
+# Import the FastAPI app
+try:
+    from app.main import app
+    print("✅ FastAPI app imported successfully")
+except ImportError as e:
+    print(f"❌ Failed to import FastAPI app: {e}")
 
-# Create FastAPI app instance - THIS IS WHAT VERCEL EXPECTS
-app = FastAPI(
-    title="AuthGateway API",
-    description="Discord verification service",
-    version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
+    # Create fallback app
+    from fastapi import FastAPI
+    app = FastAPI(title="AuthGateway")
 
-# Add CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    @app.get("/")
+    async def root():
+        return {"message": "AuthGateway is running", "status": "serverless mode"}
 
-# Basic API routes
-@app.get("/")
-async def root():
-    return {
-        "message": "AuthGateway is running",
-        "status": "serverless mode",
-        "base_url": os.getenv('BASE_URL', 'Unknown'),
-        "timestamp": "2025-11-02",
-        "service": "Discord Verification Gateway"
-    }
+# AWS Lambda / Netlify Functions handler
+def handler(event, context):
+    """
+    Netlify Functions handler with path routing support
+    """
+    try:
+        # Import mangum for FastAPI adapter
+        from mangum import Mangum
 
-@app.get("/api/health")
-async def health():
-    return {"status": "healthy", "service": "AuthGateway"}
+        # Extract path from event
+        path = event.get('path', '/')
+        http_method = event.get('httpMethod', 'GET')
 
-@app.get("/api/info")
-async def info():
-    return {
-        "title": "AuthGateway",
-        "description": "Discord verification service",
-        "version": "1.0.0",
-        "endpoints": [
-            "/",
-            "/api/health",
-            "/api/info",
-            "/verify",
-            "/verify.html",
-            "/admin"
-        ]
-    }
+        # Check for path override in query parameters (for Discord OAuth routes)
+        query_params = event.get('queryStringParameters') or {}
+        override_path = query_params.get('path')
 
-# API-only verification routes
-@app.get("/verify")
-async def verify_info():
-    return {
-        "message": "Verification API endpoint",
-        "redirect_to": "/verify.html",
-        "base_url": os.getenv('BASE_URL')
-    }
+        if override_path:
+            path = override_path
+            print(f"🔄 Path overridden to: {path}")
 
-@app.get("/admin")
-async def admin_info():
-    return {
-        "message": "Admin API endpoint",
-        "status": "requires authentication",
-        "base_url": os.getenv('BASE_URL')
-    }
+        # Handle routing for Discord OAuth and other paths
+        if path.startswith('/discord/'):
+            # Discord OAuth routes
+            print(f"🔗 Discord OAuth route: {http_method} {path}")
+        elif path.startswith('/api/'):
+            # API routes
+            print(f"🔌 API route: {http_method} {path}")
+        elif path.startswith('/verify') or path.startswith('/admin'):
+            # Verification and admin routes
+            print(f"✅ Verification route: {http_method} {path}")
+        else:
+            # Root and other routes
+            print(f"🏠 Root route: {http_method} {path}")
 
-# Discord OAuth placeholder routes
-@app.get("/discord/auth")
-async def discord_auth():
-    return {"message": "Discord OAuth endpoint", "status": "not configured"}
+        # Use Mangum to handle FastAPI app
+        mangum_handler = Mangum(app)
+        return mangum_handler(event, context)
 
-@app.get("/discord/callback")
-async def discord_callback():
-    return {"message": "Discord OAuth callback", "status": "not configured"}
+    except ImportError:
+        # Fallback without mangum
+        print("⚠️ Mangum not available, using fallback mode")
+        return {
+            'statusCode': 200,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                "message": "AuthGateway is running",
+                "status": "serverless fallback mode",
+                "note": "Install mangum for full functionality",
+                "path": event.get('path', '/'),
+                "method": event.get('httpMethod', 'GET')
+            })
+        }
+    except Exception as e:
+        # Error handling
+        print(f"❌ Error in handler: {e}")
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({
+                "error": "Internal server error",
+                "message": str(e),
+                "path": event.get('path', '/')
+            })
+        }
+
+# Export for Netlify
+lambda_handler = handler
 
 # Local testing
 if __name__ == "__main__":
