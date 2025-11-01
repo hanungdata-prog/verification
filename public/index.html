@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark-theme">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,86 +8,61 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css">
-
-    <!-- Theme Management -->
-    <script src="theme.js"></script>
+    <link rel="stylesheet" href="vercel-theme.css">
+    <link rel="stylesheet" href="animations.css">
+    <link rel="stylesheet" href="styles.css"> <!-- Keep original styles for functions -->
 
     <style>
         body {
-            background: var(--gradient-primary);
+            background-color: #000000;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
             overflow: hidden;
-        }
-
-        /* Background animation */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background:
-                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(30, 64, 175, 0.2) 0%, transparent 50%);
-            animation: backgroundShift 20s ease-in-out infinite;
-        }
-
-        @keyframes backgroundShift {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33% { transform: translate(-20px, -20px) scale(1.1); }
-            66% { transform: translate(20px, -10px) scale(0.9); }
+            font-family: var(--font-sans);
         }
 
         .hero-card {
-            background: var(--color-surface-glass);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--color-border-secondary);
-            border-radius: var(--radius-3xl);
+            background-color: #000000;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-2xl);
             padding: var(--space-12);
             max-width: 600px;
             width: 90%;
-            box-shadow: var(--shadow-2xl);
+            box-shadow: var(--shadow-xl);
             position: relative;
             z-index: 1;
             animation: fadeInUp 0.8s ease-out;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #000000, #ffffff, #000000);
+            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
         }
 
         .logo {
             width: 80px;
             height: 80px;
             margin: 0 auto var(--space-6);
-            background: var(--gradient-primary);
-            border-radius: var(--radius-2xl);
+            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--font-size-3xl);
-            color: white;
-            box-shadow: var(--shadow-accent);
+            font-size: var(--text-3xl);
+            color: #000000;
+            box-shadow: var(--shadow-lg);
             animation: logoFloat 3s ease-in-out infinite;
         }
 
@@ -97,37 +72,42 @@
         }
 
         h1 {
-            background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-accent-light) 100%);
+            background: linear-gradient(135deg, var(--foreground) 0%, var(--muted) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: var(--space-4);
-            font-size: var(--font-size-5xl);
-            font-weight: var(--font-weight-bold);
+            font-size: var(--text-5xl);
+            font-weight: var(--font-bold);
+            text-align: center;
         }
 
         .subtitle {
-            color: var(--color-text-secondary);
-            font-size: var(--font-size-lg);
-            line-height: var(--line-height-relaxed);
+            color: var(--muted);
+            font-size: var(--text-lg);
+            line-height: var(--leading-relaxed);
             margin-bottom: var(--space-8);
+            text-align: center;
         }
 
         .discord-button {
             background: #5865F2;
             color: white;
             padding: var(--space-4) var(--space-8);
-            border-radius: var(--radius-2xl);
-            font-size: var(--font-size-lg);
-            font-weight: var(--font-weight-semibold);
+            border-radius: var(--radius-full);
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
             display: inline-flex;
             align-items: center;
             gap: var(--space-3);
             text-decoration: none;
-            transition: all var(--transition-normal);
+            transition: all 0.2s ease;
             box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
             position: relative;
             overflow: hidden;
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
         }
 
         .discord-button::before {
@@ -152,7 +132,7 @@
         }
 
         .discord-button i {
-            font-size: var(--font-size-xl);
+            font-size: var(--text-xl);
         }
 
         .features {
@@ -163,72 +143,70 @@
         }
 
         .feature {
-            background: var(--color-surface-elevated);
-            border: 1px solid var(--color-border-primary);
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border);
             border-radius: var(--radius-xl);
             padding: var(--space-6);
             text-align: center;
-            transition: all var(--transition-normal);
-            animation: fadeIn 0.6s ease-out backwards;
+            transition: all 0.2s ease;
         }
-
-        .feature:nth-child(1) { animation-delay: 0.2s; }
-        .feature:nth-child(2) { animation-delay: 0.4s; }
-        .feature:nth-child(3) { animation-delay: 0.6s; }
 
         .feature:hover {
             transform: translateY(-4px);
-            border-color: var(--color-accent);
-            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+            border-color: #ffffff;
+            box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
         }
 
         .feature-icon {
             width: 48px;
             height: 48px;
             margin: 0 auto var(--space-3);
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
             border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--font-size-xl);
-            color: white;
+            font-size: var(--text-xl);
+            color: #000000;
+            margin-bottom: var(--space-3);
         }
 
         .feature-title {
-            font-size: var(--font-size-base);
-            font-weight: var(--font-weight-semibold);
-            color: var(--color-text-primary);
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--foreground);
             margin-bottom: var(--space-1);
         }
 
         .feature-description {
-            font-size: var(--font-size-sm);
-            color: var(--color-text-muted);
-            line-height: var(--line-height-snug);
+            font-size: var(--text-sm);
+            color: var(--muted);
+            line-height: var(--leading-snug);
         }
 
         .countdown {
             margin-top: var(--space-6);
-            font-size: var(--font-size-sm);
-            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            color: var(--muted);
+            text-align: center;
         }
 
         .countdown-number {
-            font-weight: var(--font-weight-semibold);
-            color: var(--color-accent-light);
+            font-weight: var(--font-semibold);
+            color: var(--foreground);
         }
 
         /* Loading dots animation */
         .loading-dots {
             display: inline-flex;
             gap: 4px;
+            margin-top: 8px;
         }
 
         .loading-dots span {
             width: 8px;
             height: 8px;
-            background: var(--color-accent);
+            background: var(--foreground);
             border-radius: 50%;
             animation: bounce 1.4s ease-in-out infinite both;
         }
@@ -254,7 +232,7 @@
             }
 
             h1 {
-                font-size: var(--font-size-4xl);
+                font-size: var(--text-4xl);
             }
 
             .features {
@@ -262,26 +240,39 @@
                 gap: var(--space-3);
             }
         }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="hero-card">
-        <div class="logo">
+    <div class="hero-card animate-fade-in">
+        <div class="logo animate-float">
             <i class="fas fa-shield-halved"></i>
         </div>
 
-        <h1>AuthGateway</h1>
-        <p class="subtitle">
+        <h1 class="animate-slide-in-up">AuthGateway</h1>
+        <p class="subtitle animate-slide-in-up stagger-1">
             Enterprise-grade Discord verification service for modern communities.
             Secure, fast, and privacy-focused authentication.
         </p>
 
-        <a href="/verify.html" class="discord-button">
-            <i class="fab fa-discord"></i>
-            Verify with Discord
-        </a>
+        <div class="flex justify-center animate-slide-in-up stagger-2">
+            <a href="/verify.html" class="discord-button hover-lift">
+                <i class="fab fa-discord"></i>
+                Verify with Discord
+            </a>
+        </div>
 
-        <div class="features">
+        <div class="features animate-slide-in-up stagger-3">
             <div class="feature">
                 <div class="feature-icon">
                     <i class="fas fa-lock"></i>
@@ -307,9 +298,9 @@
             </div>
         </div>
 
-        <div class="countdown">
+        <div class="countdown animate-slide-in-up stagger-4">
             Auto-redirecting in <span class="countdown-number" id="countdown">5</span> seconds
-            <div class="loading-dots" style="margin-top: 8px;">
+            <div class="loading-dots">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -351,7 +342,7 @@
                 redirectEnabled = false;
                 clearInterval(countdownInterval);
                 document.querySelector('.countdown').innerHTML =
-                    '<span style="color: var(--color-success);">Auto-redirect cancelled</span>';
+                    '<span style="color: var(--success);">Auto-redirect cancelled</span>';
             }
         };
 
@@ -368,5 +359,6 @@
             }
         });
     </script>
+    <script src="animations.js"></script>
 </body>
 </html>

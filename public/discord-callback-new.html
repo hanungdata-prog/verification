@@ -468,13 +468,13 @@
 
                             // For now, redirect to verify-auto page
                             setTimeout(() => {
-                                window.location.href = '/verify-auto.html';
+                                window.location.href = '/verify-auto-new.html';
                             }, 2000);
                         } else {
                             updateLoadingStep(4, 'completed');
                             document.getElementById('message').textContent = 'Authentication successful! Redirecting...';
                             setTimeout(() => {
-                                window.location.href = '/verify-auto.html';
+                                window.location.href = '/verify-auto-new.html';
                             }, 1500);
                         }
                     } else {
