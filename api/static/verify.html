@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Access Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+        }
+
+        .logo {
+            margin-bottom: 24px;
+        }
+
+        .logo i {
+            font-size: 48px;
+            color: #5865F2;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h1 {
+            color: #2c2f33;
+            font-size: 28px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #72767d;
+            font-size: 16px;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        .feature-list {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #36393f;
+            font-size: 14px;
+        }
+
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .feature-item i {
+            color: #5865F2;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .discord-login {
+            background: #5865F2;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .discord-login:hover {
+            background: #4752c4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(88, 101, 242, 0.4);
+        }
+
+        .discord-login:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            margin: 20px 0;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .privacy-link {
+            margin-top: 24px;
+            font-size: 13px;
+            color: #72767d;
+        }
+
+        .privacy-link a {
+            color: #5865F2;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .privacy-link a:hover {
+            color: #4752c4;
+            text-decoration: underline;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e3e5e8;
+            color: #36393f;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        .security-badge i {
+            color: #43b581;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        
+        <h1>Community Access Verification</h1>
+        <p class="subtitle">Verify your identity to join our exclusive Discord community</p>
+        
+        <div class="feature-list">
+            <div class="feature-item">
+                <i class="fas fa-user-check"></i>
+                <span>Secure Discord authentication</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-lock"></i>
+                <span>No manual ID entry required</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Protected by advanced security</span>
+            </div>
+        </div>
+        
+        <!-- Discord OAuth2 Login Button -->
+        <button class="discord-login" onclick="redirectToDiscord()">
+            <i class="fab fa-discord"></i>
+            Continue with Discord
+        </button>
+        
+        <div class="security-badge">
+            <i class="fas fa-shield-alt"></i>
+            Secure & Encrypted
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="privacy-link">
+            <a href="/privacy"><i class="fas fa-user-shield"></i> Privacy Policy</a>
+        </div>
+    </div>
+
+    <script>
+        // Discord OAuth redirect function
+        function redirectToDiscord() {
+            const clientId = '1230795947257368606';
+            const redirectUri = encodeURIComponent(window.location.origin + '/discord/callback');
+            const scopes = 'identify';
+
+            const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scopes}`;
+
+            window.location.href = discordAuthUrl;
+        }
+
+        // Simple script to handle any messages if needed
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
+
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+</body>
+</html>

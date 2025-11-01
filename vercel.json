@@ -26,29 +26,35 @@
     },
     {
       "src": "/privacy",
-      "dest": "/privacy.html"
+      "dest": "/api/index.py"
     },
     {
-      "src": "/discord-callback.html",
-      "dest": "/discord-callback.html"
+      "src": "/static/(.*)",
+      "dest": "/public/$1"
     },
     {
       "src": "/verify.html",
-      "dest": "/verify.html"
+      "dest": "/public/verify.html"
+    },
+    {
+      "src": "/discord-callback.html",
+      "dest": "/public/discord-callback.html"
     },
     {
       "src": "/verify-auto.html",
-      "dest": "/verify-auto.html"
+      "dest": "/public/verify-auto.html"
+    },
+    {
+      "src": "/",
+      "dest": "/public/index.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/api/index.py"
     }
   ],
   "env": {
     "PYTHONPATH": "/var/task",
-    "PYTHONUNBUFFERED": "1",
-    "BASE_URL": "https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-a64eej8it.vercel.app",
-    "DISCORD_REDIRECT_URI": "https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2-a64eej8it.vercel.app/discord/callback"
+    "PYTHONUNBUFFERED": "1"
   }
 }

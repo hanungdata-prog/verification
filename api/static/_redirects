@@ -1,0 +1,31 @@
+# Discord OAuth routes - serve callback page directly
+/discord/callback    /discord-callback.html    200
+
+# API routes to serverless functions
+/api/*    /.netlify/functions/api/:splat    200
+
+# Direct verify route to dedicated serverless function
+/verify    /.netlify/functions/verify    200
+
+# Other verification routes to serverless functions (but not /verify itself)
+/verify/*    /.netlify/functions/api/:splat    200
+/admin/*    /.netlify/functions/api/:splat    200
+
+# Static files - serve directly
+/static/*    /static/:splat    200
+/public/*    /public/:splat    200
+
+# Privacy policy and other static pages
+/privacy    /privacy.html    200
+/verify.html    /verify.html    200
+/verify-auto.html    /verify-auto.html    200
+
+# Root route - main page is verify.html (served as index.html)
+/    /index.html    200
+
+# Specific routes for verification pages
+/verify    /index.html    200
+/verify-auto    /verify-auto.html    200
+
+# Default fallback for SPA routing (index.html)
+/*    /index.html    200
