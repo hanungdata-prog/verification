@@ -521,6 +521,8 @@
 
   <!-- Scripts -->
   <script src="security.js"></script>
+  <script src="token-handler.js"></script>
+  <script src="verification-check.js"></script>
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
   <script src="debug.js"></script>
@@ -535,19 +537,57 @@
       return m ? decodeURIComponent(m[1]) : '';
     }
 
-    function populateDiscordData() {
-      const id = getUrlParameter('discord_id'), name = getUrlParameter('discord_username');
-      setTimeout(() => {
+    async function populateDiscordData() {
+      setTimeout(async () => {
         const idEl = document.getElementById('userId'), nameEl = document.getElementById('userName');
-        if (id && name) {
-          idEl.classList.remove('loading-skeleton'); nameEl.classList.remove('loading-skeleton');
-          idEl.textContent = id; nameEl.textContent = name;
-          document.getElementById('discordId').value = id;
-          document.getElementById('discordUsername').value = name;
-        } else {
-          idEl.textContent = 'Not available'; nameEl.textContent = 'Not available';
+
+        try {
+          // Try to get Discord info from token handler first
+          if (window.tokenHandler) {
+            const discordInfo = await window.tokenHandler.getDiscordInfoFromURL();
+
+            if (discordInfo && discordInfo.discord_id && discordInfo.discord_username) {
+              // Use token-based Discord info
+              idEl.classList.remove('loading-skeleton');
+              nameEl.classList.remove('loading-skeleton');
+              idEl.textContent = discordInfo.discord_id;
+              nameEl.textContent = discordInfo.discord_username;
+              document.getElementById('discordId').value = discordInfo.discord_id;
+              document.getElementById('discordUsername').value = discordInfo.discord_username;
+
+              console.log('✅ Discord data loaded from token:', discordInfo);
+              return;
+            }
+          }
+
+          // Fallback to direct URL parameters (for backward compatibility)
+          const id = getUrlParameter('discord_id'), name = getUrlParameter('discord_username');
+          if (id && name) {
+            idEl.classList.remove('loading-skeleton');
+            nameEl.classList.remove('loading-skeleton');
+            idEl.textContent = id;
+            nameEl.textContent = name;
+            document.getElementById('discordId').value = id;
+            document.getElementById('discordUsername').value = name;
+            console.log('⚠️ Using direct URL parameters (consider upgrading to tokens)');
+          } else {
+            // No Discord info found
+            idEl.textContent = 'Not available';
+            nameEl.textContent = 'Not available';
+            idEl.style.color = nameEl.style.color = 'var(--error)';
+            showMessage('Discord authentication required. Please authenticate with Discord first.', 'error');
+
+            // Show authentication prompt
+            if (window.tokenHandler) {
+              window.tokenHandler.showAuthenticationPrompt();
+            }
+          }
+        } catch (error) {
+          console.error('❌ Error populating Discord data:', error);
+          idEl.textContent = 'Error loading';
+          nameEl.textContent = 'Error loading';
           idEl.style.color = nameEl.style.color = 'var(--error)';
-          showMessage('Discord info not found.', 'error');
+          showMessage('Failed to load Discord information. Please try again.', 'error');
         }
       }, 800);
     }
@@ -717,8 +757,19 @@
       if (y !== 'error') setTimeout(() => m.style.display = 'none', 5000);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      populateDiscordData();
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Initialize token handler first
+      if (window.tokenHandler) {
+        try {
+          await window.tokenHandler.initialize();
+          console.log('✅ Token handler initialized');
+        } catch (error) {
+          console.error('❌ Token handler initialization failed:', error);
+        }
+      }
+
+      // Then populate Discord data
+      await populateDiscordData();
       if (HCAPTCHA_SITE_KEY) loadHcaptcha();
     });
 
