@@ -75,6 +75,34 @@
       "dest": "$1"
     },
     {
+      "src": "/api/csrf-nonce",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/security-error.html",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/check-vpn/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/api/check-security",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/api/check-verification/(.*)",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/api/check-user-verification",
+      "dest": "api/index.py"
+    },
+    {
+      "src": "/api/verification-stats",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "api/index.py"
     }

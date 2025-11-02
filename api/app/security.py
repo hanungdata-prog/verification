@@ -61,7 +61,7 @@ class SecurityConfig:
     SESSION_TIMEOUT = 3600  # 1 hour
 
 class VPN_Detector:
-    """Detect VPN/proxy usage using multiple APIs and heuristics"""
+    """Detect VPN/proxy usage using ProxyCheck.io and other APIs"""
 
     def __init__(self):
         self.cache = {}
@@ -70,7 +70,7 @@ class VPN_Detector:
         }
 
     async def detect_vpn(self, ip: str) -> Tuple[bool, Dict]:
-        """Detect if IP is using VPN/proxy"""
+        """Detect if IP is using VPN/proxy using ProxyCheck.io"""
         # Check cache first
         if ip in self.cache:
             cache_time, result = self.cache[ip]
@@ -84,59 +84,74 @@ class VPN_Detector:
             "is_tor": False,
             "country": "unknown",
             "provider": "unknown",
-            "confidence": 0.0
+            "confidence": 0.0,
+            "api_used": "proxycheck.io"
         }
 
         try:
-            # Method 1: IP-API (free)
-            async with httpx.AsyncClient(timeout=10) as client:
-                response = await client.get(f"http://ip-api.com/json/{ip}")
+            # Primary method: ProxyCheck.io (free tier, 1000 requests/day)
+            logger.info(f"🔍 Checking VPN status for {ip} using ProxyCheck.io")
+            async with httpx.AsyncClient(timeout=15) as client:
+                response = await client.get(f"https://proxycheck.io/v2/{ip}")
+
                 if response.status_code == 200:
                     data = response.json()
-                    if data.get("proxy") or data.get("hosting"):
+                    logger.info(f"📋 ProxyCheck.io response for {ip}: {data}")
+
+                    # Extract VPN/proxy information
+                    proxy_info = data.get("proxy", "no")
+                    is_proxy = proxy_info == "yes"
+
+                    if is_proxy:
+                        detection_results["is_vpn"] = True
                         detection_results["is_proxy"] = True
+                        detection_results["confidence"] = 0.9
+
+                    # Get additional info
+                    detection_results["country"] = data.get("country", "unknown")
+                    detection_results["provider"] = data.get("provider", "unknown")
+
+                    # Check if datacenter IP
+                    if data.get("type") == "datacenter":
                         detection_results["is_datacenter"] = True
-                    detection_results["country"] = data.get("countryCode", "unknown")
-                    detection_results["provider"] = data.get("isp", "unknown")
+                        detection_results["confidence"] = max(detection_results["confidence"], 0.7)
+
+                    logger.info(f"✅ VPN detection complete for {ip}: is_vpn={detection_results['is_vpn']}")
+                else:
+                    logger.warning(f"⚠️ ProxyCheck.io API error for {ip}: {response.status_code}")
 
         except Exception as e:
-            logger.warning(f"IP-API detection failed: {e}")
+            logger.warning(f"⚠️ ProxyCheck.io detection failed for {ip}: {e}")
 
-        try:
-            # Method 2: IPAPI (free tier)
-            async with httpx.AsyncClient(timeout=10) as client:
-                response = await client.get(f"https://ipapi.co/{ip}/json/")
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get("proxy"):
-                        detection_results["is_proxy"] = True
-                    detection_results["country"] = data.get("country_code", "unknown")
-                    detection_results["provider"] = data.get("org", "unknown")
+            # Fallback to IP-API
+            try:
+                logger.info(f"🔄 Fallback: Using IP-API for {ip}")
+                async with httpx.AsyncClient(timeout=10) as client:
+                    response = await client.get(f"http://ip-api.com/json/{ip}")
+                    if response.status_code == 200:
+                        data = response.json()
+                        if data.get("proxy") or data.get("hosting"):
+                            detection_results["is_proxy"] = True
+                            detection_results["is_datacenter"] = True
+                            detection_results["confidence"] = 0.6
+                        detection_results["country"] = data.get("countryCode", "unknown")
+                        detection_results["provider"] = data.get("isp", "unknown")
+                        detection_results["api_used"] = "ip-api"
 
-        except Exception as e:
-            logger.warning(f"IPAPI detection failed: {e}")
+            except Exception as e:
+                logger.warning(f"⚠️ IP-API fallback failed for {ip}: {e}")
 
-        # Heuristic detection
+        # Final determination
         detection_results["is_vpn"] = (
             detection_results["is_proxy"] or
             detection_results["is_datacenter"] or
             detection_results["is_tor"]
         )
 
-        # Calculate confidence
-        confidence_score = 0
-        if detection_results["is_proxy"]:
-            confidence_score += 0.7
-        if detection_results["is_datacenter"]:
-            confidence_score += 0.5
-        if detection_results["is_tor"]:
-            confidence_score += 0.9
-
-        detection_results["confidence"] = min(confidence_score, 1.0)
-
         # Cache result
         self.cache[ip] = (time.time(), detection_results["is_vpn"])
 
+        logger.info(f"🎯 Final VPN detection for {ip}: {detection_results}")
         return detection_results["is_vpn"], detection_results
 
 class DomainValidator:

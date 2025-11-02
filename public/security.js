@@ -359,10 +359,18 @@ class SecurityManager {
         }, 5000);
     }
 
-    // VPN Detection (frontend heuristic)
+    // VPN Detection (using ProxyCheck.io API + frontend heuristics)
     async detectVPN() {
         try {
-            // Check for common VPN indicators
+            // First try server-side VPN detection using ProxyCheck.io
+            const serverVpnCheck = await this.checkServerSideVPN();
+            if (serverVpnCheck.is_vpn) {
+                this.securityChecks.vpnBlocked = true;
+                this.handleSecurityError('VPN or proxy detected (server-side check)');
+                return true;
+            }
+
+            // Fallback to client-side heuristics
             const indicators = {
                 timezoneMismatch: this.checkTimezoneMismatch(),
                 navigatorProperties: this.checkNavigatorProperties(),
@@ -374,14 +382,40 @@ class SecurityManager {
 
             if (vpnScore >= 2) {
                 this.securityChecks.vpnBlocked = true;
-                this.handleSecurityError('VPN or proxy detected');
+                this.handleSecurityError('VPN or proxy detected (client-side check)');
                 return true;
             }
 
+            console.log('✅ No VPN/proxy detected');
             return false;
         } catch (error) {
             console.error('VPN detection failed:', error);
             return false;
+        }
+    }
+
+    // Server-side VPN detection using ProxyCheck.io
+    async checkServerSideVPN() {
+        try {
+            const response = await fetch('/api/check-security', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                console.warn('Server-side VPN check failed:', response.status);
+                return { is_vpn: false, confidence: 0 };
+            }
+
+            const data = await response.json();
+            return data.vpn_status || { is_vpn: false, confidence: 0 };
+        } catch (error) {
+            console.warn('Server-side VPN check error:', error);
+            return { is_vpn: false, confidence: 0 };
         }
     }
 

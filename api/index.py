@@ -365,12 +365,149 @@ async def discord_callback(request: Request, code: str = Query(None), error: str
 @app.post("/verify", response_model=VerificationResponse)
 @limiter.limit("5 per 10 minutes")
 async def verify_user(request: Request, verify_request: VerifyRequest):
-    """Main verification endpoint"""
+    """Main verification endpoint with VPN detection"""
     client_ip = get_client_ip(request)
     user_agent = get_user_agent(request)
 
     logger.info(f"🔄 Verification attempt from IP: {client_ip}")
     logger.info(f"👤 Discord ID: {verify_request.discord_id}, Username: {verify_request.discord_username}")
+
+    # VPN/Proxy Detection using ProxyCheck.io
+    try:
+        logger.info(f"🔍 Starting VPN detection for IP: {client_ip}")
+
+        # Import security module
+        from app.security import VPN_Detector
+        vpn_detector = VPN_Detector()
+
+        # Check for VPN/Proxy
+        is_vpn, vpn_info = await vpn_detector.detect_vpn(client_ip)
+
+        if is_vpn:
+            logger.warning(f"🚫 VPN/Proxy detected from {client_ip}: {vpn_info}")
+            return JSONResponse(
+                status_code=403,
+                content={
+                    "success": False,
+                    "message": "VPN/Proxy usage is not allowed for verification",
+                    "error_code": "VPN_DETECTED",
+                    "vpn_info": vpn_info,
+                    "redirect_url": f"/security-error.html?reason=vpn&message=VPN or proxy detected. Please disable VPN and try again."
+                }
+            )
+        else:
+            logger.info(f"✅ No VPN/Proxy detected for {client_ip}")
+
+    except ImportError as e:
+        logger.warning(f"⚠️ Security module not available: {e}")
+        logger.info("🔄 Continuing without VPN detection...")
+    except Exception as e:
+        logger.error(f"❌ VPN detection failed: {e}")
+        logger.info("🔄 Continuing verification despite VPN detection failure...")
+
+    # Check for existing verification (prevent double verification)
+    try:
+        logger.info(f"🔍 Checking for existing verification for Discord ID: {verify_request.discord_id}")
+
+        supabase_client = get_supabase_client()
+        if supabase_client:
+            existing_verification = await supabase_client.check_existing_verification(verify_request.discord_id)
+
+            if existing_verification:
+                logger.warning(f"🚫 User {verify_request.discord_username} already verified at {existing_verification.get('created_at', 'unknown time')}")
+
+                # Calculate time since last verification
+                from datetime import datetime
+                if 'created_at' in existing_verification:
+                    try:
+                        created_time = datetime.fromisoformat(existing_verification['created_at'].replace('Z', '+00:00'))
+                        time_diff = datetime.utcnow().replace(tzinfo=created_time.tzinfo) - created_time
+                        hours_ago = time_diff.total_seconds() / 3600
+                        time_info = f"{hours_ago:.1f} hours ago"
+                    except:
+                        time_info = "some time ago"
+                else:
+                    time_info = "previously"
+
+                return JSONResponse(
+                    status_code=409,  # Conflict status code
+                    content={
+                        "success": False,
+                        "message": "You have already been verified",
+                        "error_code": "ALREADY_VERIFIED",
+                        "details": {
+                            "discord_id": existing_verification.get("discord_id"),
+                            "discord_username": existing_verification.get("discord_username"),
+                            "verification_date": existing_verification.get("created_at"),
+                            "time_ago": time_info,
+                            "ip_address": existing_verification.get("ip_address"),
+                            "method": existing_verification.get("method", "unknown")
+                        },
+                        "redirect_url": f"/security-error.html?reason=already_verified&message=You have already been verified {time_info}. Each Discord account can only be verified once."
+                    }
+                )
+            else:
+                logger.info(f"✅ No existing verification found for {verify_request.discord_id}")
+        else:
+            logger.warning("⚠️ Supabase client not available, skipping duplicate check")
+
+    except Exception as e:
+        logger.error(f"❌ Error checking existing verification: {e}")
+        logger.info("🔄 Continuing verification despite duplicate check failure...")
+
+    # Check IP verification rate limiting
+    try:
+        logger.info(f"🔍 Checking IP verification rate for: {client_ip}")
+
+        if supabase_client:
+            ip_count_24h = await supabase_client.check_ip_verification_count(client_ip, 24)
+            ip_count_1h = await supabase_client.check_ip_verification_count(client_ip, 1)
+
+            logger.info(f"📊 IP {client_ip} has {ip_count_1h} verifications in last hour, {ip_count_24h} in last 24 hours")
+
+            # Block if too many verifications from same IP
+            if ip_count_1h >= 3:  # Max 3 per hour
+                logger.warning(f"🚫 IP {client_ip} exceeded hourly limit ({ip_count_1h} >= 3)")
+                return JSONResponse(
+                    status_code=429,  # Too Many Requests
+                    content={
+                        "success": False,
+                        "message": "Too many verification attempts from your network",
+                        "error_code": "IP_RATE_LIMIT_EXCEEDED",
+                        "details": {
+                            "ip_address": client_ip,
+                            "count_1h": ip_count_1h,
+                            "count_24h": ip_count_24h,
+                            "limit_1h": 3,
+                            "limit_24h": 10
+                        },
+                        "redirect_url": f"/security-error.html?reason=rate_limit&message=Too many verification attempts from your network. Please wait before trying again."
+                    }
+                )
+            elif ip_count_24h >= 10:  # Max 10 per day
+                logger.warning(f"🚫 IP {client_ip} exceeded daily limit ({ip_count_24h} >= 10)")
+                return JSONResponse(
+                    status_code=429,
+                    content={
+                        "success": False,
+                        "message": "Daily verification limit reached for your network",
+                        "error_code": "IP_DAILY_LIMIT_EXCEEDED",
+                        "details": {
+                            "ip_address": client_ip,
+                            "count_24h": ip_count_24h,
+                            "limit_24h": 10
+                        },
+                        "redirect_url": f"/security-error.html?reason=daily_limit&message=Daily verification limit reached for your network. Please try again tomorrow."
+                    }
+                )
+            else:
+                logger.info(f"✅ IP {client_ip} rate limits are acceptable")
+        else:
+            logger.warning("⚠️ Supabase client not available, skipping IP rate limiting")
+
+    except Exception as e:
+        logger.error(f"❌ Error checking IP rate limits: {e}")
+        logger.info("🔄 Continuing verification despite rate limit check failure...")
 
     # Log environment variables (safely)
     supabase_url = os.getenv("SUPABASE_URL")
@@ -781,6 +918,300 @@ async def check_db():
             "status": "error",
             "message": f"Database check failed: {str(e)}",
             "error_type": type(e).__name__
+        }
+
+@app.get("/api/csrf-nonce")
+async def get_csrf_nonce(request: Request):
+    """Generate CSRF nonce for security"""
+    try:
+        # Get session ID from cookie or generate new one
+        session_id = request.cookies.get("session_id") or secrets.token_urlsafe(16)
+
+        # Generate nonce
+        nonce = secrets.token_urlsafe(32)
+
+        # Store in Redis or memory (for now, just return it)
+        # In production, you'd want to store this server-side
+
+        return JSONResponse({
+            "nonce": nonce,
+            "session_id": session_id,
+            "expires_in": 3600  # 1 hour
+        })
+
+    except Exception as e:
+        logger.error(f"CSRF nonce generation failed: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate security token")
+
+@app.get("/security-error.html")
+async def security_error_page(reason: str = None, message: str = None):
+    """Serve security error page"""
+    try:
+        # Read the security error HTML file
+        with open("public/security-error.html", "r", encoding="utf-8") as f:
+            html_content = f.read()
+
+        # Replace placeholders if needed
+        if reason:
+            html_content = html_content.replace("{{reason}}", reason)
+        if message:
+            html_content = html_content.replace("{{message}}", message)
+
+        return HTMLResponse(content=html_content)
+
+    except FileNotFoundError:
+        # Fallback error page if file doesn't exist
+        return HTMLResponse(content="""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Security Error</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+                .error { color: red; }
+            </style>
+        </head>
+        <body>
+            <h1 class="error">🛡️ Security Error</h1>
+            <p>Access has been blocked due to security restrictions.</p>
+            <p><strong>Reason:</strong> {reason}</p>
+            <p><a href="/verify.html">Return to Verification</a></p>
+        </body>
+        </html>
+        """.format(reason=reason or "Unknown"))
+    except Exception as e:
+        logger.error(f"Error serving security page: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/check-vpn/{ip}")
+async def check_vpn_status(ip: str):
+    """Check if IP is using VPN/proxy using ProxyCheck.io"""
+    try:
+        # Use ProxyCheck.io API (free tier)
+        async with httpx.AsyncClient(timeout=15) as client:
+            response = await client.get(f"https://proxycheck.io/v2/{ip}")
+
+            if response.status_code == 200:
+                data = response.json()
+
+                # Extract VPN/proxy information
+                proxy_info = data.get("proxy", "no")
+                is_vpn = proxy_info == "yes"
+
+                # Get additional info if available
+                country = data.get("country", "unknown")
+                provider = data.get("provider", "unknown")
+
+                return {
+                    "ip": ip,
+                    "is_vpn": is_vpn,
+                    "is_proxy": is_vpn,  # ProxyCheck.io doesn't distinguish these
+                    "country": country,
+                    "provider": provider,
+                    "api_used": "proxycheck.io",
+                    "confidence": 0.9 if is_vpn else 0.1
+                }
+            else:
+                logger.error(f"ProxyCheck.io API error: {response.status_code}")
+                return {
+                    "ip": ip,
+                    "error": "Failed to check VPN status",
+                    "api_status": response.status_code
+                }
+
+    except Exception as e:
+        logger.error(f"VPN check failed: {e}")
+        return {
+            "ip": ip,
+            "error": str(e),
+            "is_vpn": False,
+            "confidence": 0.0
+        }
+
+@app.post("/api/check-security")
+async def check_security_status(request: Request):
+    """Comprehensive security check including VPN detection"""
+    try:
+        client_ip = get_client_ip(request)
+
+        # Get VPN status
+        vpn_result = await check_vpn_status(client_ip)
+
+        # Get additional security info
+        security_info = {
+            "ip": client_ip,
+            "user_agent": get_user_agent(request),
+            "timestamp": datetime.utcnow().isoformat(),
+            "vpn_status": vpn_result,
+            "security_headers": {
+                "x-frame-options": "DENY",
+                "x-content-type-options": "nosniff",
+                "x-xss-protection": "1; mode=block"
+            }
+        }
+
+        return JSONResponse(security_info)
+
+    except Exception as e:
+        logger.error(f"Security check failed: {e}")
+        return JSONResponse({
+            "error": str(e),
+            "ip": client_ip if 'client_ip' in locals() else "unknown"
+        }, status_code=500)
+
+@app.get("/api/check-verification/{discord_id}")
+async def check_user_verification(discord_id: str):
+    """Check if a Discord user is already verified"""
+    try:
+        logger.info(f"🔍 Checking verification status for Discord ID: {discord_id}")
+
+        # Validate Discord ID format
+        if not validate_discord_id(discord_id):
+            raise HTTPException(status_code=400, detail="Invalid Discord ID format")
+
+        supabase_client = get_supabase_client()
+        if not supabase_client:
+            return {
+                "status": "error",
+                "message": "Database not available",
+                "is_verified": False
+            }
+
+        # Check for existing verification
+        existing_verification = await supabase_client.check_existing_verification(discord_id)
+
+        if existing_verification:
+            # Calculate time since verification
+            from datetime import datetime
+            time_info = "unknown time ago"
+            if 'created_at' in existing_verification:
+                try:
+                    created_time = datetime.fromisoformat(existing_verification['created_at'].replace('Z', '+00:00'))
+                    time_diff = datetime.utcnow().replace(tzinfo=created_time.tzinfo) - created_time
+                    hours_ago = time_diff.total_seconds() / 3600
+                    if hours_ago < 1:
+                        time_info = f"{int(hours_ago * 60)} minutes ago"
+                    elif hours_ago < 24:
+                        time_info = f"{hours_ago:.1f} hours ago"
+                    else:
+                        days_ago = hours_ago / 24
+                        time_info = f"{days_ago:.1f} days ago"
+                except:
+                    time_info = "some time ago"
+
+            return {
+                "status": "success",
+                "is_verified": True,
+                "verification_data": {
+                    "discord_id": existing_verification.get("discord_id"),
+                    "discord_username": existing_verification.get("discord_username"),
+                    "verification_date": existing_verification.get("created_at"),
+                    "time_ago": time_info,
+                    "ip_address": existing_verification.get("ip_address"),
+                    "method": existing_verification.get("method", "unknown")
+                },
+                "message": f"User was verified {time_info}"
+            }
+        else:
+            return {
+                "status": "success",
+                "is_verified": False,
+                "message": "User has not been verified yet"
+            }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error checking verification status: {e}")
+        return {
+            "status": "error",
+            "message": f"Failed to check verification status: {str(e)}",
+            "is_verified": False
+        }
+
+@app.post("/api/check-user-verification")
+async def check_user_verification_post(request: Request):
+    """Check verification status via POST (more secure)"""
+    try:
+        # Get request data
+        request_data = await request.json()
+        discord_id = request_data.get("discord_id")
+
+        if not discord_id:
+            raise HTTPException(status_code=400, detail="Discord ID is required")
+
+        # Call the GET endpoint logic
+        return await check_user_verification(discord_id)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in POST verification check: {e}")
+        raise HTTPException(status_code=500, detail="Failed to check verification status")
+
+@app.get("/api/verification-stats")
+async def get_verification_stats():
+    """Get general verification statistics (public, safe info)"""
+    try:
+        logger.info("📊 Fetching verification statistics")
+
+        supabase_client = get_supabase_client()
+        if not supabase_client:
+            return {
+                "status": "error",
+                "message": "Database not available",
+                "stats": {}
+            }
+
+        # Get total verification count
+        url = f"{supabase_client.supabase_url}/rest/v1/verifications?select=count"
+        headers = {
+            "apikey": supabase_client.supabase_key,
+            "Authorization": f"Bearer {supabase_client.supabase_key}",
+            "Prefer": "count=exact"
+        }
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(url, headers=headers)
+
+        if response.status_code == 200:
+            content_range = response.headers.get("content-range", "")
+            total_count = int(content_range.split("/")[-1]) if content_range else 0
+
+            # Get recent verifications (last 24 hours)
+            from datetime import datetime, timedelta
+            yesterday = (datetime.utcnow() - timedelta(hours=24)).isoformat()
+
+            recent_url = f"{supabase_client.supabase_url}/rest/v1/verifications?created_at=gte.{yesterday}&select=count"
+            recent_response = await client.get(recent_url, headers=headers)
+
+            recent_count = 0
+            if recent_response.status_code == 200:
+                recent_content_range = recent_response.headers.get("content-range", "")
+                recent_count = int(recent_content_range.split("/")[-1]) if recent_content_range else 0
+
+            return {
+                "status": "success",
+                "stats": {
+                    "total_verifications": total_count,
+                    "verifications_last_24h": recent_count,
+                    "database_available": True
+                }
+            }
+        else:
+            logger.error(f"Failed to get stats: {response.status_code}")
+            return {
+                "status": "error",
+                "message": "Failed to fetch statistics",
+                "stats": {}
+            }
+
+    except Exception as e:
+        logger.error(f"Error fetching verification stats: {e}")
+        return {
+            "status": "error",
+            "message": f"Failed to fetch statistics: {str(e)}",
+            "stats": {}
         }
 
 print("AuthGateway FastAPI app loaded successfully")

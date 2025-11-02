@@ -37,15 +37,112 @@ class SupabaseClient:
 
         logger.info("✅ Supabase client initialized successfully")
 
+    async def check_existing_verification(self, discord_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Check if user already has a verification in the database
+        Returns the existing verification data if found, None otherwise
+        """
+        try:
+            logger.info(f"🔍 Checking existing verification for Discord ID: {discord_id}")
+
+            # Query for existing verification
+            url = f"{self.supabase_url}/rest/v1/verifications"
+            params = {
+                "discord_id": f"eq.{discord_id}",
+                "limit": 1,
+                "order": "created_at.desc"
+            }
+
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(
+                    url,
+                    headers=self.headers,
+                    params=params
+                )
+
+            logger.info(f"📋 Existing verification check status: {response.status_code}")
+
+            if response.status_code == 200:
+                data = response.json()
+                if data and len(data) > 0:
+                    existing_verification = data[0]
+                    logger.info(f"✅ Found existing verification for Discord ID {discord_id}")
+                    logger.info(f"📊 Existing data: {existing_verification}")
+                    return existing_verification
+                else:
+                    logger.info(f"ℹ️ No existing verification found for Discord ID {discord_id}")
+                    return None
+            else:
+                logger.error(f"❌ Failed to check existing verification. Status: {response.status_code}")
+                logger.error(f"❌ Response: {response.text}")
+                return None
+
+        except Exception as e:
+            logger.error(f"❌ Error checking existing verification: {str(e)}", exc_info=True)
+            return None
+
+    async def check_ip_verification_count(self, ip_address: str, time_window_hours: int = 24) -> int:
+        """
+        Check how many verifications have been done from this IP in the last X hours
+        Returns the count of verifications
+        """
+        try:
+            logger.info(f"🔍 Checking verification count for IP: {ip_address}")
+
+            # Calculate time threshold
+            from datetime import datetime, timedelta
+            time_threshold = (datetime.utcnow() - timedelta(hours=time_window_hours)).isoformat()
+
+            # Query for verifications from this IP in the time window
+            url = f"{self.supabase_url}/rest/v1/verifications"
+            params = {
+                "ip_address": f"eq.{ip_address}",
+                "created_at": f"gte.{time_threshold}",
+                "select": "count"
+            }
+
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                response = await client.get(
+                    url,
+                    headers=self.headers,
+                    params=params
+                )
+
+            logger.info(f"📋 IP count check status: {response.status_code}")
+
+            if response.status_code == 200:
+                # Get count from response headers or content
+                content_range = response.headers.get("content-range", "")
+                if content_range:
+                    # Format: "0-0/1" where last number is the total count
+                    count = int(content_range.split("/")[-1])
+                else:
+                    # Fallback: parse response if it's a count
+                    try:
+                        data = response.json()
+                        count = len(data) if isinstance(data, list) else 0
+                    except:
+                        count = 0
+
+                logger.info(f"✅ Found {count} verifications from IP {ip_address} in last {time_window_hours} hours")
+                return count
+            else:
+                logger.error(f"❌ Failed to check IP verification count. Status: {response.status_code}")
+                return 0
+
+        except Exception as e:
+            logger.error(f"❌ Error checking IP verification count: {str(e)}", exc_info=True)
+            return 0
+
     async def insert_verification(self, verification_data: Dict[str, Any]) -> bool:
         """
         Insert verification data into Supabase database
         """
         try:
             logger.info("🔄 Starting Supabase insertion process")
-            
+
             # Validate required fields
-            required_fields = ["id", "discord_id", "discord_username", "ip_address"]
+            required_fields = ["verification_id", "discord_id", "discord_username", "ip_address"]
             for field in required_fields:
                 if field not in verification_data:
                     logger.error(f"❌ Missing required field: {field}")
@@ -53,7 +150,7 @@ class SupabaseClient:
 
             # Prepare the data for Supabase
             supabase_data = {
-                "verification_id": verification_data["id"],  # Map 'id' to 'verification_id'
+                "verification_id": verification_data["verification_id"],
                 "discord_id": verification_data["discord_id"],
                 "discord_username": verification_data["discord_username"],
                 "ip_address": verification_data["ip_address"],
@@ -65,7 +162,7 @@ class SupabaseClient:
             logger.info(f"📊 Prepared data for Supabase: {supabase_data}")
 
             url = f"{self.supabase_url}/rest/v1/verifications"
-            
+
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.post(
                     url,
