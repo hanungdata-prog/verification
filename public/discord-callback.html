@@ -11,45 +11,60 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="vercel-theme.css">
+    <link rel="stylesheet" href="space-theme.css">
+    <link rel="stylesheet" href="cosmic-loading.css">
     <link rel="stylesheet" href="animations.css">
     <link rel="stylesheet" href="styles.css"> <!-- Keep original styles for functions -->
 
     <style>
         body {
-            background-color: #000000;
+            background: #0a0a12;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
+                radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
+                radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
+                radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
+                radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
+                radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
+                radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
+            background-size: 240px 120px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: var(--space-4);
-            position: relative;
-            overflow: hidden;
             font-family: var(--font-sans);
+            overflow-x: hidden;
         }
 
-        .callback-card {
-            background-color: #000000;
-            border: 1px solid var(--border);
+        .card {
+            background: rgba(15, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-2xl);
             padding: var(--space-12);
             max-width: 500px;
             width: 100%;
-            box-shadow: var(--shadow-xl);
+            box-shadow: 
+                0 0 15px rgba(100, 100, 200, 0.2),
+                0 0 30px rgba(80, 80, 180, 0.1);
             position: relative;
             z-index: 1;
             animation: fadeInUp 0.8s ease-out;
             text-align: center;
         }
 
-        .callback-card::before {
+        .card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #000000, #ffffff, #000000);
+            background: linear-gradient(90deg, transparent, #7080ff, transparent);
             border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
         }
 
@@ -57,20 +72,24 @@
             width: 80px;
             height: 80px;
             margin: 0 auto var(--space-6);
-            background: linear-gradient(135deg, #5865F2 0%, #ffffff 100%);
+            background: linear-gradient(135deg, #7080ff, #4aff8c);
             border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--text-3xl);
-            color: #000000;
-            box-shadow: var(--shadow-lg);
-            animation: logoFloat 3s ease-in-out infinite;
+            color: #0a0a12;
+            box-shadow: 0 0 20px rgba(112, 128, 255, 0.5);
+            animation: float 6s ease-in-out infinite;
         }
 
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         h1 {
@@ -117,8 +136,8 @@
         .loader-discord {
             width: 100%;
             height: 100%;
-            border: 4px solid var(--border);
-            border-top: 4px solid #5865F2;
+            border: 4px solid rgba(100, 100, 200, 0.2);
+            border-top: 4px solid #7080ff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
             position: relative;
@@ -132,7 +151,7 @@
             transform: translate(-50%, -50%);
             width: 20px;
             height: 20px;
-            background: #5865F2;
+            background: #7080ff;
             border-radius: 50%;
             animation: innerPulse 1.5s ease-in-out infinite;
         }
@@ -169,7 +188,7 @@
         }
 
         .loading-step.active {
-            color: var(--foreground);
+            color: var(--accent);
             opacity: 1;
             transform: translateX(4px);
         }
@@ -186,8 +205,8 @@
         }
 
         .error-container {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(255, 85, 122, 0.1);
+            border: 1px solid rgba(255, 85, 122, 0.3);
             border-radius: var(--radius-xl);
             padding: var(--space-6);
             margin: var(--space-6) 0;
@@ -222,8 +241,8 @@
         }
 
         .retry-button {
-            background: var(--foreground);
-            color: #000000;
+            background: linear-gradient(135deg, #ff557a, #ff7a9e);
+            color: white;
             border: none;
             padding: var(--space-3) var(--space-6);
             border-radius: var(--radius-full);
@@ -238,14 +257,15 @@
         }
 
         .retry-button:hover {
-            background: #f0f0f0;
+            background: linear-gradient(135deg, #ff658a, #ff8aae);
             transform: translateY(-1px);
+            box-shadow: 0 0 15px rgba(255, 85, 122, 0.3);
         }
 
         .progress-bar {
             width: 100%;
             height: 4px;
-            background: var(--border);
+            background: rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-full);
             overflow: hidden;
             margin: var(--space-6) 0;
@@ -253,11 +273,33 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #ffffff 0%, #a1a1aa 100%);
+            background: linear-gradient(90deg, #7080ff, #4aff8c, #ff557a);
             border-radius: var(--radius-full);
             width: 0%;
             transition: width 0.3s ease;
             animation: progressPulse 2s ease-in-out infinite;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         @keyframes progressPulse {
@@ -267,7 +309,7 @@
 
         /* Responsive */
         @media (max-width: 640px) {
-            .callback-card {
+            .card {
                 padding: var(--space-8) var(--space-6);
                 margin: var(--space-4);
             }
@@ -287,8 +329,8 @@
     </style>
 </head>
 <body>
-    <div class="callback-card animate-fade-in">
-        <div class="logo animate-float">
+    <div class="card card-centered animate-fade-in">
+        <div class="logo cosmic-float">
             <i class="fab fa-discord"></i>
         </div>
 
@@ -298,9 +340,12 @@
         </p>
 
         <div class="loader-container animate-slide-in-up stagger-2">
-            <div class="loader">
-                <div class="loader-discord"></div>
+            <div class="galaxy-spinner">
+                <div class="galaxy-arm"></div>
+                <div class="galaxy-arm"></div>
+                <div class="galaxy-arm"></div>
             </div>
+            <div class="loading-text">Establishing secure connection</div>
         </div>
 
         <div class="loading-steps animate-slide-in-up stagger-3" id="loadingSteps">
@@ -322,8 +367,11 @@
             </div>
         </div>
 
-        <div class="progress-bar animate-slide-in-up stagger-4">
-            <div class="progress-fill" id="progressFill"></div>
+        <div class="cosmic-game-progress animate-slide-in-up stagger-4">
+            <div class="cosmic-game-bar">
+                <div class="cosmic-game-fill" id="progressFill"></div>
+            </div>
+            <div class="cosmic-game-text" id="progressText">Initializing...</div>
         </div>
 
         <div class="error-container animate-slide-in-up stagger-5" id="errorContainer">
@@ -334,12 +382,13 @@
             <div class="error-message" id="errorMessage">
                 We encountered an issue while connecting to Discord. Please try again.
             </div>
-            <button class="retry-button hover-lift focus-animated" onclick="retryAuthentication()">
+            <button class="retry-button focus-animated" onclick="retryAuthentication()">
                 <i class="fas fa-redo"></i>
                 Try Again
             </button>
         </div>
     </div>
+</body>
 
     <script>
         // Enhanced Discord callback handler with modern loading states
@@ -377,8 +426,29 @@
 
             // Update progress bar
             const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
             const progress = (step / 4) * 100;
             progressFill.style.width = `${progress}%`;
+            
+            // Update progress text
+            if (progressText) {
+                switch(step) {
+                    case 1:
+                        progressText.textContent = 'Connecting to Discord...';
+                        break;
+                    case 2:
+                        progressText.textContent = 'Verifying code...';
+                        break;
+                    case 3:
+                        progressText.textContent = 'Retrieving info...';
+                        break;
+                    case 4:
+                        progressText.textContent = 'Almost there...';
+                        break;
+                    default:
+                        progressText.textContent = 'Initializing...';
+                }
+            }
         }
 
         // Enhanced Discord callback handler

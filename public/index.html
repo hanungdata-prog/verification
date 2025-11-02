@@ -11,13 +11,26 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="vercel-theme.css">
+    <link rel="stylesheet" href="space-theme.css">
+    <link rel="stylesheet" href="cosmic-loading.css">
     <link rel="stylesheet" href="animations.css">
     <link rel="stylesheet" href="styles.css"> <!-- Keep original styles for functions -->
 
     <style>
         body {
-            background-color: #000000;
+            background: #0a0a12;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
+                radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
+                radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
+                radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
+                radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
+                radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
+                radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
+            background-size: 240px 120px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -25,29 +38,33 @@
             position: relative;
             overflow: hidden;
             font-family: var(--font-sans);
+            overflow-x: hidden;
         }
 
-        .hero-card {
-            background-color: #000000;
-            border: 1px solid var(--border);
+        .card {
+            background: rgba(15, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-2xl);
             padding: var(--space-12);
             max-width: 600px;
             width: 90%;
-            box-shadow: var(--shadow-xl);
+            box-shadow: 
+                0 0 15px rgba(100, 100, 200, 0.2),
+                0 0 30px rgba(80, 80, 180, 0.1);
             position: relative;
             z-index: 1;
             animation: fadeInUp 0.8s ease-out;
         }
 
-        .hero-card::before {
+        .card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #000000, #ffffff, #000000);
+            background: linear-gradient(90deg, transparent, #7080ff, transparent);
             border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
         }
 
@@ -55,31 +72,36 @@
             width: 80px;
             height: 80px;
             margin: 0 auto var(--space-6);
-            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            background: linear-gradient(135deg, #7080ff, #4aff8c);
             border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--text-3xl);
-            color: #000000;
-            box-shadow: var(--shadow-lg);
-            animation: logoFloat 3s ease-in-out infinite;
+            color: #0a0a12;
+            box-shadow: 0 0 20px rgba(112, 128, 255, 0.5);
+            animation: float 6s ease-in-out infinite;
         }
 
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         h1 {
-            background: linear-gradient(135deg, var(--foreground) 0%, var(--muted) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--foreground);
             margin-bottom: var(--space-4);
             font-size: var(--text-5xl);
             font-weight: var(--font-bold);
             text-align: center;
+            background: linear-gradient(135deg, #e0e0ff, #a0a0c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .subtitle {
@@ -91,7 +113,7 @@
         }
 
         .discord-button {
-            background: #5865F2;
+            background: linear-gradient(135deg, #4a55d6, #7080ff);
             color: white;
             padding: var(--space-4) var(--space-8);
             border-radius: var(--radius-full);
@@ -102,7 +124,7 @@
             gap: var(--space-3);
             text-decoration: none;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+            box-shadow: 0 4px 15px rgba(112, 128, 255, 0.3);
             position: relative;
             overflow: hidden;
             width: 100%;
@@ -113,22 +135,34 @@
         .discord-button::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #7080ff, #4aff8c, #ff557a, #ffcc66, #7080ff);
+            border-radius: var(--radius-full);
+            z-index: -1;
+            animation: rotate 4s linear infinite;
         }
 
-        .discord-button:hover::before {
-            left: 100%;
+        .discord-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .discord-button:hover {
-            background: #4752C4;
+            background: linear-gradient(135deg, #5a65e6, #8090ff);
             transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
+            box-shadow: 0 0 20px rgba(112, 128, 255, 0.4);
         }
 
         .discord-button i {
@@ -143,8 +177,8 @@
         }
 
         .feature {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
+            background: rgba(15, 15, 30, 0.5);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-xl);
             padding: var(--space-6);
             text-align: center;
@@ -153,21 +187,21 @@
 
         .feature:hover {
             transform: translateY(-4px);
-            border-color: #ffffff;
-            box-shadow: 0 10px 15px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
+            border-color: #7080ff;
+            box-shadow: 0 10px 15px -3px rgba(112, 128, 255, 0.2), 0 4px 6px -2px rgba(112, 128, 255, 0.1);
         }
 
         .feature-icon {
             width: 48px;
             height: 48px;
             margin: 0 auto var(--space-3);
-            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            background: linear-gradient(135deg, #7080ff, #4aff8c);
             border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--text-xl);
-            color: #000000;
+            color: #0a0a12;
             margin-bottom: var(--space-3);
         }
 
@@ -193,7 +227,7 @@
 
         .countdown-number {
             font-weight: var(--font-semibold);
-            color: var(--foreground);
+            color: var(--accent);
         }
 
         /* Loading dots animation */
@@ -206,7 +240,7 @@
         .loading-dots span {
             width: 8px;
             height: 8px;
-            background: var(--foreground);
+            background: var(--accent);
             border-radius: 50%;
             animation: bounce 1.4s ease-in-out infinite both;
         }
@@ -226,7 +260,7 @@
 
         /* Responsive */
         @media (max-width: 640px) {
-            .hero-card {
+            .card {
                 padding: var(--space-8);
                 margin: var(--space-4);
             }
@@ -254,8 +288,8 @@
     </style>
 </head>
 <body>
-    <div class="hero-card animate-fade-in">
-        <div class="logo animate-float">
+    <div class="card card-centered animate-fade-in">
+        <div class="logo cosmic-float">
             <i class="fas fa-shield-halved"></i>
         </div>
 
@@ -266,9 +300,8 @@
         </p>
 
         <div class="flex justify-center animate-slide-in-up stagger-2">
-            <a href="/verify.html" class="discord-button hover-lift">
-                <i class="fab fa-discord"></i>
-                Verify with Discord
+            <a href="/verify.html" class="discord-button btn-cosmic">
+                <span><i class="fab fa-discord"></i> Verify with Discord</span>
             </a>
         </div>
 
@@ -307,6 +340,7 @@
             </div>
         </div>
     </div>
+</body>
 
     <script>
         // Enhanced countdown with smooth animation

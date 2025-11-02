@@ -1,0 +1,368 @@
+/* Space Theme CSS with cosmic background and improved color palette */
+:root {
+  /* Core colors - improved palette */
+  --background: #0a0a12; /* Deep space black */
+  --card-bg: rgba(15, 15, 30, 0.8); /* Space card background */
+  --card-border: rgba(100, 100, 200, 0.2); /* Cosmic purple-blue border */
+  --foreground: #e0e0ff; /* Cosmic white */
+  --muted: #a0a0c0; /* Soft space gray */
+  --accent: #7080ff; /* Cosmic blue */
+  --accent-hover: #5060d0; /* Hover variant */
+  --success: #4aff8c; /* Space green */
+  --error: #ff557a; /* Cosmic red */
+  --warning: #ffcc66; /* Cosmic yellow */
+  --info: #66b3ff; /* Space blue */
+  
+  /* Sizing */
+  --radius-sm: 0.125rem;
+  --radius: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  /* Spacing */
+  --space-px: 0.0625rem;
+  --space-0: 0rem;
+  --space-0-5: 0.125rem;
+  --space-1: 0.25rem;
+  --space-1-5: 0.375rem;
+  --space-2: 0.5rem;
+  --space-2-5: 0.625rem;
+  --space-3: 0.75rem;
+  --space-3-5: 0.875rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 1.75rem;
+  --space-8: 2rem;
+  --space-9: 2.25rem;
+  --space-10: 2.5rem;
+  --space-11: 2.75rem;
+  --space-12: 3rem;
+  --space-14: 3.5rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-28: 7rem;
+  --space-32: 8rem;
+  --space-36: 9rem;
+  --space-40: 10rem;
+  --space-44: 11rem;
+  --space-48: 12rem;
+  --space-52: 13rem;
+  --space-56: 14rem;
+  --space-60: 15rem;
+  --space-64: 16rem;
+  --space-72: 18rem;
+  --space-80: 20rem;
+  --space-96: 24rem;
+  
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-mono: 'Geist Mono', 'Fira Code', Consolas, monospace;
+  
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+  --text-8xl: 6rem;
+  --text-9xl: 8rem;
+  
+  --font-thin: 100;
+  --font-extralight: 200;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  --font-black: 900;
+  
+  /* Line heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+}
+
+/* Background with stars and cosmic effect */
+body {
+  background: #0a0a12;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
+    radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
+    radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
+    radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
+    radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
+    radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
+    radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
+    radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
+    radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
+    radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
+  background-size: 240px 120px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Cosmic card with glow effect */
+.card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-8);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 
+    0 0 15px rgba(100, 100, 200, 0.2),
+    0 0 30px rgba(80, 80, 180, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #7080ff, transparent);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+}
+
+/* Cosmic button styles */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--muted);
+  border-radius: var(--radius-full);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(112, 128, 255, 0.3);
+}
+
+.btn:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #4a55d6, #7080ff);
+  color: white;
+  border: none;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #5a65e6, #8090ff);
+  box-shadow: 0 0 20px rgba(112, 128, 255, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--muted);
+}
+
+.btn-secondary:hover {
+  border-color: var(--foreground);
+  background: rgba(224, 224, 255, 0.05);
+}
+
+/* Special cosmic button with glow */
+.btn-cosmic {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-cosmic::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #7080ff, #4aff8c, #ff557a, #ffcc66, #7080ff);
+  border-radius: var(--radius-full);
+  z-index: -1;
+  animation: rotate 4s linear infinite;
+}
+
+.btn-cosmic span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Cosmic input fields */
+.form-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(15, 15, 30, 0.5);
+  color: var(--foreground);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(112, 128, 255, 0.2);
+}
+
+/* Cosmic status messages */
+.status-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  margin: var(--space-4) 0;
+  font-size: var(--text-sm);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.status-message.success {
+  background: rgba(74, 255, 140, 0.1);
+  border-color: rgba(74, 255, 140, 0.3);
+  color: var(--success);
+}
+
+.status-message.error {
+  background: rgba(255, 85, 122, 0.1);
+  border-color: rgba(255, 85, 122, 0.3);
+  color: var(--error);
+}
+
+.status-message.info {
+  background: rgba(102, 179, 255, 0.1);
+  border-color: rgba(102, 179, 255, 0.3);
+  color: var(--info);
+}
+
+/* Cosmic glow effects */
+.glow {
+  box-shadow: 0 0 15px rgba(112, 128, 255, 0.3);
+}
+
+.glow-success {
+  box-shadow: 0 0 15px rgba(74, 255, 140, 0.3);
+}
+
+.glow-error {
+  box-shadow: 0 0 15px rgba(255, 85, 122, 0.3);
+}
+
+/* Cosmic animations */
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Cosmic floating elements */
+.cosmic-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Cosmic pulsing effect */
+.cosmic-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Centered layout */
+.card-centered {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-8);
+  position: relative;
+  z-index: 2;
+}
+
+/* Space-themed captcha container */
+.captcha-container {
+  background: rgba(15, 15, 30, 0.5);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Space-themed account switch */
+.account-switch a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: var(--font-medium);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  background: rgba(15, 15, 30, 0.5);
+  border: 1px solid var(--card-border);
+  width: 100%;
+  justify-content: center;
+}
+
+.account-switch a:hover {
+  color: var(--foreground);
+  border-color: var(--accent);
+}

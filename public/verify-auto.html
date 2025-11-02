@@ -11,45 +11,60 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="vercel-theme.css">
+    <link rel="stylesheet" href="space-theme.css">
+    <link rel="stylesheet" href="cosmic-loading.css">
     <link rel="stylesheet" href="animations.css">
     <link rel="stylesheet" href="styles.css"> <!-- Keep original styles for functions -->
 
     <style>
         body {
-            background-color: #000000;
+            background: #0a0a12;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
+                radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
+                radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
+                radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
+                radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
+                radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
+                radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
+            background-size: 240px 120px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: var(--space-4);
-            position: relative;
-            overflow: hidden;
             font-family: var(--font-sans);
+            overflow-x: hidden;
         }
 
-        .verification-card {
-            background-color: #000000;
-            border: 1px solid var(--border);
+        .card {
+            background: rgba(15, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-2xl);
             padding: var(--space-10);
             max-width: 500px;
             width: 100%;
-            box-shadow: var(--shadow-xl);
+            box-shadow: 
+                0 0 15px rgba(100, 100, 200, 0.2),
+                0 0 30px rgba(80, 80, 180, 0.1);
+            transition: all 0.3s ease;
             position: relative;
-            z-index: 1;
-            animation: fadeInUp 0.8s ease-out;
             overflow: hidden;
+            animation: fadeInUp 0.8s ease-out;
         }
 
-        .verification-card::before {
+        .card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #000000, #ffffff, #000000);
+            background: linear-gradient(90deg, transparent, #7080ff, transparent);
             border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
         }
 
@@ -57,20 +72,24 @@
             width: 80px;
             height: 80px;
             margin: 0 auto var(--space-6);
-            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            background: linear-gradient(135deg, #7080ff, #4aff8c);
             border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--text-3xl);
-            color: #000000;
-            box-shadow: var(--shadow-lg);
-            animation: logoFloat 3s ease-in-out infinite;
+            color: #0a0a12;
+            box-shadow: 0 0 20px rgba(112, 128, 255, 0.5);
+            animation: float 6s ease-in-out infinite;
         }
 
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         h1 {
@@ -90,8 +109,8 @@
         }
 
         .user-info {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
+            background: rgba(15, 15, 30, 0.5);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-xl);
             padding: var(--space-6);
             margin-bottom: var(--space-6);
@@ -107,7 +126,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #000000, #ffffff, #000000);
+            background: linear-gradient(90deg, transparent, #7080ff, transparent);
         }
 
         .user-info h3 {
@@ -122,7 +141,7 @@
         }
 
         .user-info h3 i {
-            color: #5865F2;
+            color: #7080ff;
             font-size: var(--text-xl);
         }
 
@@ -142,7 +161,7 @@
         }
 
         .user-info strong {
-            color: var(--foreground);
+            color: var(--accent);
             font-weight: var(--font-semibold);
         }
 
@@ -150,7 +169,7 @@
             display: inline-block;
             width: 120px;
             height: 16px;
-            background: var(--border);
+            background: rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-sm);
             animation: pulse 1.5s ease-in-out infinite;
         }
@@ -174,8 +193,8 @@
         }
 
         .captcha-container {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
+            background: rgba(15, 15, 30, 0.5);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-lg);
             padding: var(--space-4);
             margin: var(--space-4) 0;
@@ -190,12 +209,12 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #000000, #ffffff, #000000);
+            background: linear-gradient(90deg, transparent, #7080ff, transparent);
         }
 
         .submit-btn {
-            background: linear-gradient(90deg, #ffffff 0%, #a1a1aa 100%);
-            color: #000000;
+            background: linear-gradient(135deg, #4a55d6, #7080ff);
+            color: white;
             border: none;
             padding: var(--space-4) var(--space-6);
             font-size: var(--text-lg);
@@ -204,7 +223,7 @@
             cursor: pointer;
             width: 100%;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(112, 128, 255, 0.3);
             position: relative;
             overflow: hidden;
             display: flex;
@@ -216,21 +235,33 @@
         .submit-btn::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.2), transparent);
-            transition: left 0.5s;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #7080ff, #4aff8c, #ff557a, #ffcc66, #7080ff);
+            border-radius: var(--radius-full);
+            z-index: -1;
+            animation: rotate 4s linear infinite;
         }
 
-        .submit-btn:hover::before {
-            left: 100%;
+        .submit-btn span {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .submit-btn:hover:not(:disabled) {
             transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(112, 128, 255, 0.4);
         }
 
         .submit-btn:active:not(:disabled) {
@@ -259,9 +290,9 @@
             display: none;
             width: 20px;
             height: 20px;
-            border: 2px solid rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: #000000;
+            border-top-color: white;
             animation: spin 0.8s linear infinite;
         }
 
@@ -284,15 +315,6 @@
             gap: var(--space-2);
         }
 
-        .loading-spinner {
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            border-top-color: var(--foreground);
-            animation: spin 0.8s linear infinite;
-        }
-
         .loading-dots {
             display: inline-flex;
             gap: 4px;
@@ -301,7 +323,7 @@
         .loading-dots span {
             width: 6px;
             height: 6px;
-            background: var(--foreground);
+            background: var(--accent);
             border-radius: 50%;
             animation: bounce 1.4s ease-in-out infinite both;
         }
@@ -325,6 +347,7 @@
             animation: slideDown 0.3s ease-out;
             align-items: center;
             gap: var(--space-2);
+            border: 1px solid transparent;
         }
 
         @keyframes slideDown {
@@ -339,15 +362,15 @@
         }
 
         .message.success {
-            background: rgba(34, 197, 94, 0.1);
+            background: rgba(74, 255, 140, 0.1);
+            border-color: rgba(74, 255, 140, 0.3);
             color: var(--success);
-            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .message.error {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(255, 85, 122, 0.1);
+            border-color: rgba(255, 85, 122, 0.3);
             color: var(--error);
-            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .message i {
@@ -359,10 +382,12 @@
             display: flex;
             flex-direction: column;
             gap: var(--space-3);
+            align-items: center;
         }
 
         .account-switch {
             font-size: var(--text-sm);
+            width: 100%;
         }
 
         .account-switch a {
@@ -375,14 +400,16 @@
             gap: var(--space-2);
             padding: var(--space-2) var(--space-3);
             border-radius: var(--radius-lg);
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
+            background: rgba(15, 15, 30, 0.5);
+            border: 1px solid rgba(100, 100, 200, 0.2);
+            width: 100%;
+            justify-content: center;
         }
 
         .account-switch a:hover {
             color: var(--foreground);
+            border-color: var(--accent);
             transform: translateY(-1px);
-            border-color: var(--foreground);
         }
 
         .account-switch a:hover i {
@@ -438,7 +465,7 @@
 
         /* Responsive */
         @media (max-width: 640px) {
-            .verification-card {
+            .card {
                 padding: var(--space-8) var(--space-6);
                 margin: var(--space-4);
             }
@@ -462,8 +489,8 @@
     </style>
 </head>
 <body>
-    <div class="verification-card animate-fade-in">
-        <div class="logo animate-float">
+    <div class="card card-centered animate-fade-in">
+        <div class="logo cosmic-float">
             <i class="fas fa-shield-halved"></i>
         </div>
 
@@ -504,9 +531,8 @@
                 </div>
             </div>
 
-            <button type="submit" class="submit-btn hover-lift animate-slide-in-up stagger-4" id="submitBtn">
-                <i class="fas fa-check-circle"></i>
-                <span class="btn-text">Verify & Continue</span>
+            <button type="submit" class="submit-btn btn-cosmic animate-slide-in-up stagger-4" id="submitBtn">
+                <span class="btn-text"><i class="fas fa-check-circle"></i> Verify & Continue</span>
                 <div class="btn-spinner"></div>
             </button>
         </form>
@@ -518,13 +544,12 @@
         </svg>
 
         <div class="loading" id="loading">
-            <div class="loading-spinner"></div>
-            <span>Verifying your account</span>
             <div class="loading-dots">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
+            <div class="loading-text">Verifying your account</div>
         </div>
 
         <div class="message animate-slide-in-up stagger-5" id="message">
@@ -548,6 +573,7 @@
             </div>
         </div>
     </div>
+</body>
 
     <script>
         // Configuration - hCaptcha only

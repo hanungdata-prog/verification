@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Custom Styles -->
-    <link rel="stylesheet" href="vercel-theme.css">
+    <link rel="stylesheet" href="space-theme.css">
+    <link rel="stylesheet" href="cosmic-loading.css">
     <link rel="stylesheet" href="animations.css">
     <link rel="stylesheet" href="styles.css"> <!-- Keep original styles for functions -->
 
@@ -26,28 +27,65 @@
             font-family: var(--font-sans);
         }
 
+        body {
+            background: #0a0a12;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
+                radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
+                radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
+                radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
+                radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
+                radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
+                radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
+                radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
+            background-size: 240px 120px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-4);
+            font-family: var(--font-sans);
+            overflow-x: hidden;
+        }
+
         .logo {
             width: 60px;
             height: 60px;
             margin-bottom: var(--space-6);
-            background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+            background: linear-gradient(135deg, #7080ff, #4aff8c);
             border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--text-2xl);
-            color: #000000;
-            box-shadow: var(--shadow-lg);
+            color: #0a0a12;
+            box-shadow: 0 0 20px rgba(112, 128, 255, 0.5);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
 
         .verification-card {
-            background-color: #000000;
-            border: 1px solid var(--border);
+            background: rgba(15, 15, 30, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-2xl);
             padding: var(--space-8);
             max-width: 500px;
             width: 100%;
-            box-shadow: var(--shadow-xl);
+            box-shadow: 
+                0 0 15px rgba(100, 100, 200, 0.2),
+                0 0 30px rgba(80, 80, 180, 0.1);
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
             animation: fadeIn 0.6s ease-out;
@@ -60,7 +98,7 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: linear-gradient(90deg, #000000, #ffffff, #000000);
+            background: linear-gradient(90deg, transparent, #7080ff, transparent);
             border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
         }
 
@@ -70,6 +108,7 @@
             font-weight: var(--font-semibold);
             margin-bottom: var(--space-2);
             line-height: var(--leading-tight);
+            text-align: center;
         }
 
         .subtitle {
@@ -77,11 +116,12 @@
             font-size: var(--text-lg);
             line-height: var(--leading-relaxed);
             margin-bottom: var(--space-8);
+            text-align: center;
         }
 
         .feature-list {
-            background-color: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border);
+            background: rgba(15, 15, 30, 0.5);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-xl);
             padding: var(--space-6);
             margin-bottom: var(--space-8);
@@ -107,7 +147,7 @@
         }
 
         .feature-item i {
-            color: var(--foreground);
+            color: var(--accent);
             margin-right: var(--space-3);
             font-size: var(--text-lg);
             width: 20px;
@@ -115,7 +155,7 @@
         }
 
         .discord-button {
-            background: #5865F2;
+            background: linear-gradient(135deg, #4a55d6, #7080ff);
             color: white;
             border: none;
             padding: var(--space-4) var(--space-6);
@@ -129,7 +169,7 @@
             align-items: center;
             justify-content: center;
             gap: var(--space-3);
-            box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+            box-shadow: 0 4px 15px rgba(112, 128, 255, 0.3);
             position: relative;
             overflow: hidden;
             margin-bottom: var(--space-4);
@@ -139,22 +179,34 @@
         .discord-button::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #7080ff, #4aff8c, #ff557a, #ffcc66, #7080ff);
+            border-radius: var(--radius-full);
+            z-index: -1;
+            animation: rotate 4s linear infinite;
         }
 
-        .discord-button:hover::before {
-            left: 100%;
+        .discord-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .discord-button:hover {
-            background: #4752C4;
+            background: linear-gradient(135deg, #5a65e6, #8090ff);
+            box-shadow: 0 0 20px rgba(112, 128, 255, 0.4);
             transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(88, 101, 242, 0.4);
         }
 
         .discord-button:active {
@@ -174,8 +226,8 @@
             display: inline-flex;
             align-items: center;
             gap: var(--space-2);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border);
+            background: rgba(15, 15, 30, 0.5);
+            border: 1px solid rgba(100, 100, 200, 0.2);
             color: var(--muted);
             padding: var(--space-2) var(--space-4);
             border-radius: var(--radius-full);
@@ -183,6 +235,8 @@
             font-weight: var(--font-medium);
             margin-top: var(--space-4);
             transition: all 0.2s ease;
+            width: 100%;
+            justify-content: center;
         }
 
         .security-badge:hover {
@@ -203,6 +257,7 @@
             font-size: var(--text-sm);
             font-weight: var(--font-medium);
             animation: slideDown 0.3s ease-out;
+            border: 1px solid transparent;
         }
 
         @keyframes slideDown {
@@ -217,15 +272,15 @@
         }
 
         .message.success {
-            background: rgba(34, 197, 94, 0.1);
+            background: rgba(74, 255, 140, 0.1);
+            border-color: rgba(74, 255, 140, 0.3);
             color: var(--success);
-            border: 1px solid rgba(34, 197, 94, 0.3);
         }
 
         .message.error {
-            background: rgba(239, 68, 68, 0.1);
+            background: rgba(255, 85, 122, 0.1);
+            border-color: rgba(255, 85, 122, 0.3);
             color: var(--error);
-            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .message i {
@@ -236,6 +291,7 @@
             margin-top: var(--space-6);
             font-size: var(--text-sm);
             color: var(--muted);
+            text-align: center;
         }
 
         .privacy-link a {
@@ -332,14 +388,14 @@
     </style>
 </head>
 <body>
-    <div class="verification-card animate-fade-in">
+    <div class="card card-centered animate-fade-in">
         <div class="flex flex-col items-center">
-            <div class="logo animate-float">
+            <div class="logo cosmic-float">
                 <i class="fas fa-shield-halved"></i>
             </div>
 
             <h1 class="animate-slide-in-up">Verify Your Account</h1>
-            <p class="subtitle text-center animate-slide-in-up stagger-1">
+            <p class="subtitle animate-slide-in-up stagger-1">
                 Join our exclusive Discord community with secure, instant verification powered by AuthGateway
             </p>
 
@@ -359,9 +415,8 @@
             </div>
 
             <!-- Enhanced Discord OAuth2 Login Button -->
-            <button class="discord-button hover-lift animate-slide-in-up stagger-3" id="discordButton" onclick="redirectToDiscord()">
-                <i class="fab fa-discord"></i>
-                <span class="btn-text">Connect Discord</span>
+            <button class="discord-button btn-cosmic animate-slide-in-up stagger-3" id="discordButton" onclick="redirectToDiscord()">
+                <span class="btn-text"><i class="fab fa-discord"></i> Connect Discord</span>
                 <div class="btn-spinner"></div>
             </button>
 
@@ -375,7 +430,7 @@
                 <span id="messageText"></span>
             </div>
 
-            <div class="privacy-link text-center animate-slide-in-up stagger-5">
+            <div class="privacy-link animate-slide-in-up stagger-5">
                 <a href="/privacy" class="focus-animated">
                     <i class="fas fa-user-shield"></i>
                     Privacy & Security Policy
@@ -383,6 +438,7 @@
             </div>
         </div>
     </div>
+</body>
 
     <script>
         // Enhanced Discord OAuth redirect function
