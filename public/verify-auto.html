@@ -639,6 +639,10 @@
 
             if (error.type === 'already_verified') {
               showMessage(`User ${discordUsername} is already verified ${error.data?.time_ago || 'previously'}`, 'error');
+            } else if (error.type === 'database_unavailable') {
+              showMessage('Database temporarily unavailable - please try again later', 'error');
+            } else if (error.type === 'network_error_blocked') {
+              showMessage('Network error - please check your connection and try again', 'error');
             } else {
               showMessage(error.message || 'Verification failed', 'error');
             }

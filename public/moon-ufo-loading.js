@@ -16,7 +16,7 @@ class MoonUFOLoading {
     // Create loading overlay
     this.overlay = document.createElement('div');
     this.overlay.className = 'loading-overlay';
-    
+
     this.overlay.innerHTML = `
       <div class="moon-container">
         <div class="moon">
@@ -33,26 +33,26 @@ class MoonUFOLoading {
       </div>
       <div class="progress-text">Initializing...</div>
       <div class="progress-subtext">Please wait while we prepare your session</div>
-      <div class="loading-steps">
-        <div class="loading-step" data-step="1">
+      <div class="loading-steps" style="display: none;">
+        <div class="loading-step" data-step="1" style="display: none;">
           <div class="step-icon">
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
           <span>Connecting to servers</span>
         </div>
-        <div class="loading-step" data-step="2">
+        <div class="loading-step" data-step="2" style="display: none;">
           <div class="step-icon">
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
           <span>Verifying credentials</span>
         </div>
-        <div class="loading-step" data-step="3">
+        <div class="loading-step" data-step="3" style="display: none;">
           <div class="step-icon">
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
           <span>Loading user data</span>
         </div>
-        <div class="loading-step" data-step="4">
+        <div class="loading-step" data-step="4" style="display: none;">
           <div class="step-icon">
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
@@ -60,11 +60,12 @@ class MoonUFOLoading {
         </div>
       </div>
     `;
-    
+
     document.body.appendChild(this.overlay);
     this.progressText = this.overlay.querySelector('.progress-text');
     this.progressSubtext = this.overlay.querySelector('.progress-subtext');
     this.steps = this.overlay.querySelectorAll('.loading-step');
+    this.loadingStepsContainer = this.overlay.querySelector('.loading-steps');
   }
 
   show() {
@@ -72,6 +73,10 @@ class MoonUFOLoading {
       this.overlay.classList.add('active');
       this.currentStep = 0;
       this.resetSteps();
+      // Initially hide all steps
+      if (this.loadingStepsContainer) {
+        this.loadingStepsContainer.style.display = 'none';
+      }
     }
   }
 
@@ -134,12 +139,20 @@ class MoonUFOLoading {
 
     const stepElement = this.overlay.querySelector(`[data-step="${step}"]`);
     if (stepElement) {
+      // Show the loading steps container when first step is activated
+      if (this.loadingStepsContainer && this.loadingStepsContainer.style.display === 'none') {
+        this.loadingStepsContainer.style.display = 'block';
+      }
+
+      // Show the current step element
+      stepElement.style.display = 'flex';
+
       const icon = stepElement.querySelector('.step-icon');
-      
+
       // Remove all status classes
       stepElement.classList.remove('active', 'completed');
       icon.classList.remove('active', 'completed');
-      
+
       if (status === 'completed') {
         stepElement.classList.add('completed');
         icon.classList.add('completed');
@@ -371,36 +384,22 @@ class MoonUFOLoading {
       } else {
         // Database check failed - check if it's a "Database not available" error
         if (checkData.message && checkData.message.includes('Database not available')) {
-          console.warn('Database not available, proceeding with verification anyway');
-          this.updateStep(2, 'completed');
-          this.updateStep(3, 'active');
-          this.updateProgress(70, 'Proceeding with verification...');
-          this.updateSubtext('Database temporarily unavailable, continuing verification...');
+          console.warn('Database not available - BLOCKING VERIFICATION FOR SECURITY');
+          this.updateStep(2, 'error');
+          this.updateStep(3, 'error');
+          this.updateProgress(100, 'Database Unavailable!');
+          this.updateSubtext('Database temporarily unavailable - please try again later');
 
-          // Continue with verification without database check
           setTimeout(() => {
-            this.updateStep(3, 'completed');
-            this.updateStep(4, 'active');
-            this.updateProgress(90, 'Finalizing...');
-            this.updateSubtext('Verification complete!');
-
-            setTimeout(() => {
-              this.updateStep(4, 'completed');
-              this.updateProgress(100, 'Success!');
-              this.updateSubtext('Verification complete!');
-
-              setTimeout(() => {
-                this.hide();
-                if (successCallback) {
-                  successCallback({
-                    type: 'verification_success_fallback',
-                    message: 'Verification completed (database check bypassed)',
-                    data: { bypass_reason: 'database_unavailable' }
-                  });
-                }
-              }, 1000);
-            }, 800);
-          }, 1000);
+            this.hide();
+            if (errorCallback) {
+              errorCallback({
+                type: 'database_unavailable',
+                message: 'Database temporarily unavailable - verification blocked for security',
+                data: checkData
+              });
+            }
+          }, 3000);
         } else {
           // Other database check failed
           this.updateStep(2, 'error');
@@ -424,35 +423,22 @@ class MoonUFOLoading {
 
       // Check if it's a network error or database unavailable
       if (error.message && error.message.includes('Failed to fetch')) {
-        console.warn('Network error, proceeding with verification fallback');
-        this.updateStep(2, 'completed');
-        this.updateStep(3, 'active');
-        this.updateProgress(70, 'Network issue detected...');
-        this.updateSubtext('Unable to reach database, continuing verification...');
+        console.warn('Network error - BLOCKING VERIFICATION FOR SECURITY');
+        this.updateStep(2, 'error');
+        this.updateStep(3, 'error');
+        this.updateProgress(100, 'Network Error!');
+        this.updateSubtext('Unable to verify user status - please check your connection');
 
         setTimeout(() => {
-          this.updateStep(3, 'completed');
-          this.updateStep(4, 'active');
-          this.updateProgress(90, 'Finalizing...');
-          this.updateSubtext('Verification complete!');
-
-          setTimeout(() => {
-            this.updateStep(4, 'completed');
-            this.updateProgress(100, 'Success!');
-            this.updateSubtext('Verification complete!');
-
-            setTimeout(() => {
-              this.hide();
-              if (successCallback) {
-                successCallback({
-                  type: 'verification_success_fallback',
-                  message: 'Verification completed (network issue bypassed)',
-                  data: { bypass_reason: 'network_error' }
-                });
-              }
-            }, 1000);
-          }, 800);
-        }, 1000);
+          this.hide();
+          if (errorCallback) {
+            errorCallback({
+              type: 'network_error_blocked',
+              message: 'Network error - verification blocked for security',
+              error: error
+            });
+          }
+        }, 3000);
       } else {
         this.updateStep(2, 'error');
         this.updateProgress(100, 'Error!');
