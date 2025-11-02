@@ -35,27 +35,9 @@ class SecurityManager {
     }
 
     validateDomain() {
-        const currentDomain = window.location.hostname;
-        const allowedDomains = [
-            'authgateway.vercel.app',
-            'localhost',
-            '127.0.0.1'
-        ];
-
-        const isAllowed = allowedDomains.some(domain => {
-            if (domain.includes('*')) {
-                const regex = new RegExp(domain.replace(/\*/g, '.*'));
-                return regex.test(currentDomain);
-            }
-            return currentDomain === domain || currentDomain.endsWith(`.${domain}`);
-        });
-
-        if (!isAllowed) {
-            this.handleSecurityError(`Domain ${currentDomain} is not allowed`);
-            return;
-        }
-
+        // Domain validation removed - all domains are now allowed
         this.securityChecks.domainValid = true;
+        console.log(`✅ Domain validation bypassed - all domains allowed`);
     }
 
     async fetchCSRFNonce() {

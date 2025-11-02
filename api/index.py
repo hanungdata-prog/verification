@@ -334,10 +334,25 @@ async def discord_callback(request: Request, code: str = Query(None), error: str
                 </html>
                 """)
 
-            # Redirect to auto-verification page with user data
-            redirect_url = f"/verify-auto.html?discord_id={discord_user['id']}&discord_username={discord_user['full_username']}"
-            logger.info(f"Successfully authenticated user {discord_user['full_username']}, redirecting to: {redirect_url}")
-            return RedirectResponse(url=redirect_url)
+            # Create secure token instead of passing Discord info in URL
+            try:
+                from app.token_utils import generate_short_discord_token
+                discord_token = generate_short_discord_token(discord_user['id'], discord_user['full_username'])
+
+                # Redirect to auto-verification page with token
+                redirect_url = f"/verify-auto.html?token={discord_token}"
+                logger.info(f"Successfully authenticated user {discord_user['full_username']}, redirecting with token to: {redirect_url}")
+                return RedirectResponse(url=redirect_url)
+            except ImportError as e:
+                logger.warning(f"⚠️ Token utils not available, falling back to direct parameters: {e}")
+                # Fallback to direct parameters if token utils not available
+                redirect_url = f"/verify-auto.html?discord_id={discord_user['id']}&discord_username={discord_user['full_username']}"
+                return RedirectResponse(url=redirect_url)
+            except Exception as e:
+                logger.error(f"❌ Failed to generate token: {e}")
+                # Fallback to direct parameters on error
+                redirect_url = f"/verify-auto.html?discord_id={discord_user['id']}&discord_username={discord_user['full_username']}"
+                return RedirectResponse(url=redirect_url)
 
     except httpx.RequestError as e:
         logger.error(f"HTTP request error during Discord OAuth2: {str(e)}")
@@ -1283,6 +1298,67 @@ async def check_user_verification_post(request: Request):
     except Exception as e:
         logger.error(f"Error in POST verification check: {e}")
         raise HTTPException(status_code=500, detail="Failed to check verification status")
+
+@app.get("/api/decode-token/{token}")
+async def decode_discord_token(token: str):
+    """Decode Discord token to get user information"""
+    try:
+        from app.token_utils import decode_discord_token
+
+        logger.info(f"🔍 Decoding token: {token[:20]}...")
+
+        decoded_data = decode_discord_token(token)
+
+        if not decoded_data:
+            return {
+                "status": "error",
+                "message": "Invalid or expired token",
+                "valid": False
+            }
+
+        # Return decoded Discord info
+        return {
+            "status": "success",
+            "valid": True,
+            "discord_id": decoded_data.get("discord_id"),
+            "discord_username": decoded_data.get("discord_username"),
+            "expires_at": decoded_data.get("expires_at"),
+            "message": "Token decoded successfully"
+        }
+
+    except ImportError as e:
+        logger.error(f"❌ Token utils not available: {e}")
+        return {
+            "status": "error",
+            "message": "Token decoding service not available",
+            "valid": False
+        }
+    except Exception as e:
+        logger.error(f"❌ Error decoding token: {e}")
+        return {
+            "status": "error",
+            "message": f"Failed to decode token: {str(e)}",
+            "valid": False
+        }
+
+@app.post("/api/decode-token")
+async def decode_discord_token_post(request: Request):
+    """Decode Discord token via POST (more secure)"""
+    try:
+        request_data = await request.json()
+        token = request_data.get("token")
+
+        if not token:
+            raise HTTPException(status_code=400, detail="Token is required")
+
+        # Call GET endpoint logic
+        return await decode_discord_token(token)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error in POST token decode: {e}")
+        raise HTTPException(status_code=500, detail="Failed to decode token")
 
 @app.get("/api/verification-stats")
 async def get_verification_stats():

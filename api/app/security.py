@@ -23,13 +23,11 @@ logger = logging.getLogger(__name__)
 
 class SecurityConfig:
     """Configuration for security settings"""
-    ALLOWED_DOMAINS = [
-        "authgateway.vercel.app",
-        "localhost:3000",
-        "localhost:8000",
-        "127.0.0.1:3000",
-        "127.0.0.1:8000"
-    ]
+
+    # Domain validation completely removed
+    # All domains are now allowed for maximum compatibility
+    ALLOWED_DOMAINS = []  # Empty list = no domain restrictions
+    ALLOWED_DOMAIN_PATTERNS = []  # Empty list = no pattern restrictions
 
     VPN_DETECTION_APIS = [
         "https://ipapi.co/{ip}/vpn/",
@@ -155,40 +153,15 @@ class VPN_Detector:
         return detection_results["is_vpn"], detection_results
 
 class DomainValidator:
-    """Validate allowed domains"""
+    """Domain validation disabled - all domains allowed"""
 
-    def __init__(self, allowed_domains: List[str]):
-        self.allowed_domains = [d.lower() for d in allowed_domains]
+    def __init__(self, allowed_domains: List[str] = None, allowed_patterns: List[str] = None):
+        # Domain validation completely disabled
+        pass
 
     def is_domain_allowed(self, request: Request) -> bool:
-        """Check if the request domain is allowed"""
-        try:
-            origin = request.headers.get("origin")
-            referer = request.headers.get("referer")
-            host = request.headers.get("host")
-
-            # Check Host header first
-            if host:
-                host_domain = host.split(":")[0].lower()
-                if any(host_domain == allowed.split(":")[0] for allowed in self.allowed_domains):
-                    return True
-
-            # Check Origin header
-            if origin:
-                origin_domain = urlparse(origin).netloc.lower()
-                if any(origin_domain == allowed for allowed in self.allowed_domains):
-                    return True
-
-            # Check Referer header
-            if referer:
-                referer_domain = urlparse(referer).netloc.lower()
-                if any(referer_domain == allowed for allowed in self.allowed_domains):
-                    return True
-
-            return False
-        except Exception as e:
-            logger.error(f"Domain validation error: {e}")
-            return False
+        """All domains are now allowed"""
+        return True
 
 class CSRFProtection:
     """CSRF protection using nonces"""
@@ -231,7 +204,10 @@ class SecurityMiddleware:
     def __init__(self, config: SecurityConfig):
         self.config = config
         self.vpn_detector = VPN_Detector()
-        self.domain_validator = DomainValidator(config.ALLOWED_DOMAINS)
+        self.domain_validator = DomainValidator(
+            config.ALLOWED_DOMAINS,
+            config.ALLOWED_DOMAIN_PATTERNS
+        )
         self.csrf_protection = CSRFProtection()
         self.blocked_ips: Set[str] = set()
         self.suspicious_activities: Dict[str, List] = {}
