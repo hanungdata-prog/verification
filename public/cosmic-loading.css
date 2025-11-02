@@ -1,127 +1,356 @@
 /* Cosmic Loading Animations */
-.cosmic-loader {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  margin: 20px auto;
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  text-align: center;
 }
 
-.cosmic-loader::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  background: var(--primary-color);
+/* Cosmic planet loading animation */
+.planet-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-4) 0;
+}
+
+.planet {
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  animation: cosmic-spin 2s linear infinite;
+  background: var(--accent);
+  animation: planetOrbit 2s infinite ease-in-out;
 }
 
-.cosmic-loader::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 30px;
-  height: 30px;
-  margin: -15px 0 0 -15px;
-  border: 3px solid transparent;
-  border-top-color: var(--secondary-color);
+.planet:nth-child(2) {
+  background: var(--success);
+  animation-delay: 0.2s;
+}
+
+.planet:nth-child(3) {
+  background: var(--warning);
+  animation-delay: 0.4s;
+}
+
+@keyframes planetOrbit {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0, -15px);
+  }
+}
+
+/* Cosmic spinner */
+.cosmic-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(112, 128, 255, 0.2);
+  border-top: 3px solid var(--accent);
   border-radius: 50%;
-  animation: cosmic-spin 1s linear infinite;
+  animation: spin 1s linear infinite;
+  margin: var(--space-4) auto;
 }
 
-@keyframes cosmic-spin {
+@keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* Loading skeleton */
-.loading-skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  border-radius: 4px;
+/* Star loading animation */
+.star-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-4) 0;
 }
 
-@keyframes loading {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+.star {
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  animation: twinkle 1.5s infinite ease-in-out;
 }
 
-/* Cosmic particles effect */
-.cosmic-particles {
-  position: fixed;
+.star:nth-child(2) {
+  background: var(--success);
+  animation-delay: 0.3s;
+}
+
+.star:nth-child(3) {
+  background: var(--warning);
+  animation-delay: 0.6s;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Cosmic progress bar */
+.cosmic-progress {
+  width: 100%;
+  height: 6px;
+  background: rgba(100, 100, 200, 0.2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin: var(--space-4) 0;
+  position: relative;
+}
+
+.cosmic-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #7080ff, #4aff8c, #ff557a);
+  width: 0%;
+  border-radius: var(--radius-full);
+  transition: width 0.4s ease;
+  position: relative;
+}
+
+.cosmic-progress-bar::after {
+  content: '';
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: -1;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: shine 2s infinite;
 }
 
-.particle {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Retro gaming style loading */
+.retro-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: monospace;
+  color: var(--accent);
+  text-shadow: 0 0 5px var(--accent);
+}
+
+.retro-dots {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.retro-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
   border-radius: 50%;
-  animation: particle-float 10s infinite linear;
+  animation: retroPulse 1.4s infinite ease-in-out;
 }
 
-@keyframes particle-float {
-  0% {
-    transform: translateY(100vh) translateX(0);
-    opacity: 0;
+.retro-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.retro-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes retroPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
   }
-  10% {
+  50% {
     opacity: 1;
+    transform: scale(1.2);
   }
-  90% {
+}
+
+/* Animated text */
+.loading-text {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+  animation: textFade 2s infinite;
+}
+
+@keyframes textFade {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Pulsing cosmic effect */
+.cosmic-pulse-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6);
+}
+
+.cosmic-pulse-circle {
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  position: relative;
+  animation: pulseRing 2s infinite;
+}
+
+.cosmic-pulse-circle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 15px;
+  height: 15px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: scale(0.5);
     opacity: 1;
   }
   100% {
-    transform: translateY(-100vh) translateX(100px);
+    transform: scale(1.5);
     opacity: 0;
   }
 }
 
-/* Glow effects */
-.cosmic-glow {
-  box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-  transition: box-shadow 0.3s ease;
+@keyframes pulseDot {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
 }
 
-.cosmic-glow:hover {
-  box-shadow: 0 0 30px rgba(102, 126, 234, 0.5);
+/* Galaxy spinner */
+.galaxy-spinner {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  margin: var(--space-4) auto;
 }
 
-/* Loading dots */
-.loading-dots {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-}
-
-.loading-dots span {
-  width: 8px;
-  height: 8px;
-  background: var(--primary-color);
+.galaxy-arm {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  animation: dot-bounce 1.4s infinite ease-in-out both;
+  border: 2px solid transparent;
+  animation: rotate 3s linear infinite;
 }
 
-.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-.loading-dots span:nth-child(3) { animation-delay: 0; }
+.galaxy-arm:nth-child(1) {
+  border-top-color: var(--accent);
+  animation-duration: 3s;
+}
 
-@keyframes dot-bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
+.galaxy-arm:nth-child(2) {
+  border-right-color: var(--success);
+  animation-duration: 2.5s;
+  animation-direction: reverse;
+}
+
+.galaxy-arm:nth-child(3) {
+  border-bottom-color: var(--error);
+  animation-duration: 2s;
+}
+
+/* Cosmic gaming progress */
+.cosmic-game-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.cosmic-game-bar {
+  width: 100%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--muted);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.cosmic-game-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7080ff, #4aff8c, #ff557a);
+  width: 0%;
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+  position: relative;
+  box-shadow: 0 0 10px rgba(112, 128, 255, 0.5);
+}
+
+.cosmic-game-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: shine 1.5s infinite;
+}
+
+.cosmic-game-text {
+  font-family: monospace;
+  font-size: var(--text-sm);
+  color: var(--accent);
+  text-shadow: 0 0 5px var(--accent);
+  letter-spacing: 1px;
+}
+
+/* Cosmic button loading state */
+.btn-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.btn-loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
