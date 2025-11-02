@@ -16,7 +16,7 @@
 /public/*    /public/:splat    200
 
 # Privacy policy and other static pages
-/privacy    /privacy.html    200
+/privacy    /privacy-policy.html    200
 /verify.html    /verify.html    200
 /verify-auto.html    /verify-auto.html    200
 

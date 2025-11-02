@@ -36,7 +36,7 @@
     },
     {
       "src": "/privacy",
-      "dest": "api/index.py"
+      "dest": "privacy-policy.html"
     },
     {
       "src": "/admin/verifications",
