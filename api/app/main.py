@@ -26,6 +26,18 @@ from .captcha import validate_captcha
 from .webhooks import send_webhook
 from .utils import validate_discord_id, get_user_agent, get_client_ip
 from .supabase_db import get_supabase_client
+from .security import (
+    validate_request_security,
+    get_security_headers,
+    generate_csrf_nonce,
+    validate_csrf_nonce
+)
+from .validation import (
+    VerificationRequest,
+    SuspiciousActivityLog,
+    validate_verification_params,
+    extract_and_validate_query_params
+)
 
 # Load environment variables
 load_dotenv()
@@ -78,26 +90,48 @@ app.add_middleware(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+# Security middleware to add headers
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+
+    # Add security headers
+    security_headers = get_security_headers()
+    for header, value in security_headers.items():
+        response.headers[header] = value
+
+    return response
+
 # Static files are served by Vercel routing, no need to mount here
 
-class VerifyRequest(BaseModel):
-    discord_id: str
-    discord_username: str
-    captcha_token: str
-    metadata: dict = {}
+# Use VerificationRequest from validation module instead
 
 @app.post("/verify", response_model=VerificationResponse)
 @limiter.limit("5 per 10 minutes")  # Rate limit: 5 attempts per 10 minutes per IP
-async def verify_user(request: Request, verify_request: VerifyRequest):
+async def verify_user(
+    request: Request,
+    verify_request: VerificationRequest,
+    security_context: dict = Depends(validate_request_security)
+):
     """
-    Main verification endpoint that validates CAPTCHA, encrypts IP, stores data,
-    and sends webhook to Discord.
+    Main verification endpoint with enhanced security that validates:
+    - Domain whitelist
+    - VPN/Proxy detection
+    - CSRF protection
+    - Rate limiting
+    - Suspicious activity detection
+    - CAPTCHA validation
     """
-    client_ip = get_client_ip(request)
-    user_agent = get_user_agent(request)
-    
-    logger.info(f"Verification attempt from IP: {client_ip}")
-    
+    client_ip = security_context["ip"]
+    user_agent = security_context["user_agent"]
+
+    logger.info(f"Verification attempt from IP: {client_ip}, Domain: {security_context['host']}")
+
+    # Validate CSRF nonce
+    if not validate_csrf_nonce(security_context["session_id"], verify_request.csrf_nonce):
+        logger.warning(f"Invalid CSRF nonce from IP: {client_ip}")
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+
     # Validate Discord ID format
     if not validate_discord_id(verify_request.discord_id):
         logger.warning(f"Invalid Discord ID format: {verify_request.discord_id}")
@@ -208,6 +242,105 @@ async def get_verify_page():
         logger.error(f"Error serving verification page: {str(e)}")
         raise HTTPException(status_code=500, detail="Error loading verification page")
 
+@app.get("/api/csrf-nonce")
+@limiter.limit("10 per minute")
+async def get_csrf_nonce(request: Request):
+    """
+    Generate CSRF nonce for form protection
+    """
+    import secrets
+    session_id = secrets.token_urlsafe(16)
+    nonce = generate_csrf_nonce(session_id)
+
+    response = JSONResponse({
+        "nonce": nonce,
+        "session_id": session_id
+    })
+
+    # Set session cookie
+    response.set_cookie(
+        key="session_id",
+        value=session_id,
+        max_age=3600,  # 1 hour
+        httponly=True,
+        secure=True,
+        samesite="strict"
+    )
+
+    return response
+
+@app.post("/api/log-suspicious-activity")
+@limiter.limit("20 per minute")
+async def log_suspicious_activity(
+    request: Request,
+    activity_log: SuspiciousActivityLog,
+    security_context: dict = Depends(validate_request_security)
+):
+    """
+    Log suspicious activity for security monitoring
+    """
+    try:
+        # Add IP address and session ID from security context
+        activity_log.ip_address = security_context["ip"]
+        activity_log.session_id = security_context["session_id"]
+
+        # Log to console (in production, this would go to a security monitoring system)
+        logger.warning(
+            f"Suspicious activity detected: {activity_log.activity} "
+            f"from IP {activity_log.ip_address} "
+            f"(Domain: {activity_log.domain}, "
+            f"User-Agent: {activity_log.user_agent[:100]}...)"
+        )
+
+        # Store in database for monitoring
+        try:
+            supabase_client = get_supabase_client()
+            suspicious_data = {
+                "activity": activity_log.activity,
+                "timestamp": datetime.utcnow().isoformat(),
+                "ip_address": activity_log.ip_address,
+                "user_agent": activity_log.user_agent,
+                "domain": activity_log.domain,
+                "session_id": activity_log.session_id,
+                "additional_data": activity_log.additional_data
+            }
+
+            # Try to insert into suspicious_activities table, but don't fail if it doesn't exist
+            try:
+                result = supabase_client.table("suspicious_activities").insert(suspicious_data).execute()
+                if not result.data:
+                    logger.warning("Failed to log suspicious activity to database")
+            except Exception as table_error:
+                logger.info(f"suspicious_activities table not available: {table_error}")
+                # Continue without database logging
+
+        except Exception as db_error:
+            logger.error(f"Supabase connection failed: {db_error}")
+            # Continue anyway - logging failure shouldn't block the request
+
+        return {"status": "logged", "message": "Suspicious activity logged"}
+
+    except Exception as e:
+        logger.error(f"Error logging suspicious activity: {e}")
+        # Don't expose internal errors
+        return {"status": "error", "message": "Logging failed"}
+
+@app.get("/api/security-status")
+async def get_security_status(
+    request: Request,
+    security_context: dict = Depends(validate_request_security)
+):
+    """
+    Get current security status (for debugging/monitoring)
+    """
+    return {
+        "status": "secure",
+        "domain_valid": True,
+        "ip_address": security_context["ip"][:8] + "...",  # Partial IP for privacy
+        "session_id": security_context["session_id"][:8] + "...",
+        "timestamp": security_context["timestamp"].isoformat()
+    }
+
 @app.get("/privacy")
 async def privacy_policy():
     """
@@ -316,8 +449,23 @@ async def discord_callback(code: str = Query(...), error: str = None, error_desc
                 "full_username": f"{user_data['username']}#{user_data['discriminator']}"
             }
             
-            # Redirect to auto-verification page with user data
-            redirect_url = f"/verify-auto.html?discord_id={discord_user['id']}&discord_username={discord_user['full_username']}"
+            # Validate Discord user data before redirect
+            if not validate_discord_id(discord_user['id']):
+                logger.error(f"Invalid Discord ID received: {discord_user['id']}")
+                raise HTTPException(status_code=400, detail="Invalid Discord user data")
+
+            # Create secure redirect URL with validated parameters
+            from urllib.parse import quote
+
+            validated_params = {
+                'discord_id': discord_user['id'],
+                'discord_username': discord_user['full_username']
+            }
+
+            # URL encode parameters
+            redirect_url = f"/verify-auto.html?discord_id={quote(validated_params['discord_id'])}&discord_username={quote(validated_params['discord_username'])}"
+
+            logger.info(f"Redirecting user {discord_user['id']} to verification page")
             return RedirectResponse(url=redirect_url)
             
     except httpx.RequestError as e:

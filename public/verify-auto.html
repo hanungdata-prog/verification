@@ -520,8 +520,10 @@
   </div>
 
   <!-- Scripts -->
+  <script src="security.js"></script>
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
+  <script src="debug.js"></script>
 
   <script>
     const HCAPTCHA_SITE_KEY = "f9b8d3ba-9142-42c8-9ee6-57f23258f83a";
@@ -575,8 +577,8 @@
       document.getElementById('loading').classList.add('active');
 
       // ANIMASI UFO SAAT KLIK
-      if (window.moonUFOLoading && typeof window.moonUFOLoading.show === 'function') {
-        window.moonUFOLoading.show(async () => {
+      if (window.moonUFOLoading && typeof window.moonUFOLoading.showOnVerifyClick === 'function') {
+        window.moonUFOLoading.showOnVerifyClick(async () => {
           await sendVerification();
         });
       } else {
@@ -585,37 +587,125 @@
     });
 
     async function sendVerification() {
-      const data = {
-        discord_id: document.getElementById('discordId').value,
-        discord_username: document.getElementById('discordUsername').value,
-        captcha_token: currentToken,
-        metadata: { timestamp: new Date().toISOString(), source: 'discord_oauth', captcha_provider: 'hcaptcha', user_agent: navigator.userAgent }
-      };
+      // Debug logging
+      if (window.authDebugger) {
+        window.authDebugger.logVerificationStart();
+      }
 
       try {
-        let res = await fetch('/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        if (!res.ok) res = await fetch('/.netlify/functions/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        // Wait for security manager to be ready
+        if (window.securityManager && !window.securityManager.isInitialized) {
+          await window.securityManager.initialize();
+          if (window.authDebugger) {
+            window.authDebugger.logStep('Security', 'Security manager initialized', 'success');
+          }
+        }
+
+        // Prepare base data
+        const baseData = {
+          discord_id: document.getElementById('discordId').value,
+          discord_username: document.getElementById('discordUsername').value,
+          captcha_token: currentToken,
+          metadata: {
+            timestamp: new Date().toISOString(),
+            source: 'discord_oauth',
+            captcha_provider: 'hcaptcha',
+            user_agent: navigator.userAgent,
+            domain: window.location.hostname,
+            referrer: document.referrer
+          }
+        };
+
+        // Add security metadata if security manager is available
+        let data = baseData;
+        if (window.securityManager) {
+          data = await window.securityManager.verifyRequest(baseData);
+        }
+
+        // Send secure request
+        let res;
+        if (window.securityManager) {
+          res = await window.securityManager.secureFetch('/verify', {
+            method: 'POST',
+            body: JSON.stringify(data)
+          });
+        } else {
+          // Fallback to regular fetch
+          res = await fetch('/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        }
+
+        // Try fallback if first request fails
+        if (!res.ok) {
+          res = await fetch('/.netlify/functions/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        }
+
         const result = await res.json();
 
         if (res.ok) {
+          // Hide UFO loading animation
+          if (window.moonUFOLoading && typeof window.moonUFOLoading.hideLoading === 'function') {
+            window.moonUFOLoading.hideLoading();
+          }
+
+          // Debug logging
+          if (window.authDebugger) {
+            window.authDebugger.logVerificationSuccess(result);
+          }
+
           document.getElementById('successCheckmark').classList.add('show');
           showMessage(result.message || 'Success! Redirecting...', 'success');
           if ('vibrate' in navigator) navigator.vibrate([100,50,100]);
+
           setTimeout(() => {
             document.body.style.opacity = '0';
             document.body.style.transition = 'opacity 0.5s ease-out';
             setTimeout(() => window.location.href = result.redirect_url || 'https://discord.gg/UNpRpJMt', 500);
           }, 2000);
         } else {
+          // Hide UFO loading animation on error
+          if (window.moonUFOLoading && typeof window.moonUFOLoading.showError === 'function') {
+            window.moonUFOLoading.showError(result.error || result.message || 'Verification failed');
+          } else if (window.moonUFOLoading && typeof window.moonUFOLoading.hideLoading === 'function') {
+            window.moonUFOLoading.hideLoading();
+          }
+
+          // Debug logging
+          if (window.authDebugger) {
+            window.authDebugger.logVerificationError(new Error(result.error || result.message || 'Verification failed'));
+          }
+
           showMessage((result.error || result.message || 'Failed') + (result.details ? ` (${result.details})` : ''), 'error');
           if ('vibrate' in navigator) navigator.vibrate(200);
         }
       } catch (err) {
+        console.error('Verification error:', err);
+
+        // Hide UFO loading animation on exception
+        if (window.moonUFOLoading && typeof window.moonUFOLoading.showError === 'function') {
+          window.moonUFOLoading.showError(`Network error: ${err.message}`);
+        } else if (window.moonUFOLoading && typeof window.moonUFOLoading.hideLoading === 'function') {
+          window.moonUFOLoading.hideLoading();
+        }
+
+        // Debug logging
+        if (window.authDebugger) {
+          window.authDebugger.logVerificationError(err);
+        }
+
         showMessage(`Error: ${err.message}`, 'error');
         if ('vibrate' in navigator) navigator.vibrate(200);
       } finally {
         const btn = document.getElementById('submitBtn');
-        btn.disabled = false; btn.classList.remove('loading');
+        btn.disabled = false;
+        btn.classList.remove('loading');
         document.getElementById('loading').classList.remove('active');
       }
     }

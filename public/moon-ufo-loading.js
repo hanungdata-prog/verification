@@ -183,27 +183,35 @@ class MoonUFOLoading {
   showOnVerifyClick(callback) {
     // Show loading screen immediately
     this.show();
-    
+
     // Start progress simulation with smoother animation
     let percent = 0;
     const interval = setInterval(() => {
       // Smoother increment with easing
       const increment = percent < 50 ? 3 : percent < 80 ? 2 : 1.5;
       percent += increment;
-      
+
       if (percent >= 100) {
         percent = 100;
         clearInterval(interval);
         this.updateProgress(percent, 'Complete!');
         this.updateSubtext('Verification complete. Redirecting...');
-        
-        // Call the callback after a short delay
+
+        // Call the callback immediately after animation completes
         setTimeout(() => {
-          if (callback) callback();
-        }, 1000);
+          if (callback && typeof callback === 'function') {
+            try {
+              callback();
+            } catch (error) {
+              console.error('Error executing callback:', error);
+              // Hide loading on error
+              this.hide();
+            }
+          }
+        }, 500); // Reduced delay for faster response
       } else {
         this.updateProgress(percent, 'Verifying...');
-        
+
         // Dynamic subtext based on progress
         if (percent < 30) {
           this.updateSubtext('Establishing secure connection...');
@@ -215,7 +223,7 @@ class MoonUFOLoading {
           this.updateSubtext('Almost ready...');
         }
       }
-      
+
       // Update steps based on progress with smoother transitions
       if (percent >= 20) this.updateStep(1, 'active');
       if (percent >= 30) this.updateStep(1, 'completed');
@@ -226,6 +234,32 @@ class MoonUFOLoading {
       if (percent >= 85) this.updateStep(4, 'active');
       if (percent >= 100) this.updateStep(4, 'completed');
     }, 80);
+  }
+
+  // Add method to hide loading and reset
+  hideLoading() {
+    this.hide();
+    this.resetSteps();
+  }
+
+  // Add method to show error state
+  showError(message = 'Verification failed') {
+    if (this.progressText) {
+      this.progressText.textContent = 'Error!';
+    }
+    if (this.progressSubtext) {
+      this.progressSubtext.textContent = message;
+    }
+
+    // Mark current step as error
+    if (this.currentStep > 0) {
+      this.updateStep(this.currentStep, 'error');
+    }
+
+    // Hide after delay
+    setTimeout(() => {
+      this.hideLoading();
+    }, 3000);
   }
   
   // Demo method to show all features
