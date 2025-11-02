@@ -83,6 +83,10 @@
       "dest": "api/index.py"
     },
     {
+      "src": "/test-security-error",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/check-vpn/(.*)",
       "dest": "api/index.py"
     },

@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(__file__))
 
 # Import dependencies directly to avoid module issues
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import AsyncGenerator, Optional
 import asyncio
 import logging
@@ -944,44 +944,179 @@ async def get_csrf_nonce(request: Request):
         raise HTTPException(status_code=500, detail="Failed to generate security token")
 
 @app.get("/security-error.html")
-async def security_error_page(reason: str = None, message: str = None):
+async def security_error_page(request: Request, reason: str = None, message: str = None):
     """Serve security error page"""
     try:
-        # Read the security error HTML file
-        with open("public/security-error.html", "r", encoding="utf-8") as f:
-            html_content = f.read()
+        logger.info(f"🔍 Serving security error page - reason: {reason}, message: {message}")
 
-        # Replace placeholders if needed
-        if reason:
-            html_content = html_content.replace("{{reason}}", reason)
-        if message:
-            html_content = html_content.replace("{{message}}", message)
+        # Try multiple possible file paths
+        possible_paths = [
+            "public/security-error.html",
+            "../public/security-error.html",
+            "security-error.html",
+            "/var/task/public/security-error.html"
+        ]
+
+        html_content = None
+        file_path_used = None
+
+        for path in possible_paths:
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    html_content = f.read()
+                    file_path_used = path
+                    logger.info(f"✅ Found security error file at: {path}")
+                    break
+            except FileNotFoundError:
+                continue
+            except Exception as e:
+                logger.warning(f"⚠️ Error reading file {path}: {e}")
+                continue
+
+        if not html_content:
+            logger.warning("⚠️ Security error HTML file not found, using inline fallback")
+            # Create a simple inline HTML response
+            html_content = generate_security_error_html(reason, message)
+        else:
+            # Replace placeholders if needed
+            if reason:
+                html_content = html_content.replace("{{reason}}", reason)
+            if message:
+                html_content = html_content.replace("{{message}}", message)
 
         return HTMLResponse(content=html_content)
 
-    except FileNotFoundError:
-        # Fallback error page if file doesn't exist
-        return HTMLResponse(content="""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>Security Error</title>
-            <style>
-                body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-                .error { color: red; }
-            </style>
-        </head>
-        <body>
-            <h1 class="error">🛡️ Security Error</h1>
-            <p>Access has been blocked due to security restrictions.</p>
-            <p><strong>Reason:</strong> {reason}</p>
-            <p><a href="/verify.html">Return to Verification</a></p>
-        </body>
-        </html>
-        """.format(reason=reason or "Unknown"))
     except Exception as e:
-        logger.error(f"Error serving security page: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        logger.error(f"❌ Critical error serving security page: {e}", exc_info=True)
+        # Last resort - return minimal HTML response
+        return HTMLResponse(content=generate_security_error_html(reason, message))
+
+def generate_security_error_html(reason: str = None, message: str = None) -> str:
+    """Generate security error HTML inline"""
+    # Map reasons to user-friendly messages
+    reason_messages = {
+        'domain': 'Invalid Domain Access',
+        'vpn': 'VPN or Proxy Detected',
+        'rate_limit': 'Rate Limit Exceeded',
+        'daily_limit': 'Daily Limit Reached',
+        'already_verified': 'Already Verified',
+        'suspicious': 'Suspicious Activity Detected',
+        'blocked': 'Access Blocked',
+        'csrf': 'Security Token Invalid'
+    }
+
+    display_reason = reason_messages.get(reason, 'Security Error')
+    display_message = message or 'Access has been blocked due to security restrictions.'
+
+    return f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Security Error - AuthGateway</title>
+        <style>
+            * {{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}
+
+            body {{
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #333;
+            }}
+
+            .error-container {{
+                background: white;
+                padding: 3rem;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                max-width: 500px;
+                width: 90%;
+                text-align: center;
+            }}
+
+            .error-icon {{
+                font-size: 4rem;
+                margin-bottom: 1rem;
+                animation: pulse 2s infinite;
+            }}
+
+            @keyframes pulse {{
+                0% {{ transform: scale(1); }}
+                50% {{ transform: scale(1.1); }}
+                100% {{ transform: scale(1); }}
+            }}
+
+            .error-title {{
+                font-size: 2rem;
+                font-weight: 700;
+                color: #e74c3c;
+                margin-bottom: 1rem;
+            }}
+
+            .error-message {{
+                font-size: 1.1rem;
+                color: #666;
+                margin-bottom: 2rem;
+                line-height: 1.6;
+            }}
+
+            .back-button {{
+                display: inline-block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 1rem 2rem;
+                text-decoration: none;
+                border-radius: 50px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }}
+
+            .back-button:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            }}
+
+            .timestamp {{
+                margin-top: 2rem;
+                font-size: 0.8rem;
+                color: #999;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="error-container">
+            <div class="error-icon">🛡️</div>
+            <h1 class="error-title">{display_reason}</h1>
+            <div class="error-message">{display_message}</div>
+            <a href="/verify.html" class="back-button">Return to Verification</a>
+            <div class="timestamp">Error occurred at: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}</div>
+        </div>
+    </body>
+    </html>
+    """
+
+@app.get("/test-security-error")
+async def test_security_error_page(request: Request):
+    """Test endpoint for security error page"""
+    test_reasons = ['domain', 'vpn', 'rate_limit', 'already_verified', 'suspicious']
+    import random
+    test_reason = random.choice(test_reasons)
+    test_message = f"This is a test security error for: {test_reason}"
+
+    return await security_error_page(
+        request=request,
+        reason=test_reason,
+        message=test_message
+    )
 
 @app.get("/check-vpn/{ip}")
 async def check_vpn_status(ip: str):
