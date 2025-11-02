@@ -521,6 +521,7 @@
 
   <!-- Scripts -->
   <script src="security.js"></script>
+  <script src="verification-bridge.js"></script>
   <script src="token-handler.js"></script>
   <script src="verification-check.js"></script>
   <script src="animations.js"></script>
@@ -641,10 +642,33 @@
           }
         }
 
+        // Get Discord ID from form
+        const discordId = document.getElementById('discordId').value;
+        const discordUsername = document.getElementById('discordUsername').value;
+
+        // ⭐ NEW: Check existing verification before proceeding
+        if (window.verificationBridge) {
+          console.log('🔍 Checking existing verification before proceeding...');
+          const canProceed = await window.verificationBridge.checkVerificationWithUI(discordId);
+
+          if (!canProceed) {
+            console.log('❌ Verification blocked - user already verified');
+            if (window.authDebugger) {
+              window.authDebugger.logStep('Verification', 'Blocked - User already verified', 'blocked');
+            }
+            return; // Stop verification process
+          }
+
+          console.log('✅ User not previously verified - proceeding with verification');
+          if (window.authDebugger) {
+            window.authDebugger.logStep('Verification', 'Passed duplicate check', 'success');
+          }
+        }
+
         // Prepare base data
         const baseData = {
-          discord_id: document.getElementById('discordId').value,
-          discord_username: document.getElementById('discordUsername').value,
+          discord_id: discordId,
+          discord_username: discordUsername,
           captcha_token: currentToken,
           metadata: {
             timestamp: new Date().toISOString(),
@@ -652,7 +676,8 @@
             captcha_provider: 'hcaptcha',
             user_agent: navigator.userAgent,
             domain: window.location.hostname,
-            referrer: document.referrer
+            referrer: document.referrer,
+            duplicate_check: 'passed'
           }
         };
 
