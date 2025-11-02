@@ -1166,6 +1166,188 @@ async def test_token_generation():
             "message": f"Failed to generate test token: {e}"
         }, status_code=500)
 
+@app.post("/debug-token")
+async def debug_token_decode(request: Request):
+    """Debug endpoint for token decoding with detailed information"""
+    try:
+        request_data = await request.json()
+        token = request_data.get("token")
+
+        if not token:
+            return JSONResponse({
+                "status": "error",
+                "message": "Token is required"
+            }, status_code=400)
+
+        from app.token_utils import TokenManager
+        token_manager = TokenManager()
+
+        # Step-by-step debugging
+        debug_info = {
+            "token": token,
+            "token_length": len(token),
+            "steps": []
+        }
+
+        # Step 1: Clean token and add padding
+        clean_token = token.strip()
+        padding_needed = (4 - len(clean_token) % 4) % 4
+        if padding_needed:
+            clean_token += '=' * padding_needed
+
+        debug_info["steps"].append({
+            "step": "clean_and_pad",
+            "original": token,
+            "cleaned": clean_token,
+            "padding_added": padding_needed
+        })
+
+        # Step 2: Base64 decode
+        try:
+            import base64
+            token_bytes = base64.urlsafe_b64decode(clean_token.encode('utf-8'))
+            debug_info["steps"].append({
+                "step": "base64_decode",
+                "success": True,
+                "bytes_length": len(token_bytes)
+            })
+        except Exception as e:
+            debug_info["steps"].append({
+                "step": "base64_decode",
+                "success": False,
+                "error": str(e)
+            })
+            return JSONResponse({
+                "status": "error",
+                "message": "Base64 decode failed",
+                "debug": debug_info
+            })
+
+        # Step 3: JSON decode
+        try:
+            token_json = token_bytes.decode('utf-8')
+            import json
+            token_data = json.loads(token_json)
+            debug_info["steps"].append({
+                "step": "json_decode",
+                "success": True,
+                "json_keys": list(token_data.keys())
+            })
+        except Exception as e:
+            debug_info["steps"].append({
+                "step": "json_decode",
+                "success": False,
+                "error": str(e)
+            })
+            return JSONResponse({
+                "status": "error",
+                "message": "JSON decode failed",
+                "debug": debug_info
+            })
+
+        # Step 4: Extract payload and signature
+        payload = token_data.get("data")
+        signature = token_data.get("sig")
+
+        if not payload or not signature:
+            debug_info["steps"].append({
+                "step": "extract_components",
+                "success": False,
+                "payload": bool(payload),
+                "signature": bool(signature)
+            })
+            return JSONResponse({
+                "status": "error",
+                "message": "Invalid token format",
+                "debug": debug_info
+            })
+
+        debug_info["steps"].append({
+            "step": "extract_components",
+            "success": True,
+            "payload_keys": list(payload.keys()) if payload else None
+        })
+
+        # Step 5: Signature verification
+        try:
+            # Create expected signature
+            payload_json = token_manager._serialize_payload(payload)
+            expected_signature = token_manager._sign_payload(payload_json)
+
+            debug_info["steps"].append({
+                "step": "signature_verification",
+                "payload_json": payload_json,
+                "expected_signature": expected_signature[:20] + "...",
+                "received_signature": signature[:20] + "...",
+                "signatures_match": expected_signature == signature
+            })
+
+            if expected_signature != signature:
+                return JSONResponse({
+                    "status": "error",
+                    "message": "Signature verification failed",
+                    "debug": debug_info
+                })
+
+        except Exception as e:
+            debug_info["steps"].append({
+                "step": "signature_verification",
+                "success": False,
+                "error": str(e)
+            })
+            return JSONResponse({
+                "status": "error",
+                "message": "Signature verification error",
+                "debug": debug_info
+            })
+
+        # Step 6: Expiry check
+        try:
+            from datetime import datetime
+            expires_at = datetime.fromisoformat(payload.get("expires_at", ""))
+            is_expired = datetime.utcnow() > expires_at
+
+            debug_info["steps"].append({
+                "step": "expiry_check",
+                "expires_at": payload.get("expires_at"),
+                "is_expired": is_expired,
+                "current_utc": datetime.utcnow().isoformat()
+            })
+
+            if is_expired:
+                return JSONResponse({
+                    "status": "error",
+                    "message": "Token expired",
+                    "debug": debug_info
+                })
+
+        except Exception as e:
+            debug_info["steps"].append({
+                "step": "expiry_check",
+                "success": False,
+                "error": str(e)
+            })
+
+        # If all steps passed, token is valid
+        return JSONResponse({
+            "status": "success",
+            "message": "Token is valid",
+            "debug": debug_info,
+            "decoded_data": {
+                "discord_id": payload.get("discord_id"),
+                "discord_username": payload.get("discord_username"),
+                "expires_at": payload.get("expires_at")
+            }
+        })
+
+    except Exception as e:
+        logger.error(f"Debug token decode failed: {e}")
+        return JSONResponse({
+            "status": "error",
+            "message": f"Debug failed: {str(e)}",
+            "error_type": type(e).__name__
+        })
+
 @app.get("/check-vpn/{ip}")
 async def check_vpn_status(ip: str):
     """Check if IP is using VPN/proxy using ProxyCheck.io"""

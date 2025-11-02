@@ -32,8 +32,8 @@ class TokenManager:
                 "expires_at": (datetime.utcnow() + timedelta(seconds=self.token_expiry)).isoformat()
             }
 
-            # Create signature
-            payload_json = json.dumps(payload, sort_keys=True)
+            # Create signature with consistent serialization
+            payload_json = self._serialize_payload(payload)
             signature = self._sign_payload(payload_json)
 
             # Combine payload and signature
@@ -98,14 +98,15 @@ class TokenManager:
                 logger.warning(f"Token data: {token_data}")
                 return None
 
-            # Verify signature
-            payload_json = json.dumps(payload, sort_keys=True, separators=(',', ':'))
+            # Verify signature using consistent serialization
+            payload_json = self._serialize_payload(payload)
             expected_signature = self._sign_payload(payload_json)
 
             if not self._secure_compare(signature, expected_signature):
                 logger.warning("⚠️ Token signature verification failed")
-                logger.warning(f"Expected: {expected_signature[:20]}...")
-                logger.warning(f"Received: {signature[:20]}...")
+                logger.warning(f"📝 Payload JSON: {payload_json}")
+                logger.warning(f"🔐 Expected: {expected_signature}")
+                logger.warning(f"🔐 Received: {signature}")
                 return None
 
             # Check expiry
@@ -130,6 +131,10 @@ class TokenManager:
             logger.error(f"❌ Failed to decode token: {e}")
             logger.error(f"❌ Token that failed: {token[:50] if token else 'None'}...")
             return None
+
+    def _serialize_payload(self, payload: Dict) -> str:
+        """Serialize payload with consistent formatting"""
+        return json.dumps(payload, ensure_ascii=False, separators=(',', ':'))
 
     def _sign_payload(self, payload_json: str) -> str:
         """Create HMAC signature for payload"""
@@ -156,8 +161,8 @@ class TokenManager:
                 "expires_at": (datetime.utcnow() + timedelta(seconds=self.token_expiry)).isoformat()
             }
 
-            # Create signature
-            payload_json = json.dumps(payload, ensure_ascii=False, separators=(',', ':'))
+            # Create signature with consistent serialization
+            payload_json = self._serialize_payload(payload)
             signature = self._sign_payload(payload_json)
 
             # Create short token data
@@ -166,8 +171,8 @@ class TokenManager:
                 "sig": signature
             }
 
-            # Encode with better UTF-8 handling
-            token_json = json.dumps(short_token_data, ensure_ascii=False, separators=(',', ':'))
+            # Encode with consistent JSON formatting
+            token_json = self._serialize_payload(short_token_data)
             token_bytes = token_json.encode('utf-8')
             token_b64 = base64.urlsafe_b64encode(token_bytes).decode('utf-8')
 
