@@ -45,7 +45,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(100, 100, 200, 0.2);
             border-radius: var(--radius-2xl);
-            padding: var(--space-12);
+            padding: var(--space-8);
             max-width: 500px;
             width: 100%;
             box-shadow: 
@@ -69,15 +69,15 @@
         }
 
         .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto var(--space-6);
+            width: 60px;
+            height: 60px;
+            margin: 0 auto var(--space-4);
             background: linear-gradient(135deg, #7080ff, #4aff8c);
             border-radius: var(--radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--text-3xl);
+            font-size: var(--text-2xl);
             color: #0a0a12;
             box-shadow: 0 0 20px rgba(112, 128, 255, 0.5);
             animation: float 6s ease-in-out infinite;
@@ -95,15 +95,15 @@
         h1 {
             color: var(--foreground);
             margin-bottom: var(--space-4);
-            font-size: var(--text-3xl);
+            font-size: var(--text-2xl);
             font-weight: var(--font-semibold);
         }
 
         .message {
             color: var(--muted);
-            font-size: var(--text-lg);
+            font-size: var(--text-base);
             line-height: var(--leading-relaxed);
-            margin-bottom: var(--space-8);
+            margin-bottom: var(--space-4);
             animation: fadeIn 1s ease-out;
         }
 
@@ -114,63 +114,57 @@
 
         /* Enhanced loader */
         .loader-container {
-            margin: var(--space-8) 0;
+            margin: var(--space-6) 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: var(--space-4);
+            gap: var(--space-3);
         }
 
-        .loader {
-            width: 60px;
-            height: 60px;
+        .galaxy-spinner {
             position: relative;
-            animation: containerPulse 2s ease-in-out infinite;
+            width: 50px;
+            height: 50px;
+            margin: var(--space-4) auto;
         }
 
-        @keyframes containerPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .loader-discord {
+        .galaxy-arm {
+            position: absolute;
             width: 100%;
             height: 100%;
-            border: 4px solid rgba(100, 100, 200, 0.2);
-            border-top: 4px solid #7080ff;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            position: relative;
+            border: 2px solid transparent;
+            animation: rotate 3s linear infinite;
         }
 
-        .loader-discord::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px;
-            height: 20px;
-            background: #7080ff;
-            border-radius: 50%;
-            animation: innerPulse 1.5s ease-in-out infinite;
+        .galaxy-arm:nth-child(1) {
+            border-top-color: var(--accent);
+            animation-duration: 3s;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .galaxy-arm:nth-child(2) {
+            border-right-color: var(--success);
+            animation-duration: 2.5s;
+            animation-direction: reverse;
         }
 
-        @keyframes innerPulse {
-            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.8); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+        .galaxy-arm:nth-child(3) {
+            border-bottom-color: var(--error);
+            animation-duration: 2s;
+        }
+
+        .loading-text {
+            font-size: var(--text-xs);
+            color: var(--muted);
+            margin-top: var(--space-2);
+            text-align: center;
         }
 
         .loading-steps {
             display: flex;
             flex-direction: column;
-            gap: var(--space-3);
-            margin: var(--space-6) 0;
+            gap: var(--space-2);
+            margin: var(--space-4) 0;
             text-align: left;
             max-width: 300px;
             margin-left: auto;
@@ -180,7 +174,7 @@
         .loading-step {
             display: flex;
             align-items: center;
-            gap: var(--space-3);
+            gap: var(--space-2);
             color: var(--muted);
             font-size: var(--text-sm);
             transition: all 0.2s ease;
@@ -199,8 +193,8 @@
         }
 
         .loading-step i {
-            font-size: var(--text-lg);
-            width: 20px;
+            font-size: var(--text-base);
+            width: 16px;
             text-align: center;
         }
 
@@ -208,8 +202,8 @@
             background: rgba(255, 85, 122, 0.1);
             border: 1px solid rgba(255, 85, 122, 0.3);
             border-radius: var(--radius-xl);
-            padding: var(--space-6);
-            margin: var(--space-6) 0;
+            padding: var(--space-4);
+            margin: var(--space-4) 0;
             display: none;
             animation: shake 0.5s ease-out;
         }
@@ -262,26 +256,36 @@
             box-shadow: 0 0 15px rgba(255, 85, 122, 0.3);
         }
 
-        .progress-bar {
+        .cosmic-game-progress {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-3);
             width: 100%;
-            height: 4px;
-            background: rgba(100, 100, 200, 0.2);
-            border-radius: var(--radius-full);
-            overflow: hidden;
-            margin: var(--space-6) 0;
+            margin: var(--space-4) 0;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #7080ff, #4aff8c, #ff557a);
+        .cosmic-game-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--muted);
             border-radius: var(--radius-full);
-            width: 0%;
-            transition: width 0.3s ease;
-            animation: progressPulse 2s ease-in-out infinite;
+            overflow: hidden;
             position: relative;
         }
 
-        .progress-fill::after {
+        .cosmic-game-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7080ff, #4aff8c, #ff557a);
+            width: 0%;
+            border-radius: var(--radius-full);
+            transition: width 0.5s ease;
+            position: relative;
+            box-shadow: 0 0 10px rgba(112, 128, 255, 0.5);
+        }
+
+        .cosmic-game-fill::after {
             content: '';
             position: absolute;
             top: 0;
@@ -291,20 +295,23 @@
             background: linear-gradient(
                 90deg,
                 transparent,
-                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0.4),
                 transparent
             );
-            animation: shine 2s infinite;
+            animation: shine 1.5s infinite;
+        }
+
+        .cosmic-game-text {
+            font-family: monospace;
+            font-size: var(--text-sm);
+            color: var(--accent);
+            text-shadow: 0 0 5px var(--accent);
+            letter-spacing: 1px;
         }
 
         @keyframes shine {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
-        }
-
-        @keyframes progressPulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
         }
 
         /* Responsive */
@@ -525,7 +532,6 @@
                             window.location.href = data.redirect_url;
                         } else if (data.success) {
                             // Test response - show success message
-                            document.querySelector('.loader-container').style.display = 'none';
                             document.getElementById('loadingSteps').style.display = 'none';
                             document.getElementById('message').textContent = `Success! Authentication completed.`;
 
@@ -533,8 +539,21 @@
 
                             // Add success animation
                             const logo = document.querySelector('.logo');
-                            logo.style.background = 'var(--success)';
-                            logo.innerHTML = '<i class="fas fa-check"></i>';
+                            if (logo) {
+                                logo.style.background = 'var(--success)';
+                                logo.innerHTML = '<i class="fas fa-check"></i>';
+                            }
+
+                            // Show success loader
+                            const loaderContainer = document.querySelector('.loader-container');
+                            if (loaderContainer) {
+                                loaderContainer.innerHTML = `
+                                    <div class="cosmic-pulse-container">
+                                        <div class="cosmic-pulse-circle"></div>
+                                        <div class="loading-text">Success!</div>
+                                    </div>
+                                `;
+                            }
 
                             // For now, redirect to verify-auto page
                             setTimeout(() => {
@@ -543,6 +562,18 @@
                         } else {
                             updateLoadingStep(4, 'completed');
                             document.getElementById('message').textContent = 'Authentication successful! Redirecting...';
+                            
+                            // Show success loader
+                            const loaderContainer = document.querySelector('.loader-container');
+                            if (loaderContainer) {
+                                loaderContainer.innerHTML = `
+                                    <div class="cosmic-pulse-container">
+                                        <div class="cosmic-pulse-circle"></div>
+                                        <div class="loading-text">Redirecting...</div>
+                                    </div>
+                                `;
+                            }
+                            
                             setTimeout(() => {
                                 window.location.href = '/verify-auto.html';
                             }, 1500);
@@ -551,11 +582,17 @@
                         // Got HTML instead of JSON - likely an error page
                         const htmlText = await response.text();
                         console.log('Received HTML instead of JSON:', htmlText.substring(0, 200));
+                        // Show loading steps again when handling error
+                        const loadingSteps = document.getElementById('loadingSteps');
+                        if (loadingSteps) loadingSteps.style.display = 'flex';
                         throw new Error('Server returned HTML instead of JSON. Function may not be deployed correctly.');
                     }
                 } else {
                     const errorText = await response.text();
                     console.log('Error response:', errorText);
+                    // Show loading steps again when handling error
+                    const loadingSteps = document.getElementById('loadingSteps');
+                    if (loadingSteps) loadingSteps.style.display = 'flex';
                     throw new Error(`Server responded with ${response.status}: ${errorText.substring(0, 100)}`);
                 }
             } catch (error) {
@@ -571,6 +608,9 @@
                     // Retry after delay
                     setTimeout(() => {
                         hideError();
+                        // Show loading steps again for retry
+                        const loadingSteps = document.getElementById('loadingSteps');
+                        if (loadingSteps) loadingSteps.style.display = 'flex';
                         handleDiscordCallback();
                     }, 2000);
                 } else {
@@ -581,9 +621,15 @@
 
         // Start loading sequence
         function startLoadingSequence() {
-            document.querySelector('.loader-container').style.display = 'flex';
-            document.getElementById('loadingSteps').style.display = 'flex';
-            document.getElementById('progressFill').style.width = '0%';
+            const loaderContainer = document.querySelector('.loader-container');
+            const loadingSteps = document.getElementById('loadingSteps');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (loaderContainer) loaderContainer.style.display = 'flex';
+            if (loadingSteps) loadingSteps.style.display = 'flex';
+            if (progressFill) progressFill.style.width = '0%';
+            if (progressText) progressText.textContent = 'Initializing...';
 
             // Reset all steps
             for (let i = 1; i <= 4; i++) {
@@ -593,8 +639,9 @@
 
         // Show error with enhanced styling
         function showError(message, isRetry = false) {
-            document.querySelector('.loader-container').style.display = 'none';
-            document.getElementById('loadingSteps').style.display = 'none';
+            // Only hide loading steps, keep the main loader visible during retry
+            const loadingSteps = document.getElementById('loadingSteps');
+            if (loadingSteps) loadingSteps.style.display = 'none';
 
             const errorContainer = document.getElementById('errorContainer');
             const errorMessage = document.getElementById('errorMessage');
@@ -613,7 +660,11 @@
         // Hide error
         function hideError() {
             const errorContainer = document.getElementById('errorContainer');
+            const loadingSteps = document.getElementById('loadingSteps');
+            
             errorContainer.classList.remove('show');
+            // Show loading steps again when hiding error for retry
+            if (loadingSteps) loadingSteps.style.display = 'flex';
         }
 
         // Retry authentication
@@ -637,11 +688,15 @@
 
         // Add page visibility handling to pause animations
         document.addEventListener('visibilitychange', () => {
-            const loader = document.querySelector('.loader-discord');
+            const loaders = document.querySelectorAll('.galaxy-arm');
             if (document.hidden) {
-                loader.style.animationPlayState = 'paused';
+                loaders.forEach(loader => {
+                    loader.style.animationPlayState = 'paused';
+                });
             } else {
-                loader.style.animationPlayState = 'running';
+                loaders.forEach(loader => {
+                    loader.style.animationPlayState = 'running';
+                });
             }
         });
 

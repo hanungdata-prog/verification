@@ -122,7 +122,7 @@ body {
   backdrop-filter: blur(10px);
   border: 1px solid var(--card-border);
   border-radius: var(--radius-2xl);
-  padding: var(--space-8);
+  padding: var(--space-6);
   max-width: 500px;
   width: 100%;
   box-shadow: 
@@ -329,7 +329,7 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  padding: var(--space-8);
+  padding: var(--space-4);
   position: relative;
   z-index: 2;
 }
