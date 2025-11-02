@@ -23,12 +23,25 @@ class TokenHandler {
         }
 
         try {
-            const response = await fetch(`/api/decode-token/${token}`, {
-                method: 'GET',
+            // Clean and validate token
+            if (!token || typeof token !== 'string') {
+                throw new Error('Invalid token provided');
+            }
+
+            // Clean token - remove any whitespace and common URL encoding issues
+            const cleanToken = token.trim().replace(/\s+/g, '');
+
+            console.log(`🔍 Attempting to decode token: ${cleanToken.substring(0, 20)}...`);
+
+            // Use POST endpoint to avoid URL encoding issues
+            const response = await fetch('/api/decode-token', {
+                method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
-                }
+                },
+                body: JSON.stringify({ token: cleanToken })
             });
 
             if (!response.ok) {
@@ -37,16 +50,19 @@ class TokenHandler {
 
             const data = await response.json();
 
-            // Cache the result
-            this.cache.set(cacheKey, {
-                data: data,
-                timestamp: Date.now()
-            });
+            // Cache the result only if successful
+            if (data.valid) {
+                this.cache.set(cacheKey, {
+                    data: data,
+                    timestamp: Date.now()
+                });
+            }
 
+            console.log('✅ Token decode result:', data);
             return data;
 
         } catch (error) {
-            console.error('Failed to decode token:', error);
+            console.error('❌ Failed to decode token:', error);
             return {
                 status: 'error',
                 message: 'Failed to decode token: ' + error.message,

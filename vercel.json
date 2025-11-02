@@ -87,6 +87,10 @@
       "dest": "api/index.py"
     },
     {
+      "src": "/test-token",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/check-vpn/(.*)",
       "dest": "api/index.py"
     },

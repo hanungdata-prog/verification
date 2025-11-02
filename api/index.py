@@ -1133,6 +1133,39 @@ async def test_security_error_page(request: Request):
         message=test_message
     )
 
+@app.get("/test-token")
+async def test_token_generation():
+    """Test endpoint for token generation"""
+    try:
+        from app.token_utils import generate_short_discord_token
+
+        # Generate test token
+        test_discord_id = "692037233644929075"
+        test_discord_username = "TestUser#1234"
+
+        token = generate_short_discord_token(test_discord_id, test_discord_username)
+
+        return JSONResponse({
+            "status": "success",
+            "token": token,
+            "discord_id": test_discord_id,
+            "discord_username": test_discord_username,
+            "test_url": f"/verify-auto.html?token={token}",
+            "decode_url": f"/api/decode-token/{token}"
+        })
+
+    except ImportError as e:
+        return JSONResponse({
+            "status": "error",
+            "message": f"Token utils not available: {e}"
+        }, status_code=500)
+    except Exception as e:
+        logger.error(f"Test token generation failed: {e}")
+        return JSONResponse({
+            "status": "error",
+            "message": f"Failed to generate test token: {e}"
+        }, status_code=500)
+
 @app.get("/check-vpn/{ip}")
 async def check_vpn_status(ip: str):
     """Check if IP is using VPN/proxy using ProxyCheck.io"""
