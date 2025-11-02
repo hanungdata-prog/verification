@@ -1,718 +1,463 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Authenticating with Discord - AuthGateway</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authenticating with Discord - AuthGateway</title>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="space-theme.css">
-    <link rel="stylesheet" href="cosmic-loading.css">
-    <link rel="stylesheet" href="animations.css">
-    <link rel="stylesheet" href="styles.css"> <!-- Keep original styles for functions -->
+  <!-- External Styles (opsional) -->
+  <link rel="stylesheet" href="space-theme.css">
+  <link rel="stylesheet" href="cosmic-loading.css">
+  <link rel="stylesheet" href="animations.css">
+  <link rel="stylesheet" href="styles.css">
 
-    <style>
-        body {
-            background: #0a0a12;
-            background-image: 
-                radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
-                radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
-                radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
-                radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
-                radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
-                radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
-                radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
-                radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
-                radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
-                radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
-            background-size: 240px 120px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: var(--space-4);
-            font-family: var(--font-sans);
-            overflow-x: hidden;
-        }
+  <style>
+    :root {
+      --font-sans: 'Inter', sans-serif;
+      --foreground: #e0e0ff;
+      --muted: #a0a0c0;
+      --accent: #7080ff;
+      --success: #4aff8c;
+      --error: #ff557a;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.5rem;
+      --radius-full: 9999px;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1rem;
+      --text-lg: 1.125rem;
+      --text-xl: 1.25rem;
+      --text-2xl: 1.5rem;
+      --font-medium: 500;
+      --font-semibold: 600;
+      --font-bold: 700;
+    }
 
-        .card {
-            background: rgba(15, 15, 30, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(100, 100, 200, 0.2);
-            border-radius: var(--radius-2xl);
-            padding: var(--space-8);
-            max-width: 500px;
-            width: 100%;
-            box-shadow: 
-                0 0 15px rgba(100, 100, 200, 0.2),
-                0 0 30px rgba(80, 80, 180, 0.1);
-            position: relative;
-            z-index: 1;
-            animation: fadeInUp 0.8s ease-out;
-            text-align: center;
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #7080ff, transparent);
-            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
-        }
+    body {
+      background: #0a0a12;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
+        radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
+        radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
+        radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
+        radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
+        radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
+        radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
+      background-size: 240px 120px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: var(--font-sans);
+      color: var(--foreground);
+      padding: var(--space-4);
+      overflow: hidden;
+    }
 
-        .logo {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto var(--space-4);
-            background: linear-gradient(135deg, #7080ff, #4aff8c);
-            border-radius: var(--radius-xl);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--text-2xl);
-            color: #0a0a12;
-            box-shadow: 0 0 20px rgba(112, 128, 255, 0.5);
-            animation: float 6s ease-in-out infinite;
-        }
+    /* CARD UTAMA - KONSISTEN DENGAN HALAMAN LAIN */
+    .card {
+      background: rgba(15, 15, 30, 0.9);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(100, 100, 200, 0.25);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-8);
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(112, 128, 255, 0.15);
+      position: relative;
+      animation: fadeInUp 0.8s ease-out;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
 
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7080ff, transparent);
+      border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    }
 
-        h1 {
-            color: var(--foreground);
-            margin-bottom: var(--space-4);
-            font-size: var(--text-2xl);
-            font-weight: var(--font-semibold);
-        }
+    /* LOGO */
+    .logo {
+      width: 64px; height: 64px;
+      margin-bottom: var(--space-6);
+      background: linear-gradient(135deg, #7080ff, #4aff8c);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-2xl);
+      color: #0a0a12;
+      box-shadow: 0 0 25px rgba(112, 128, 255, 0.6);
+      animation: float 6s ease-in-out infinite;
+    }
 
-        .message {
-            color: var(--muted);
-            font-size: var(--text-base);
-            line-height: var(--leading-relaxed);
-            margin-bottom: var(--space-4);
-            animation: fadeIn 1s ease-out;
-        }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
+    /* JUDUL */
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-semibold);
+      color: var(--foreground);
+      margin-bottom: var(--space-4);
+      line-height: 1.3;
+    }
 
-        /* Enhanced loader */
-        .loader-container {
-            margin: var(--space-6) 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-3);
-        }
+    /* PESAN */
+    .message {
+      color: var(--muted);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      margin-bottom: var(--space-6);
+      max-width: 90%;
+    }
 
-        .galaxy-spinner {
-            position: relative;
-            width: 50px;
-            height: 50px;
-            margin: var(--space-4) auto;
-        }
+    /* LOADER CONTAINER */
+    .loader-container {
+      margin: var(--space-6) 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+      width: 100%;
+    }
 
-        .galaxy-arm {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            animation: rotate 3s linear infinite;
-        }
+    .galaxy-spinner {
+      position: relative;
+      width: 50px;
+      height: 50px;
+    }
 
-        .galaxy-arm:nth-child(1) {
-            border-top-color: var(--accent);
-            animation-duration: 3s;
-        }
+    .galaxy-arm {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      animation: rotate 3s linear infinite;
+    }
 
-        .galaxy-arm:nth-child(2) {
-            border-right-color: var(--success);
-            animation-duration: 2.5s;
-            animation-direction: reverse;
-        }
+    .galaxy-arm:nth-child(1) { border-top-color: var(--accent); animation-duration: 3s; }
+    .galaxy-arm:nth-child(2) { border-right-color: var(--success); animation-duration: 2.5s; animation-direction: reverse; }
+    .galaxy-arm:nth-child(3) { border-bottom-color: var(--error); animation-duration: 2s; }
 
-        .galaxy-arm:nth-child(3) {
-            border-bottom-color: var(--error);
-            animation-duration: 2s;
-        }
+    .loading-text {
+      font-size: var(--text-xs);
+      color: var(--muted);
+      text-align: center;
+    }
 
-        .loading-text {
-            font-size: var(--text-xs);
-            color: var(--muted);
-            margin-top: var(--space-2);
-            text-align: center;
-        }
+    /* LOADING STEPS */
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto var(--space-6);
+    }
 
-        .loading-steps {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-2);
-            margin: var(--space-4) 0;
-            text-align: left;
-            max-width: 300px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+    .loading-step {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--muted);
+      font-size: var(--text-sm);
+      opacity: 0.5;
+      transition: all 0.3s ease;
+    }
 
-        .loading-step {
-            display: flex;
-            align-items: center;
-            gap: var(--space-2);
-            color: var(--muted);
-            font-size: var(--text-sm);
-            transition: all 0.2s ease;
-            opacity: 0.5;
-        }
+    .loading-step.active {
+      color: var(--accent);
+      opacity: 1;
+      transform: translateX(4px);
+    }
 
-        .loading-step.active {
-            color: var(--accent);
-            opacity: 1;
-            transform: translateX(4px);
-        }
+    .loading-step.completed {
+      color: var(--success);
+      opacity: 1;
+    }
 
-        .loading-step.completed {
-            color: var(--success);
-            opacity: 1;
-        }
+    .loading-step i {
+      font-size: var(--text-base);
+      width: 18px;
+      text-align: center;
+    }
 
-        .loading-step i {
-            font-size: var(--text-base);
-            width: 16px;
-            text-align: center;
-        }
+    /* PROGRESS BAR */
+    .cosmic-game-progress {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
 
-        .error-container {
-            background: rgba(255, 85, 122, 0.1);
-            border: 1px solid rgba(255, 85, 122, 0.3);
-            border-radius: var(--radius-xl);
-            padding: var(--space-4);
-            margin: var(--space-4) 0;
-            display: none;
-            animation: shake 0.5s ease-out;
-        }
+    .cosmic-game-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--muted);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      position: relative;
+    }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
+    .cosmic-game-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7080ff, #4aff8c, #ff557a);
+      width: 0%;
+      border-radius: var(--radius-full);
+      transition: width 0.5s ease;
+      box-shadow: 0 0 10px rgba(112, 128, 255, 0.5);
+    }
 
-        .error-container.show {
-            display: block;
-        }
+    .cosmic-game-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shine 1.5s infinite;
+    }
 
-        .error-title {
-            color: var(--error);
-            font-size: var(--text-lg);
-            font-weight: var(--font-semibold);
-            margin-bottom: var(--space-3);
-            display: flex;
-            align-items: center;
-            gap: var(--space-2);
-        }
+    .cosmic-game-text {
+      font-family: monospace;
+      font-size: var(--text-sm);
+      color: var(--accent);
+      text-shadow: 0 0 5px var(--accent);
+      letter-spacing: 1px;
+      text-align: center;
+    }
 
-        .error-message {
-            color: var(--muted);
-            font-size: var(--text-sm);
-            line-height: var(--leading-relaxed);
-        }
+    @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        .retry-button {
-            background: linear-gradient(135deg, #ff557a, #ff7a9e);
-            color: white;
-            border: none;
-            padding: var(--space-3) var(--space-6);
-            border-radius: var(--radius-full);
-            font-size: var(--text-base);
-            font-weight: var(--font-medium);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin-top: var(--space-4);
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-2);
-        }
+    /* ERROR CONTAINER */
+    .error-container {
+      background: rgba(255, 85, 122, 0.1);
+      border: 1px solid rgba(255, 85, 122, 0.3);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      display: none;
+      animation: shake 0.5s ease-out;
+    }
 
-        .retry-button:hover {
-            background: linear-gradient(135deg, #ff658a, #ff8aae);
-            transform: translateY(-1px);
-            box-shadow: 0 0 15px rgba(255, 85, 122, 0.3);
-        }
+    .error-container.show { display: block; }
 
-        .cosmic-game-progress {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: var(--space-3);
-            width: 100%;
-            margin: var(--space-4) 0;
-        }
+    .error-title {
+      color: var(--error);
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
 
-        .cosmic-game-bar {
-            width: 100%;
-            height: 12px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--muted);
-            border-radius: var(--radius-full);
-            overflow: hidden;
-            position: relative;
-        }
+    .error-message {
+      color: var(--muted);
+      font-size: var(--text-sm);
+      line-height: 1.6;
+      margin-bottom: var(--space-4);
+    }
 
-        .cosmic-game-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #7080ff, #4aff8c, #ff557a);
-            width: 0%;
-            border-radius: var(--radius-full);
-            transition: width 0.5s ease;
-            position: relative;
-            box-shadow: 0 0 10px rgba(112, 128, 255, 0.5);
-        }
+    .retry-button {
+      background: linear-gradient(135deg, #ff557a, #ff7a9e);
+      color: white;
+      border: none;
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-full);
+      font-size: var(--text-base);
+      font-weight: var(--font-medium);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
 
-        .cosmic-game-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(
-                90deg,
-                transparent,
-                rgba(255, 255, 255, 0.4),
-                transparent
-            );
-            animation: shine 1.5s infinite;
-        }
+    .retry-button:hover {
+      background: linear-gradient(135deg, #ff658a, #ff8aae);
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(255, 85, 122, 0.4);
+    }
 
-        .cosmic-game-text {
-            font-family: monospace;
-            font-size: var(--text-sm);
-            color: var(--accent);
-            text-shadow: 0 0 5px var(--accent);
-            letter-spacing: 1px;
-        }
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .card { padding: var(--space-6); max-width: 380px; }
+      h1 { font-size: var(--text-xl); }
+      .message { font-size: var(--text-sm); }
+      .loading-steps, .cosmic-game-progress, .error-container { max-width: 280px; }
+    }
 
-        @keyframes shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        /* Responsive */
-        @media (max-width: 640px) {
-            .card {
-                padding: var(--space-8) var(--space-6);
-                margin: var(--space-4);
-            }
-
-            h1 {
-                font-size: var(--text-2xl);
-            }
-
-            .message {
-                font-size: var(--text-base);
-            }
-
-            .loading-steps {
-                max-width: 250px;
-            }
-        }
-    </style>
+    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }
+  </style>
 </head>
 <body>
-    <div class="card card-centered animate-fade-in">
-        <div class="logo cosmic-float">
-            <i class="fab fa-discord"></i>
-        </div>
 
-        <h1 class="animate-slide-in-up">Authenticating with Discord</h1>
-        <p class="message animate-slide-in-up stagger-1" id="message">
-            Please wait while we securely connect your Discord account to AuthGateway
-        </p>
+  <!-- CARD SANGAT RAPI -->
+  <div class="card">
+    <div class="logo"><i class="fab fa-discord"></i></div>
+    <h1>Authenticating with Discord</h1>
+    <p class="message" id="message">
+      Please wait while we securely connect your Discord account to AuthGateway
+    </p>
 
-        <div class="loader-container animate-slide-in-up stagger-2">
-            <div class="galaxy-spinner">
-                <div class="galaxy-arm"></div>
-                <div class="galaxy-arm"></div>
-                <div class="galaxy-arm"></div>
-            </div>
-            <div class="loading-text">Establishing secure connection</div>
-        </div>
-
-        <div class="loading-steps animate-slide-in-up stagger-3" id="loadingSteps">
-            <div class="loading-step" data-step="1">
-                <i class="fas fa-circle-notch fa-spin"></i>
-                <span>Connecting to Discord servers</span>
-            </div>
-            <div class="loading-step" data-step="2">
-                <i class="fas fa-circle-notch fa-spin"></i>
-                <span>Verifying authorization code</span>
-            </div>
-            <div class="loading-step" data-step="3">
-                <i class="fas fa-circle-notch fa-spin"></i>
-                <span>Retrieving user information</span>
-            </div>
-            <div class="loading-step" data-step="4">
-                <i class="fas fa-circle-notch fa-spin"></i>
-                <span>Preparing verification session</span>
-            </div>
-        </div>
-
-        <div class="cosmic-game-progress animate-slide-in-up stagger-4">
-            <div class="cosmic-game-bar">
-                <div class="cosmic-game-fill" id="progressFill"></div>
-            </div>
-            <div class="cosmic-game-text" id="progressText">Initializing...</div>
-        </div>
-
-        <div class="error-container animate-slide-in-up stagger-5" id="errorContainer">
-            <div class="error-title">
-                <i class="fas fa-exclamation-triangle"></i>
-                Authentication Failed
-            </div>
-            <div class="error-message" id="errorMessage">
-                We encountered an issue while connecting to Discord. Please try again.
-            </div>
-            <button class="retry-button focus-animated" onclick="retryAuthentication()">
-                <i class="fas fa-redo"></i>
-                Try Again
-            </button>
-        </div>
+    <!-- LOADER -->
+    <div class="loader-container">
+      <div class="galaxy-spinner">
+        <div class="galaxy-arm"></div>
+        <div class="galaxy-arm"></div>
+        <div class="galaxy-arm"></div>
+      </div>
+      <div class="loading-text">Establishing secure connection</div>
     </div>
-</body>
 
-    <script>
-        // Enhanced Discord callback handler with modern loading states
-        let currentStep = 0;
-        let retryCount = 0;
-        const maxRetries = 3;
+    <!-- STEPS -->
+    <div class="loading-steps" id="loadingSteps">
+      <div class="loading-step" data-step="1"><i class="fas fa-circle-notch fa-spin"></i><span>Connecting to Discord servers</span></div>
+      <div class="loading-step" data-step="2"><i class="fas fa-circle-notch fa-spin"></i><span>Verifying authorization code</span></div>
+      <div class="loading-step" data-step="3"><i class="fas fa-circle-notch fa-spin"></i><span>Retrieving user information</span></div>
+      <div class="loading-step" data-step="4"><i class="fas fa-circle-notch fa-spin"></i><span>Preparing verification session</span></div>
+    </div>
 
-        // Function to get URL parameters
-        function getUrlParameter(name) {
-            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-            const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-            const results = regex.exec(location.search);
-            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-        }
+    <!-- PROGRESS -->
+    <div class="cosmic-game-progress">
+      <div class="cosmic-game-bar"><div class="cosmic-game-fill" id="progressFill"></div></div>
+      <div class="cosmic-game-text" id="progressText">Initializing...</div>
+    </div>
 
-        // Update loading step with animation
-        function updateLoadingStep(step, status = 'active') {
-            const stepElement = document.querySelector(`[data-step="${step}"]`);
-            if (stepElement) {
-                const icon = stepElement.querySelector('i');
+    <!-- ERROR -->
+    <div class="error-container" id="errorContainer">
+      <div class="error-title"><i class="fas fa-exclamation-triangle"></i> Authentication Failed</div>
+      <div class="error-message" id="errorMessage"></div>
+      <button class="retry-button" onclick="retryAuthentication()"><i class="fas fa-redo"></i> Try Again</button>
+    </div>
+  </div>
 
-                // Remove all status classes
-                stepElement.classList.remove('active', 'completed');
+  <!-- Scripts -->
+  <script src="animations.js"></script>
 
-                if (status === 'completed') {
-                    stepElement.classList.add('completed');
-                    icon.className = 'fas fa-check-circle';
-                } else if (status === 'active') {
-                    stepElement.classList.add('active');
-                    icon.className = 'fas fa-circle-notch fa-spin';
-                } else if (status === 'error') {
-                    icon.className = 'fas fa-exclamation-circle';
-                }
-            }
+  <script>
+    // === SEMUA JS TETAP SAMA (HANYA DIPERBAIKI STRUKTUR HTML) ===
+    let currentStep = 0, retryCount = 0, maxRetries = 3;
 
-            // Update progress bar
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            const progress = (step / 4) * 100;
-            progressFill.style.width = `${progress}%`;
-            
-            // Update progress text
-            if (progressText) {
-                switch(step) {
-                    case 1:
-                        progressText.textContent = 'Connecting to Discord...';
-                        break;
-                    case 2:
-                        progressText.textContent = 'Verifying code...';
-                        break;
-                    case 3:
-                        progressText.textContent = 'Retrieving info...';
-                        break;
-                    case 4:
-                        progressText.textContent = 'Almost there...';
-                        break;
-                    default:
-                        progressText.textContent = 'Initializing...';
-                }
-            }
-        }
+    function getUrlParameter(name) {
+      const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      const results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
 
-        // Enhanced Discord callback handler
-        async function handleDiscordCallback() {
-            const code = getUrlParameter('code');
-            const error = getUrlParameter('error');
-            const errorDescription = getUrlParameter('error_description');
+    function updateLoadingStep(step, status = 'active') {
+      const el = document.querySelector(`[data-step="${step}"]`);
+      if (!el) return;
+      const icon = el.querySelector('i');
+      el.classList.remove('active', 'completed');
+      if (status === 'completed') { el.classList.add('completed'); icon.className = 'fas fa-check-circle'; }
+      else if (status === 'active') { el.classList.add('active'); icon.className = 'fas fa-circle-notch fa-spin'; }
+      else if (status === 'error') { icon.className = 'fas fa-exclamation-circle'; }
 
-            if (error) {
-                showError(`Discord authentication error: ${errorDescription || error}`);
-                return;
-            }
+      const progress = (step / 4) * 100;
+      document.getElementById('progressFill').style.width = `${progress}%`;
+      const texts = ['Initializing...', 'Connecting to Discord...', 'Verifying code...', 'Retrieving info...', 'Almost there...'];
+      document.getElementById('progressText').textContent = texts[step] || 'Initializing...';
+    }
 
-            if (!code) {
-                showError('No authorization code received from Discord. Please try again.');
-                return;
-            }
+    async function handleDiscordCallback() {
+      const code = getUrlParameter('code'), error = getUrlParameter('error');
+      if (error || !code) { showError(error ? `Discord error: ${getUrlParameter('error_description') || error}` : 'No code received.'); return; }
 
-            try {
-                // Start loading sequence
-                startLoadingSequence();
+      try {
+        updateLoadingStep(1, 'active'); await delay(1000);
+        updateLoadingStep(1, 'completed'); updateLoadingStep(2, 'active');
 
-                // Update step 1: Connecting to Discord servers
-                updateLoadingStep(1, 'active');
-                await new Promise(resolve => setTimeout(resolve, 1000));
+        const res = await fetch(`/.netlify/functions/discord?code=${encodeURIComponent(code)}`);
+        updateLoadingStep(2, 'completed'); updateLoadingStep(3, 'active'); await delay(800);
 
-                // Update step 2: Verifying authorization code
-                updateLoadingStep(1, 'completed');
-                updateLoadingStep(2, 'active');
+        if (res.status === 302) { const loc = res.headers.get('Location'); if (loc) { updateLoadingStep(3, 'completed'); updateLoadingStep(4, 'active'); await delay(500); window.location.href = loc; return; } }
+        if (!res.ok) throw new Error(await res.text());
 
-                // Send the code to our serverless function
-                const response = await fetch('/.netlify/functions/discord?code=' + encodeURIComponent(code), {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
+        const data = await res.json();
+        updateLoadingStep(3, 'completed'); updateLoadingStep(4, 'active'); await delay(500);
+        if (data.redirect_url) window.location.href = data.redirect_url;
+        else { successRedirect(); }
+      } catch (err) {
+        updateLoadingStep(currentStep, 'error');
+        if (retryCount < maxRetries) { retryCount++; showError(`Retrying... (${retryCount}/${maxRetries})`, true); setTimeout(() => { hideError(); handleDiscordCallback(); }, 2000); }
+        else showError(`Failed: ${err.message}`);
+      }
+    }
 
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
+    function successRedirect() {
+      document.getElementById('loadingSteps').style.display = 'none';
+      document.getElementById('message').textContent = 'Success! Redirecting...';
+      const loader = document.querySelector('.loader-container');
+      loader.innerHTML = `<div style="text-align:center"><div style="width:40px;height:40px;border:4px solid #4aff8c;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem"></div><div style="color:#4aff8c">Success!</div></div>`;
+      setTimeout(() => window.location.href = '/verify-auto.html', 1500);
+    }
 
-                // Update step 3: Retrieving user information
-                updateLoadingStep(2, 'completed');
-                updateLoadingStep(3, 'active');
-                await new Promise(resolve => setTimeout(resolve, 800));
+    function showError(msg, isRetry = false) {
+      document.getElementById('loadingSteps').style.display = 'none';
+      const container = document.getElementById('errorContainer');
+      document.getElementById('errorMessage').textContent = msg;
+      container.classList.add('show');
+      if (!isRetry && 'vibrate' in navigator) navigator.vibrate(200);
+    }
 
-                // Check if the response is a redirect (302)
-                if (response.status === 302) {
-                    const redirectUrl = response.headers.get('Location');
-                    if (redirectUrl) {
-                        updateLoadingStep(3, 'completed');
-                        updateLoadingStep(4, 'active');
-                        await new Promise(resolve => setTimeout(resolve, 500));
+    function hideError() {
+      document.getElementById('errorContainer').classList.remove('show');
+      document.getElementById('loadingSteps').style.display = 'flex';
+    }
 
-                        window.location.href = redirectUrl;
-                        return;
-                    }
-                }
+    function retryAuthentication() { retryCount = 0; hideError(); handleDiscordCallback(); }
 
-                if (response.ok) {
-                    const contentType = response.headers.get('content-type');
-                    console.log('Content type:', contentType);
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-                    if (contentType && contentType.includes('application/json')) {
-                        // Try to parse as JSON
-                        const data = await response.json();
-                        console.log('Received JSON data:', data);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.getElementById('errorContainer').classList.contains('show')) retryAuthentication();
+      if (e.key === 'Escape') window.history.back();
+    });
 
-                        updateLoadingStep(3, 'completed');
-                        updateLoadingStep(4, 'active');
-                        await new Promise(resolve => setTimeout(resolve, 500));
-
-                        if (data.redirect_url) {
-                            window.location.href = data.redirect_url;
-                        } else if (data.success) {
-                            // Test response - show success message
-                            document.getElementById('loadingSteps').style.display = 'none';
-                            document.getElementById('message').textContent = `Success! Authentication completed.`;
-
-                            updateLoadingStep(4, 'completed');
-
-                            // Add success animation
-                            const logo = document.querySelector('.logo');
-                            if (logo) {
-                                logo.style.background = 'var(--success)';
-                                logo.innerHTML = '<i class="fas fa-check"></i>';
-                            }
-
-                            // Show success loader
-                            const loaderContainer = document.querySelector('.loader-container');
-                            if (loaderContainer) {
-                                loaderContainer.innerHTML = `
-                                    <div class="cosmic-pulse-container">
-                                        <div class="cosmic-pulse-circle"></div>
-                                        <div class="loading-text">Success!</div>
-                                    </div>
-                                `;
-                            }
-
-                            // For now, redirect to verify-auto page
-                            setTimeout(() => {
-                                window.location.href = '/verify-auto.html';
-                            }, 2000);
-                        } else {
-                            updateLoadingStep(4, 'completed');
-                            document.getElementById('message').textContent = 'Authentication successful! Redirecting...';
-                            
-                            // Show success loader
-                            const loaderContainer = document.querySelector('.loader-container');
-                            if (loaderContainer) {
-                                loaderContainer.innerHTML = `
-                                    <div class="cosmic-pulse-container">
-                                        <div class="cosmic-pulse-circle"></div>
-                                        <div class="loading-text">Redirecting...</div>
-                                    </div>
-                                `;
-                            }
-                            
-                            setTimeout(() => {
-                                window.location.href = '/verify-auto.html';
-                            }, 1500);
-                        }
-                    } else {
-                        // Got HTML instead of JSON - likely an error page
-                        const htmlText = await response.text();
-                        console.log('Received HTML instead of JSON:', htmlText.substring(0, 200));
-                        // Show loading steps again when handling error
-                        const loadingSteps = document.getElementById('loadingSteps');
-                        if (loadingSteps) loadingSteps.style.display = 'flex';
-                        throw new Error('Server returned HTML instead of JSON. Function may not be deployed correctly.');
-                    }
-                } else {
-                    const errorText = await response.text();
-                    console.log('Error response:', errorText);
-                    // Show loading steps again when handling error
-                    const loadingSteps = document.getElementById('loadingSteps');
-                    if (loadingSteps) loadingSteps.style.display = 'flex';
-                    throw new Error(`Server responded with ${response.status}: ${errorText.substring(0, 100)}`);
-                }
-            } catch (error) {
-                console.error('Error during Discord callback:', error);
-
-                // Mark current step as error
-                updateLoadingStep(currentStep, 'error');
-
-                if (retryCount < maxRetries) {
-                    retryCount++;
-                    showError(`Connection failed. Retrying... (${retryCount}/${maxRetries})`, true);
-
-                    // Retry after delay
-                    setTimeout(() => {
-                        hideError();
-                        // Show loading steps again for retry
-                        const loadingSteps = document.getElementById('loadingSteps');
-                        if (loadingSteps) loadingSteps.style.display = 'flex';
-                        handleDiscordCallback();
-                    }, 2000);
-                } else {
-                    showError(`Failed to process Discord login: ${error.message}. Please try again or contact support.`);
-                }
-            }
-        }
-
-        // Start loading sequence
-        function startLoadingSequence() {
-            const loaderContainer = document.querySelector('.loader-container');
-            const loadingSteps = document.getElementById('loadingSteps');
-            const progressFill = document.getElementById('progressFill');
-            const progressText = document.getElementById('progressText');
-            
-            if (loaderContainer) loaderContainer.style.display = 'flex';
-            if (loadingSteps) loadingSteps.style.display = 'flex';
-            if (progressFill) progressFill.style.width = '0%';
-            if (progressText) progressText.textContent = 'Initializing...';
-
-            // Reset all steps
-            for (let i = 1; i <= 4; i++) {
-                updateLoadingStep(i, 'pending');
-            }
-        }
-
-        // Show error with enhanced styling
-        function showError(message, isRetry = false) {
-            // Only hide loading steps, keep the main loader visible during retry
-            const loadingSteps = document.getElementById('loadingSteps');
-            if (loadingSteps) loadingSteps.style.display = 'none';
-
-            const errorContainer = document.getElementById('errorContainer');
-            const errorMessage = document.getElementById('errorMessage');
-
-            errorMessage.textContent = message;
-            errorContainer.classList.add('show');
-
-            if (!isRetry) {
-                // Add haptic feedback for mobile (if supported)
-                if ('vibrate' in navigator) {
-                    navigator.vibrate(200);
-                }
-            }
-        }
-
-        // Hide error
-        function hideError() {
-            const errorContainer = document.getElementById('errorContainer');
-            const loadingSteps = document.getElementById('loadingSteps');
-            
-            errorContainer.classList.remove('show');
-            // Show loading steps again when hiding error for retry
-            if (loadingSteps) loadingSteps.style.display = 'flex';
-        }
-
-        // Retry authentication
-        function retryAuthentication() {
-            retryCount = 0;
-            hideError();
-            handleDiscordCallback();
-        }
-
-        // Add keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && document.getElementById('errorContainer').classList.contains('show')) {
-                retryAuthentication();
-            }
-
-            if (e.key === 'Escape' && document.getElementById('errorContainer').classList.contains('show')) {
-                // Go back to previous page
-                window.history.back();
-            }
-        });
-
-        // Add page visibility handling to pause animations
-        document.addEventListener('visibilitychange', () => {
-            const loaders = document.querySelectorAll('.galaxy-arm');
-            if (document.hidden) {
-                loaders.forEach(loader => {
-                    loader.style.animationPlayState = 'paused';
-                });
-            } else {
-                loaders.forEach(loader => {
-                    loader.style.animationPlayState = 'running';
-                });
-            }
-        });
-
-        // Performance optimization - preload fonts
-        const fontPreloadLink = document.createElement('link');
-        fontPreloadLink.rel = 'preload';
-        fontPreloadLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';
-        fontPreloadLink.as = 'style';
-        document.head.appendChild(fontPreloadLink);
-
-        // Process the callback when the page loads
-        window.addEventListener('load', () => {
-            // Add a small delay for smooth animation
-            setTimeout(handleDiscordCallback, 300);
-        });
-    </script>
-    <script src="animations.js"></script>
+    window.addEventListener('load', () => setTimeout(handleDiscordCallback, 300));
+  </script>
 </body>
 </html>

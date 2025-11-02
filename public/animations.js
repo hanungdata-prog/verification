@@ -54,44 +54,6 @@ function handlePageTransitions() {
     });
 }
 
-// Add ripple effect to buttons
-function addRippleEffect() {
-    const buttons = document.querySelectorAll('.btn, button, [role="button"]');
-    
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            // Create ripple element
-            const ripple = document.createElement('span');
-            ripple.classList.add('ripple-effect');
-            
-            // Position ripple at click location
-            const rect = button.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            // Style ripple
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            
-            // Add to button
-            if (button.style.position !== 'relative') {
-                button.style.position = 'relative';
-            }
-            
-            button.appendChild(ripple);
-            
-            // Remove ripple after animation
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-}
-
-// Call ripple effect function when DOM is loaded
-document.addEventListener('DOMContentLoaded', addRippleEffect);
 
 // Enhanced scroll animations for long pages
 function handleScrollAnimations() {
