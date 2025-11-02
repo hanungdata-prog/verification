@@ -236,6 +236,174 @@ class MoonUFOLoading {
     }, 80);
   }
 
+  // Enhanced method for database verification
+  async verifyDatabaseAndProceed(discordData, successCallback, errorCallback) {
+    this.show();
+
+    try {
+      let percent = 0;
+      const interval = setInterval(() => {
+        const increment = percent < 25 ? 4 : percent < 70 ? 2 : 1;
+        percent += increment;
+
+        if (percent >= 30) {
+          clearInterval(interval);
+          this.performDatabaseCheck(discordData, successCallback, errorCallback);
+        } else {
+          this.updateProgress(percent, 'Initializing...');
+          this.updateSubtext('Preparing verification system...');
+          if (percent >= 15) this.updateStep(1, 'active');
+        }
+      }, 50);
+    } catch (error) {
+      console.error('Error in verification process:', error);
+      this.showError('Failed to initialize verification');
+      if (errorCallback) errorCallback(error);
+    }
+  }
+
+  async performDatabaseCheck(discordData, successCallback, errorCallback) {
+    this.updateStep(1, 'completed');
+    this.updateStep(2, 'active');
+    this.updateProgress(40, 'Checking database...');
+    this.updateSubtext('Verifying user status in database...');
+
+    try {
+      // Check if user already exists in database
+      const checkResponse = await fetch('/api/check-user-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+          discord_id: discordData.discordId,
+          discord_username: discordData.discordUsername
+        })
+      });
+
+      const checkData = await checkResponse.json();
+
+      if (checkResponse.ok && checkData.status === 'success') {
+        if (checkData.is_verified) {
+          // User already verified - show error
+          this.updateStep(2, 'error');
+          this.updateStep(3, 'error');
+          this.updateProgress(100, 'Already Verified!');
+          this.updateSubtext(`User ${discordData.discordUsername} was verified ${checkData.verification_data?.time_ago || 'previously'}`);
+
+          setTimeout(() => {
+            this.hide();
+            if (errorCallback) {
+              errorCallback({
+                type: 'already_verified',
+                message: `User ${discordData.discordUsername} is already verified`,
+                data: checkData.verification_data
+              });
+            }
+          }, 3000);
+        } else {
+          // User not verified - proceed with registration
+          this.updateStep(2, 'completed');
+          this.updateStep(3, 'active');
+          this.updateProgress(60, 'Registering user...');
+          this.updateSubtext('Creating verification record...');
+
+          // Register user in database
+          const registerResponse = await fetch('/api/verify-discord', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+              discord_id: discordData.discordId,
+              discord_username: discordData.discordUsername,
+              method: 'oauth_verification'
+            })
+          });
+
+          const registerData = await registerResponse.json();
+
+          if (registerResponse.ok && registerData.status === 'success') {
+            // Success - user registered
+            this.updateStep(3, 'completed');
+            this.updateStep(4, 'active');
+            this.updateProgress(85, 'Finalizing...');
+            this.updateSubtext('Verification successful!');
+
+            setTimeout(() => {
+              this.updateStep(4, 'completed');
+              this.updateProgress(100, 'Success!');
+              this.updateSubtext('Verification complete!');
+
+              setTimeout(() => {
+                this.hide();
+                if (successCallback) {
+                  successCallback({
+                    type: 'verification_success',
+                    message: 'User successfully verified',
+                    data: registerData
+                  });
+                }
+              }, 1000);
+            }, 800);
+          } else {
+            // Registration failed
+            this.updateStep(3, 'error');
+            this.updateProgress(100, 'Registration Failed!');
+            this.updateSubtext(registerData.message || 'Failed to register user');
+
+            setTimeout(() => {
+              this.hide();
+              if (errorCallback) {
+                errorCallback({
+                  type: 'registration_failed',
+                  message: registerData.message || 'Failed to register user',
+                  data: registerData
+                });
+              }
+            }, 3000);
+          }
+        }
+      } else {
+        // Database check failed
+        this.updateStep(2, 'error');
+        this.updateProgress(100, 'Check Failed!');
+        this.updateSubtext(checkData.message || 'Failed to check user status');
+
+        setTimeout(() => {
+          this.hide();
+          if (errorCallback) {
+            errorCallback({
+              type: 'check_failed',
+              message: checkData.message || 'Failed to check user status',
+              data: checkData
+            });
+          }
+        }, 3000);
+      }
+    } catch (error) {
+      console.error('Database verification error:', error);
+      this.updateStep(2, 'error');
+      this.updateProgress(100, 'Error!');
+      this.updateSubtext('Network error occurred');
+
+      setTimeout(() => {
+        this.hide();
+        if (errorCallback) {
+          errorCallback({
+            type: 'network_error',
+            message: 'Network error occurred',
+            error: error
+          });
+        }
+      }, 3000);
+    }
+  }
+
   // Add method to hide loading and reset
   hideLoading() {
     this.hide();

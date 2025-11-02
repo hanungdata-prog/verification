@@ -363,11 +363,10 @@
   </div>
 
   <!-- Scripts -->
-  <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
   <script>
-    // === COUNTDOWN & UFO LOADING (SUDAH TERBUKTI JALAN) ===
+    // === COUNTDOWN & MOON UFO LOADING ===
     let countdown = 10;
     const verifyButton = document.getElementById('verifyButton');
     const timerDisplay = document.getElementById('timerDisplay');
@@ -400,7 +399,9 @@
           window.location.href = '/verify.html';
         });
       } else {
-        alert('UFO loading tidak tersedia.');
+        // Fallback jika moon UFO loading tidak tersedia
+        console.error('Moon UFO loading tidak tersedia, langsung redirect');
+        window.location.href = '/verify.html';
       }
     });
 
@@ -408,6 +409,15 @@
       if ((e.key === 'Enter' || e.key === ' ') && !verifyButton.disabled) {
         e.preventDefault();
         verifyButton.click();
+      }
+    });
+
+    // Initialize moon UFO loading when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.moonUFOLoading) {
+        console.log('✅ Moon UFO Loading initialized');
+      } else {
+        console.warn('⚠️ Moon UFO Loading not available');
       }
     });
   </script>
