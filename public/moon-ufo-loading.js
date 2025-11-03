@@ -16,7 +16,7 @@ class MoonUFOLoading {
     // Create loading overlay
     this.overlay = document.createElement('div');
     this.overlay.className = 'loading-overlay';
-    
+
     this.overlay.innerHTML = `
       <div class="moon-container">
         <div class="moon">
@@ -33,26 +33,26 @@ class MoonUFOLoading {
       </div>
       <div class="progress-text">Initializing...</div>
       <div class="progress-subtext">Please wait while we prepare your session</div>
-      <div class="loading-steps">
-        <div class="loading-step" data-step="1">
+      <div class="loading-steps" style="display: none;">
+        <div class="loading-step" data-step="1" style="display: none;">
           <div class="step-icon">
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
           <span>Connecting to servers</span>
         </div>
-        <div class="loading-step" data-step="2">
+        <div class="loading-step" data-step="2" style="display: none;">
           <div class="step-icon">
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
           <span>Verifying credentials</span>
         </div>
-        <div class="loading-step" data-step="3">
+        <div class="loading-step" data-step="3" style="display: none;">
           <div class="step-icon">
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
           <span>Loading user data</span>
         </div>
-        <div class="loading-step" data-step="4">
+        <div class="loading-step" data-step="4" style="display: none;">
           <div class="step-icon">
             <i class="fas fa-circle-notch fa-spin"></i>
           </div>
@@ -60,11 +60,12 @@ class MoonUFOLoading {
         </div>
       </div>
     `;
-    
+
     document.body.appendChild(this.overlay);
     this.progressText = this.overlay.querySelector('.progress-text');
     this.progressSubtext = this.overlay.querySelector('.progress-subtext');
     this.steps = this.overlay.querySelectorAll('.loading-step');
+    this.loadingStepsContainer = this.overlay.querySelector('.loading-steps');
   }
 
   show() {
@@ -72,6 +73,10 @@ class MoonUFOLoading {
       this.overlay.classList.add('active');
       this.currentStep = 0;
       this.resetSteps();
+      // Initially hide all steps
+      if (this.loadingStepsContainer) {
+        this.loadingStepsContainer.style.display = 'none';
+      }
     }
   }
 
@@ -134,12 +139,20 @@ class MoonUFOLoading {
 
     const stepElement = this.overlay.querySelector(`[data-step="${step}"]`);
     if (stepElement) {
+      // Show the loading steps container when first step is activated
+      if (this.loadingStepsContainer && this.loadingStepsContainer.style.display === 'none') {
+        this.loadingStepsContainer.style.display = 'block';
+      }
+
+      // Show the current step element
+      stepElement.style.display = 'flex';
+
       const icon = stepElement.querySelector('.step-icon');
-      
+
       // Remove all status classes
       stepElement.classList.remove('active', 'completed');
       icon.classList.remove('active', 'completed');
-      
+
       if (status === 'completed') {
         stepElement.classList.add('completed');
         icon.classList.add('completed');
@@ -179,23 +192,26 @@ class MoonUFOLoading {
     }, 200);
   }
   
-  // Method to show loading when verify button is clicked
+  // Method to show loading when verify button is clicked and handle page navigation
   showOnVerifyClick(callback) {
     // Show loading screen immediately
     this.show();
 
-    // Start progress simulation with smoother animation
-    let percent = 0;
+    // Update steps for page navigation
+    this.updateStep(1, 'active');
+    this.updateProgress(10, 'Initializing...');
+    this.updateSubtext('Preparing to navigate...');
+
+    // Quick navigation simulation
+    let percent = 10;
     const interval = setInterval(() => {
-      // Smoother increment with easing
-      const increment = percent < 50 ? 3 : percent < 80 ? 2 : 1.5;
-      percent += increment;
+      percent += 15; // Faster increment for navigation
 
       if (percent >= 100) {
         percent = 100;
         clearInterval(interval);
-        this.updateProgress(percent, 'Complete!');
-        this.updateSubtext('Verification complete. Redirecting...');
+        this.updateProgress(percent, 'Ready!');
+        this.updateSubtext('Navigating to next page...');
 
         // Call the callback immediately after animation completes
         setTimeout(() => {
@@ -208,32 +224,238 @@ class MoonUFOLoading {
               this.hide();
             }
           }
-        }, 500); // Reduced delay for faster response
+        }, 300); // Very short delay for navigation
       } else {
-        this.updateProgress(percent, 'Verifying...');
+        this.updateProgress(percent, 'Navigating...');
 
-        // Dynamic subtext based on progress
-        if (percent < 30) {
-          this.updateSubtext('Establishing secure connection...');
-        } else if (percent < 60) {
-          this.updateSubtext('Authenticating credentials...');
-        } else if (percent < 90) {
-          this.updateSubtext('Loading your dashboard...');
-        } else {
+        // Simple subtext for navigation
+        if (percent < 50) {
+          this.updateSubtext('Preparing navigation...');
+        } else if (percent < 80) {
           this.updateSubtext('Almost ready...');
+        } else {
+          this.updateSubtext('Redirecting...');
         }
       }
 
-      // Update steps based on progress with smoother transitions
-      if (percent >= 20) this.updateStep(1, 'active');
+      // Update steps for navigation (simpler)
       if (percent >= 30) this.updateStep(1, 'completed');
-      if (percent >= 35) this.updateStep(2, 'active');
-      if (percent >= 55) this.updateStep(2, 'completed');
-      if (percent >= 60) this.updateStep(3, 'active');
-      if (percent >= 80) this.updateStep(3, 'completed');
-      if (percent >= 85) this.updateStep(4, 'active');
-      if (percent >= 100) this.updateStep(4, 'completed');
-    }, 80);
+      if (percent >= 50) this.updateStep(2, 'active');
+      if (percent >= 80) this.updateStep(2, 'completed');
+      if (percent >= 100) {
+        this.updateStep(3, 'completed');
+        this.updateStep(4, 'completed');
+      }
+    }, 100); // Faster interval for navigation
+  }
+
+  // Enhanced method for database verification
+  async verifyDatabaseAndProceed(discordData, successCallback, errorCallback) {
+    this.show();
+
+    try {
+      let percent = 0;
+      const interval = setInterval(() => {
+        const increment = percent < 25 ? 4 : percent < 70 ? 2 : 1;
+        percent += increment;
+
+        if (percent >= 30) {
+          clearInterval(interval);
+          this.performDatabaseCheck(discordData, successCallback, errorCallback);
+        } else {
+          this.updateProgress(percent, 'Initializing...');
+          this.updateSubtext('Preparing verification system...');
+          if (percent >= 15) this.updateStep(1, 'active');
+        }
+      }, 50);
+    } catch (error) {
+      console.error('Error in verification process:', error);
+      this.showError('Failed to initialize verification');
+      if (errorCallback) errorCallback(error);
+    }
+  }
+
+  async performDatabaseCheck(discordData, successCallback, errorCallback) {
+    this.updateStep(1, 'completed');
+    this.updateStep(2, 'active');
+    this.updateProgress(40, 'Checking database...');
+    this.updateSubtext('Verifying user status in database...');
+
+    try {
+      // Check if user already exists in database
+      const checkResponse = await fetch('/api/check-user-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+          discord_id: discordData.discordId,
+          discord_username: discordData.discordUsername
+        })
+      });
+
+      const checkData = await checkResponse.json();
+
+      if (checkResponse.ok && checkData.status === 'success') {
+        if (checkData.is_verified) {
+          // User already verified - show error
+          this.updateStep(2, 'error');
+          this.updateStep(3, 'error');
+          this.updateProgress(100, 'Already Verified!');
+          this.updateSubtext(`User ${discordData.discordUsername} was verified ${checkData.verification_data?.time_ago || 'previously'}`);
+
+          setTimeout(() => {
+            this.hide();
+            if (errorCallback) {
+              errorCallback({
+                type: 'already_verified',
+                message: `User ${discordData.discordUsername} is already verified`,
+                data: checkData.verification_data
+              });
+            }
+          }, 3000);
+        } else {
+          // User not verified - proceed with registration
+          this.updateStep(2, 'completed');
+          this.updateStep(3, 'active');
+          this.updateProgress(60, 'Registering user...');
+          this.updateSubtext('Creating verification record...');
+
+          // Register user in database
+          const registerResponse = await fetch('/api/verify-discord', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+              discord_id: discordData.discordId,
+              discord_username: discordData.discordUsername,
+              method: 'oauth_verification'
+            })
+          });
+
+          const registerData = await registerResponse.json();
+
+          if (registerResponse.ok && registerData.status === 'success') {
+            // Success - user registered
+            this.updateStep(3, 'completed');
+            this.updateStep(4, 'active');
+            this.updateProgress(85, 'Finalizing...');
+            this.updateSubtext('Verification successful!');
+
+            setTimeout(() => {
+              this.updateStep(4, 'completed');
+              this.updateProgress(100, 'Success!');
+              this.updateSubtext('Verification complete!');
+
+              setTimeout(() => {
+                this.hide();
+                if (successCallback) {
+                  successCallback({
+                    type: 'verification_success',
+                    message: 'User successfully verified',
+                    data: registerData
+                  });
+                }
+              }, 1000);
+            }, 800);
+          } else {
+            // Registration failed
+            this.updateStep(3, 'error');
+            this.updateProgress(100, 'Registration Failed!');
+            this.updateSubtext(registerData.message || 'Failed to register user');
+
+            setTimeout(() => {
+              this.hide();
+              if (errorCallback) {
+                errorCallback({
+                  type: 'registration_failed',
+                  message: registerData.message || 'Failed to register user',
+                  data: registerData
+                });
+              }
+            }, 3000);
+          }
+        }
+      } else {
+        // Database check failed - check if it's a "Database not available" error
+        if (checkData.message && checkData.message.includes('Database not available')) {
+          console.warn('Database not available - BLOCKING VERIFICATION FOR SECURITY');
+          this.updateStep(2, 'error');
+          this.updateStep(3, 'error');
+          this.updateProgress(100, 'Database Unavailable!');
+          this.updateSubtext('Database temporarily unavailable - please try again later');
+
+          setTimeout(() => {
+            this.hide();
+            if (errorCallback) {
+              errorCallback({
+                type: 'database_unavailable',
+                message: 'Database temporarily unavailable - verification blocked for security',
+                data: checkData
+              });
+            }
+          }, 3000);
+        } else {
+          // Other database check failed
+          this.updateStep(2, 'error');
+          this.updateProgress(100, 'Check Failed!');
+          this.updateSubtext(checkData.message || 'Failed to check user status');
+
+          setTimeout(() => {
+            this.hide();
+            if (errorCallback) {
+              errorCallback({
+                type: 'check_failed',
+                message: checkData.message || 'Failed to check user status',
+                data: checkData
+              });
+            }
+          }, 3000);
+        }
+      }
+    } catch (error) {
+      console.error('Database verification error:', error);
+
+      // Check if it's a network error or database unavailable
+      if (error.message && error.message.includes('Failed to fetch')) {
+        console.warn('Network error - BLOCKING VERIFICATION FOR SECURITY');
+        this.updateStep(2, 'error');
+        this.updateStep(3, 'error');
+        this.updateProgress(100, 'Network Error!');
+        this.updateSubtext('Unable to verify user status - please check your connection');
+
+        setTimeout(() => {
+          this.hide();
+          if (errorCallback) {
+            errorCallback({
+              type: 'network_error_blocked',
+              message: 'Network error - verification blocked for security',
+              error: error
+            });
+          }
+        }, 3000);
+      } else {
+        this.updateStep(2, 'error');
+        this.updateProgress(100, 'Error!');
+        this.updateSubtext('Network error occurred');
+
+        setTimeout(() => {
+          this.hide();
+          if (errorCallback) {
+            errorCallback({
+              type: 'network_error',
+              message: 'Network error occurred',
+              error: error
+            });
+          }
+        }, 3000);
+      }
+    }
   }
 
   // Add method to hide loading and reset

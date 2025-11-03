@@ -147,44 +147,13 @@ class TokenHandler {
     }
 
     /**
-     * Show Discord information to user
+     * Show Discord information to user (simplified version)
      * @param {Object} discordInfo - Discord user information
      */
     showDiscordInfoMessage(discordInfo) {
-        // Create or update info display
-        let infoDiv = document.getElementById('discord-info-display');
-        if (!infoDiv) {
-            infoDiv = document.createElement('div');
-            infoDiv.id = 'discord-info-display';
-            infoDiv.style.cssText = `
-                background: #e8f4f8;
-                border: 1px solid #b8daff;
-                border-radius: 8px;
-                padding: 15px;
-                margin: 15px 0;
-                text-align: center;
-            `;
-
-            // Insert before the form
-            const form = document.getElementById('verification-form');
-            if (form) {
-                form.parentNode.insertBefore(infoDiv, form);
-            } else {
-                document.body.appendChild(infoDiv);
-            }
-        }
-
-        // Update content
-        infoDiv.innerHTML = `
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="font-size: 24px;">👤</span>
-                <div>
-                    <strong>Discord Account Identified</strong><br>
-                    <span style="color: #666;">${discordInfo.discord_username}</span>
-                    ${discordInfo.expires_at ? `<br><small style="color: #999;">Session expires: ${new Date(discordInfo.expires_at).toLocaleString()}</small>` : ''}
-                </div>
-            </div>
-        `;
+        // This function is now simplified to avoid displaying unwanted UI elements
+        // Discord info is handled by the main verify-auto.html page
+        console.log('Discord info received:', discordInfo);
     }
 
     /**
@@ -219,28 +188,16 @@ class TokenHandler {
     }
 
     /**
-     * Show expired token message
+     * Show expired token message (simplified version)
      */
     showExpiredTokenMessage() {
-        const message = `
-            <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 15px 0; text-align: center;">
-                <strong>⚠️ Session Expired</strong><br>
-                Your Discord authentication session has expired. Please authenticate again.
-                <br><br>
-                <a href="/verify.html" style="background: #007bff; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; display: inline-block; margin-top: 8px;">
-                    Re-authenticate
-                </a>
-            </div>
-        `;
+        // This function is simplified to avoid displaying unwanted UI elements
+        console.log('Token expired - user needs to re-authenticate');
 
-        this.insertMessage(message);
-
-        // Disable form
-        const form = document.getElementById('verification-form');
-        if (form) {
-            form.style.opacity = '0.5';
-            form.style.pointerEvents = 'none';
-        }
+        // Simply redirect to verification page
+        setTimeout(() => {
+            window.location.href = '/verify.html';
+        }, 1000);
     }
 
     /**
@@ -321,20 +278,16 @@ class TokenHandler {
     }
 
     /**
-     * Show authentication prompt
+     * Show authentication prompt (simplified version)
      */
     showAuthenticationPrompt() {
-        const message = `
-            <div style="background: #e8f4f8; border: 1px solid #b8daff; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
-                <h3 style="margin-top: 0;">🔐 Discord Authentication Required</h3>
-                <p>Please authenticate with Discord to continue with verification.</p>
-                <a href="/verify.html" style="background: #7289da; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; margin-top: 10px;">
-                    Authenticate with Discord
-                </a>
-            </div>
-        `;
+        // This function is simplified to avoid displaying unwanted UI elements
+        console.log('Discord authentication required - redirecting to verification page');
 
-        this.insertMessage(message);
+        // Simply redirect to verification page
+        setTimeout(() => {
+            window.location.href = '/verify.html';
+        }, 1000);
     }
 
     /**

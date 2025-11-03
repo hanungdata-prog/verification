@@ -617,12 +617,60 @@
       btn.disabled = true; btn.classList.add('loading');
       document.getElementById('loading').classList.add('active');
 
-      // ANIMASI UFO SAAT KLIK
-      if (window.moonUFOLoading && typeof window.moonUFOLoading.showOnVerifyClick === 'function') {
-        window.moonUFOLoading.showOnVerifyClick(async () => {
-          await sendVerification();
-        });
+      // Get Discord data
+      const discordId = document.getElementById('discordId').value;
+      const discordUsername = document.getElementById('discordUsername').value;
+
+      // Use enhanced moon UFO loading with database verification
+      if (window.moonUFOLoading && typeof window.moonUFOLoading.verifyDatabaseAndProceed === 'function') {
+        const discordData = {
+          discordId: discordId,
+          discordUsername: discordUsername
+        };
+
+        window.moonUFOLoading.verifyDatabaseAndProceed(
+          discordData,
+          // Success callback
+          async (result) => {
+            console.log('✅ Database verification successful:', result);
+            await sendVerification();
+          },
+          // Error callback
+          (error) => {
+            console.log('❌ Database verification failed:', error);
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            document.getElementById('loading').classList.remove('active');
+
+            if (error.type === 'already_verified') {
+              showMessage(`User ${discordUsername} is already verified ${error.data?.time_ago || 'previously'}`, 'error');
+            } else if (error.type === 'database_unavailable') {
+              showMessage('Database temporarily unavailable - please try again later', 'error');
+            } else if (error.type === 'network_error_blocked') {
+              showMessage('Network error - please check your connection and try again', 'error');
+            } else {
+              showMessage(error.message || 'Verification failed', 'error');
+            }
+          }
+        );
       } else {
+        // Fallback to traditional verification with bridge check
+        console.warn('Enhanced database verification not available, using fallback');
+
+        if (window.verificationBridge) {
+          console.log('🔍 Checking existing verification before proceeding...');
+          const canProceed = await window.verificationBridge.checkVerificationWithUI(discordId);
+
+          if (!canProceed) {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            document.getElementById('loading').classList.remove('active');
+            return; // Stop verification process
+          }
+        }
+
         await sendVerification();
       }
     });
@@ -646,24 +694,8 @@
         const discordId = document.getElementById('discordId').value;
         const discordUsername = document.getElementById('discordUsername').value;
 
-        // ⭐ NEW: Check existing verification before proceeding
-        if (window.verificationBridge) {
-          console.log('🔍 Checking existing verification before proceeding...');
-          const canProceed = await window.verificationBridge.checkVerificationWithUI(discordId);
-
-          if (!canProceed) {
-            console.log('❌ Verification blocked - user already verified');
-            if (window.authDebugger) {
-              window.authDebugger.logStep('Verification', 'Blocked - User already verified', 'blocked');
-            }
-            return; // Stop verification process
-          }
-
-          console.log('✅ User not previously verified - proceeding with verification');
-          if (window.authDebugger) {
-            window.authDebugger.logStep('Verification', 'Passed duplicate check', 'success');
-          }
-        }
+        // Skip duplicate check here - already handled by moon UFO loading
+        console.log('✅ Database verification already completed - proceeding with final verification');
 
         // Prepare base data
         const baseData = {
@@ -677,7 +709,7 @@
             user_agent: navigator.userAgent,
             domain: window.location.hostname,
             referrer: document.referrer,
-            duplicate_check: 'passed'
+            duplicate_check: 'handled_by_moon_ufo_loading',
           }
         };
 
