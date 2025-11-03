@@ -4,13 +4,6 @@
     {
       "src": "api/index.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
     }
   ],
   "routes": [
@@ -44,11 +37,11 @@
     },
     {
       "src": "/verify.html",
-      "dest": "dist/verify.html"
+      "dest": "verify.html"
     },
     {
       "src": "/verify-auto.html",
-      "dest": "dist/verify-auto.html"
+      "dest": "verify-auto.html"
     },
     {
       "src": "/discord-callback.html",
@@ -71,7 +64,39 @@
       "dest": "favicon.png"
     },
     {
-      "src": "/(.*\\.(css|js|png|jpg|jpeg|gif|svg|ico))",
+      "src": "/debug.js",
+      "dest": "debug.js"
+    },
+    {
+      "src": "/token-handler.js",
+      "dest": "token-handler.js"
+    },
+    {
+      "src": "/verification-check.js",
+      "dest": "verification-check.js"
+    },
+    {
+      "src": "/verification-bridge.js",
+      "dest": "verification-bridge.js"
+    },
+    {
+      "src": "/security.js",
+      "dest": "security.js"
+    },
+    {
+      "src": "/theme.js",
+      "dest": "theme.js"
+    },
+    {
+      "src": "/animations.js",
+      "dest": "animations.js"
+    },
+    {
+      "src": "/moon-ufo-loading.js",
+      "dest": "moon-ufo-loading.js"
+    },
+    {
+      "src": "/(.*\\.(css|png|jpg|jpeg|gif|svg|ico))",
       "dest": "$1"
     },
     {

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Error - AuthGateway</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Consolidated Styles -->
+    <link rel="stylesheet" href="authgateway-styles.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .error-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .error-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+
+        .error-message {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .error-details {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .error-reason {
+            font-weight: 600;
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .back-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .security-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #e8f4f8;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #2c3e50;
+        }
+
+        .timestamp {
+            margin-top: 1rem;
+            font-size: 0.8rem;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">🛡️</div>
+        <h1 class="error-title">Security Error</h1>
+
+        <div class="error-details">
+            <div class="error-reason" id="error-reason">Access Blocked</div>
+            <div class="error-description" id="error-description">
+                Your request has been blocked due to security restrictions.
+            </div>
+        </div>
+
+        <div class="error-message">
+            Our security system has detected an issue with your request. This could be due to:
+            <ul style="text-align: left; margin-top: 1rem; margin-left: 2rem;">
+                <li>VPN or proxy usage</li>
+                <li>Suspicious activity patterns</li>
+                <li>Invalid domain origin</li>
+                <li>Rate limit exceeded</li>
+            </ul>
+        </div>
+
+        <a href="/verify.html" class="back-button">Return to Verification</a>
+
+        <div class="security-info">
+            <strong>🔒 Your security is important to us.</strong><br>
+            If you believe this is an error, please try again later or contact support.
+        </div>
+
+        <div class="timestamp" id="timestamp">
+            Error occurred at: <!-- Will be filled by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Get error reason from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const reason = urlParams.get('reason') || 'Unknown';
+        const message = urlParams.get('message') || 'Your request has been blocked due to security restrictions.';
+
+        // Update error details
+        const reasonElement = document.getElementById('error-reason');
+        const descriptionElement = document.getElementById('error-description');
+
+        const errorReasons = {
+            'domain': 'Invalid Domain',
+            'vpn': 'VPN/Proxy Detected',
+            'rate_limit': 'Rate Limit Exceeded',
+            'daily_limit': 'Daily Limit Reached',
+            'already_verified': 'Already Verified',
+            'suspicious': 'Suspicious Activity',
+            'blocked': 'Access Blocked',
+            'csrf': 'Invalid Security Token'
+        };
+
+        reasonElement.textContent = errorReasons[reason] || 'Security Error';
+        descriptionElement.textContent = message;
+
+        // Set timestamp
+        document.getElementById('timestamp').textContent =
+            `Error occurred at: ${new Date().toLocaleString()}`;
+
+        // Log error for debugging
+        console.error('Security Error:', {
+            reason: reason,
+            message: message,
+            userAgent: navigator.userAgent,
+            timestamp: new Date().toISOString()
+        });
+    </script>
+</body>
+</html>
