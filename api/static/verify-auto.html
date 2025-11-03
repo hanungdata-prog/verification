@@ -829,6 +829,20 @@
                 const parsedData = JSON.parse(decodedString);
                 console.log('Parsed data:', parsedData);
 
+                // Check if this is a nested structure with "data" field
+                if (parsedData.data && typeof parsedData.data === 'object') {
+                    console.log('Found nested data structure in base64 decode, extracting data field');
+                    console.log('Extracted data:', parsedData.data);
+                    return parsedData.data;
+                }
+
+                // Check if the parsed data itself has the Discord fields
+                if (parsedData.discord_id && parsedData.discord_username) {
+                    console.log('Found Discord fields directly in parsed data');
+                    return parsedData;
+                }
+
+                console.log('No Discord fields found in base64 decoded data');
                 return parsedData;
             } catch (error) {
                 console.error('Base64 decoding failed:', error);
