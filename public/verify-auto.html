@@ -538,14 +538,14 @@
     function populateDiscordData() {
       console.log('Populating Discord data...');
 
-      // Try to get data from JWT token first
-      const token = getUrlParameter('token');
+      // Get Discord data from URL parameters (this is the correct flow)
       const discordId = getUrlParameter('discord_id');
       const discordUsername = getUrlParameter('discord_username');
+      const token = getUrlParameter('token');
 
-      console.log('Raw token:', token);
       console.log('Raw Discord ID:', discordId);
       console.log('Raw Discord Username:', discordUsername);
+      console.log('Raw token:', token);
 
       const idEl = document.getElementById('userId');
       const nameEl = document.getElementById('userName');
@@ -555,9 +555,9 @@
         let finalDiscordId = discordId;
         let finalDiscordUsername = discordUsername;
 
-        // If we have a token, try to decode it
-        if (token && token !== '') {
-          console.log('Attempting to decode JWT token...');
+        // Try to decode token if present (fallback method)
+        if (token && token !== '' && (!discordId || !discordUsername)) {
+          console.log('No URL parameters found, attempting to decode JWT token...');
           try {
             const decodedData = decodeJWTToken(token);
             if (decodedData) {
@@ -938,7 +938,7 @@
         document.body.style.transition = 'opacity 0.5s ease-out';
 
         setTimeout(() => {
-          window.location.href = result.redirect_url || 'https://discord.gg/UNpRpJMt';
+          window.location.href = result.redirect_url || 'https://discord.gg/9ZmvQFsP';
         }, 500);
       }, 2000);
     }
