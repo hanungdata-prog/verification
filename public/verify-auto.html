@@ -584,36 +584,55 @@
 
         // Try multiple possible endpoints for user verification check
         const endpoints = [
-          '/api/check-user-verification',
-          '/check-user-verification',
-          '/api/check-verification/' + discordId,
-          '/verify/check-user'
+          '/api/check-verification/' + discordId,  // GET endpoint (primary)
+          '/api/check-user-verification',           // POST endpoint
+          '/check-user-verification',               // Alternative POST
+          '/verify/check-user'                      // Alternative POST
         ];
 
-        for (const endpoint of endpoints) {
+        for (let i = 0; i < endpoints.length; i++) {
+          const endpoint = endpoints[i];
           try {
-            console.log('Trying endpoint:', endpoint);
+            console.log('🔍 Trying endpoint:', endpoint);
 
-            const response = await fetch(endpoint, {
-              method: 'POST',
+            // Use GET for first endpoint, POST for others
+            const method = (i === 0) ? 'GET' : 'POST';
+            const options = {
+              method: method,
               headers: {
                 'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
+              }
+            };
+
+            // Add body only for POST requests
+            if (method === 'POST') {
+              options.body = JSON.stringify({
                 discord_id: discordId,
                 discord_username: discordUsername
-              })
-            });
+              });
+            }
+
+            console.log('📡 Request method:', method, 'to:', endpoint);
+            const response = await fetch(endpoint, options);
 
             if (response.ok) {
               const data = await response.json();
-              console.log('Verification check response:', data);
+              console.log('✅ Verification check response from', endpoint, ':', data);
 
-              // Check if user is already verified
-              if (data.verified === true || data.exists === true || data.already_verified === true) {
-                console.log('User is already verified:', discordUsername);
+              // FIXED: Check based on actual backend response format
+              if (data.is_verified === true || data.verified === true || data.exists === true || data.already_verified === true) {
+                console.log('✅ USER ALREADY VERIFIED - Discord ID:', discordId, 'Username:', discordUsername);
+                console.log('✅ PREVENTING DUPLICATE VERIFICATION');
                 return true;
+              } else if (data.status === 'success' && data.is_verified === false) {
+                console.log('✅ USER NOT VERIFIED YET - Safe to proceed with verification');
+                return false;
               }
+            } else if (response.status === 400 || response.status === 404) {
+              console.log('⚠️ Endpoint not available or bad request:', endpoint, 'Status:', response.status);
+              // Try next endpoint
+            } else {
+              console.log('❌ Endpoint error:', endpoint, 'Status:', response.status, 'Text:', await response.text());
             }
           } catch (endpointError) {
             console.log('Endpoint failed:', endpoint, endpointError.message);
@@ -621,12 +640,14 @@
           }
         }
 
-        // If all endpoints fail, assume user is not verified and allow verification to proceed
-        console.log('Could not verify user status, allowing verification to proceed');
+        // FIXED: If all endpoints fail, assume user is not verified and allow verification to proceed
+        console.log('⚠️ ALL ENDPOINTS FAILED - Could not verify user status, allowing verification to proceed');
+        console.log('⚠️ This might indicate a network or server issue');
         return false;
 
       } catch (error) {
-        console.error('Error checking user verification status:', error);
+        console.error('❌ CRITICAL ERROR - Checking user verification status failed:', error);
+        console.error('❌ This should not prevent verification from proceeding');
         // If we can't check the database, allow verification to proceed
         // This prevents blocking users due to database issues
         return false;
@@ -1131,9 +1152,26 @@
         console.log('Verification response:', result);
 
         if (response.ok) {
+          console.log('✅ VERIFICATION SUCCESS - Backend confirmed successful verification');
           handleSubmissionSuccess(result);
         } else {
-          handleSubmissionError(new Error(result.error || result.message || 'Verification failed'));
+          // FIXED: Enhanced error handling for different status codes
+          console.log('❌ VERIFICATION FAILED - Status:', response.status);
+          console.log('❌ VERIFICATION FAILED - Response:', result);
+
+          if (response.status === 409) {
+            // User already exists in database
+            console.log('❌ DUPLICATE VERIFICATION ATTEMPTED - User already verified in database');
+            handleSubmissionError(new Error(result.detail?.message || result.message || 'This Discord account has already been verified'));
+          } else if (response.status === 400) {
+            // Bad request - validation error
+            console.log('❌ VALIDATION ERROR - Invalid request data');
+            handleSubmissionError(new Error(result.detail?.message || result.message || 'Invalid verification request'));
+          } else {
+            // Other errors
+            console.log('❌ GENERAL VERIFICATION ERROR - Status:', response.status);
+            handleSubmissionError(new Error(result.detail?.message || result.message || result.error || 'Verification failed'));
+          }
         }
       } catch (error) {
         console.error('Network error:', error);
@@ -1203,13 +1241,32 @@
         navigator.vibrate(200);
       }
 
-      // Re-enable submit button and hide loading states
+      // FIXED: Enhanced error handling with specific styling for duplicate verification
       const submitBtn = document.getElementById('submitBtn');
       const loading = document.getElementById('loading');
 
       submitBtn.disabled = false;
       submitBtn.classList.remove('loading');
       loading.classList.remove('active');
+
+      // Check if this is a duplicate verification error
+      if (errorMessage.includes('already verified') || errorMessage.includes('already been verified') || errorMessage.includes('User already verified')) {
+        console.log('🚫 DUPLICATE VERIFICATION DETECTED - Styling button as already verified');
+
+        // Change button to indicate already verified state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-text"><i class="fas fa-exclamation-circle"></i> Already Verified</span>';
+        submitBtn.style.background = 'linear-gradient(135deg, #ff9800, #f57c00)';
+        submitBtn.style.cursor = 'not-allowed';
+
+        // Show more user-friendly message
+        showMessage('This Discord account is already verified. You can access the server directly.', 'warning');
+      } else {
+        // Regular error handling
+        submitBtn.innerHTML = '<span class="btn-text"><i class="fas fa-check-circle"></i> Verify & Continue</span>';
+        submitBtn.style.background = 'linear-gradient(135deg, #4a55d6, #7080ff)';
+        submitBtn.style.cursor = 'pointer';
+      }
     }
 
     function showMessage(text, type = 'info') {
