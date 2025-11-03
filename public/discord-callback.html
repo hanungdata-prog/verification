@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Authenticating with Discord - AuthGateway</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- External Styles (opsional) -->
+  <link rel="stylesheet" href="space-theme.css">
+  <link rel="stylesheet" href="cosmic-loading.css">
+  <link rel="stylesheet" href="animations.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    :root {
+      --font-sans: 'Inter', sans-serif;
+      --foreground: #e0e0ff;
+      --muted: #a0a0c0;
+      --accent: #7080ff;
+      --success: #4aff8c;
+      --error: #ff557a;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.5rem;
+      --radius-full: 9999px;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1rem;
+      --text-lg: 1.125rem;
+      --text-xl: 1.25rem;
+      --text-2xl: 1.5rem;
+      --font-medium: 500;
+      --font-semibold: 600;
+      --font-bold: 700;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a12;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
+        radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
+        radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
+        radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
+        radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
+        radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
+        radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
+      background-size: 240px 120px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: var(--font-sans);
+      color: var(--foreground);
+      padding: var(--space-4);
+      overflow: hidden;
+    }
+
+    /* CARD UTAMA - KONSISTEN DENGAN HALAMAN LAIN */
+    .card {
+      background: rgba(15, 15, 30, 0.9);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(100, 100, 200, 0.25);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-8);
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(112, 128, 255, 0.15);
+      position: relative;
+      animation: fadeInUp 0.8s ease-out;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7080ff, transparent);
+      border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    }
+
+    /* LOGO */
+    .logo {
+      width: 64px; height: 64px;
+      margin-bottom: var(--space-6);
+      background: linear-gradient(135deg, #7080ff, #4aff8c);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-2xl);
+      color: #0a0a12;
+      box-shadow: 0 0 25px rgba(112, 128, 255, 0.6);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* JUDUL */
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-semibold);
+      color: var(--foreground);
+      margin-bottom: var(--space-4);
+      line-height: 1.3;
+    }
+
+    /* PESAN */
+    .message {
+      color: var(--muted);
+      font-size: var(--text-base);
+      line-height: 1.6;
+      margin-bottom: var(--space-6);
+      max-width: 90%;
+    }
+
+    /* LOADER CONTAINER */
+    .loader-container {
+      margin: var(--space-6) 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3);
+      width: 100%;
+    }
+
+    .galaxy-spinner {
+      position: relative;
+      width: 50px;
+      height: 50px;
+    }
+
+    .galaxy-arm {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      animation: rotate 3s linear infinite;
+    }
+
+    .galaxy-arm:nth-child(1) { border-top-color: var(--accent); animation-duration: 3s; }
+    .galaxy-arm:nth-child(2) { border-right-color: var(--success); animation-duration: 2.5s; animation-direction: reverse; }
+    .galaxy-arm:nth-child(3) { border-bottom-color: var(--error); animation-duration: 2s; }
+
+    .loading-text {
+      font-size: var(--text-xs);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* LOADING STEPS */
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto var(--space-6);
+    }
+
+    .loading-step {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--muted);
+      font-size: var(--text-sm);
+      opacity: 0.5;
+      transition: all 0.3s ease;
+    }
+
+    .loading-step.active {
+      color: var(--accent);
+      opacity: 1;
+      transform: translateX(4px);
+    }
+
+    .loading-step.completed {
+      color: var(--success);
+      opacity: 1;
+    }
+
+    .loading-step i {
+      font-size: var(--text-base);
+      width: 18px;
+      text-align: center;
+    }
+
+    /* PROGRESS BAR */
+    .cosmic-game-progress {
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .cosmic-game-bar {
+      width: 100%;
+      height: 12px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--muted);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .cosmic-game-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7080ff, #4aff8c, #ff557a);
+      width: 0%;
+      border-radius: var(--radius-full);
+      transition: width 0.5s ease;
+      box-shadow: 0 0 10px rgba(112, 128, 255, 0.5);
+    }
+
+    .cosmic-game-fill::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shine 1.5s infinite;
+    }
+
+    .cosmic-game-text {
+      font-family: monospace;
+      font-size: var(--text-sm);
+      color: var(--accent);
+      text-shadow: 0 0 5px var(--accent);
+      letter-spacing: 1px;
+      text-align: center;
+    }
+
+    @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+    /* ERROR CONTAINER */
+    .error-container {
+      background: rgba(255, 85, 122, 0.1);
+      border: 1px solid rgba(255, 85, 122, 0.3);
+      border-radius: var(--radius-xl);
+      padding: var(--space-5);
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+      display: none;
+      animation: shake 0.5s ease-out;
+    }
+
+    .error-container.show { display: block; }
+
+    .error-title {
+      color: var(--error);
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
+
+    .error-message {
+      color: var(--muted);
+      font-size: var(--text-sm);
+      line-height: 1.6;
+      margin-bottom: var(--space-4);
+    }
+
+    .retry-button {
+      background: linear-gradient(135deg, #ff557a, #ff7a9e);
+      color: white;
+      border: none;
+      padding: var(--space-3) var(--space-6);
+      border-radius: var(--radius-full);
+      font-size: var(--text-base);
+      font-weight: var(--font-medium);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
+
+    .retry-button:hover {
+      background: linear-gradient(135deg, #ff658a, #ff8aae);
+      transform: translateY(-2px);
+      box-shadow: 0 0 20px rgba(255, 85, 122, 0.4);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      .card { padding: var(--space-6); max-width: 380px; }
+      h1 { font-size: var(--text-xl); }
+      .message { font-size: var(--text-sm); }
+      .loading-steps, .cosmic-game-progress, .error-container { max-width: 280px; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }
+  </style>
+</head>
+<body>
+
+  <!-- CARD SANGAT RAPI -->
+  <div class="card">
+    <div class="logo"><i class="fab fa-discord"></i></div>
+    <h1>Authenticating with Discord</h1>
+    <p class="message" id="message">
+      Please wait while we securely connect your Discord account to AuthGateway
+    </p>
+
+    <!-- LOADER -->
+    <div class="loader-container">
+      <div class="galaxy-spinner">
+        <div class="galaxy-arm"></div>
+        <div class="galaxy-arm"></div>
+        <div class="galaxy-arm"></div>
+      </div>
+      <div class="loading-text">Establishing secure connection</div>
+    </div>
+
+    <!-- STEPS -->
+    <div class="loading-steps" id="loadingSteps">
+      <div class="loading-step" data-step="1"><i class="fas fa-circle-notch fa-spin"></i><span>Connecting to Discord servers</span></div>
+      <div class="loading-step" data-step="2"><i class="fas fa-circle-notch fa-spin"></i><span>Verifying authorization code</span></div>
+      <div class="loading-step" data-step="3"><i class="fas fa-circle-notch fa-spin"></i><span>Retrieving user information</span></div>
+      <div class="loading-step" data-step="4"><i class="fas fa-circle-notch fa-spin"></i><span>Preparing verification session</span></div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="cosmic-game-progress">
+      <div class="cosmic-game-bar"><div class="cosmic-game-fill" id="progressFill"></div></div>
+      <div class="cosmic-game-text" id="progressText">Initializing...</div>
+    </div>
+
+    <!-- ERROR -->
+    <div class="error-container" id="errorContainer">
+      <div class="error-title"><i class="fas fa-exclamation-triangle"></i> Authentication Failed</div>
+      <div class="error-message" id="errorMessage"></div>
+      <button class="retry-button" onclick="retryAuthentication()"><i class="fas fa-redo"></i> Try Again</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="animations.js"></script>
+
+  <script>
+    // === SEMUA JS TETAP SAMA (HANYA DIPERBAIKI STRUKTUR HTML) ===
+    let currentStep = 0, retryCount = 0, maxRetries = 3;
+
+    function getUrlParameter(name) {
+      const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      const results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    function updateLoadingStep(step, status = 'active') {
+      const el = document.querySelector(`[data-step="${step}"]`);
+      if (!el) return;
+      const icon = el.querySelector('i');
+      el.classList.remove('active', 'completed');
+      if (status === 'completed') { el.classList.add('completed'); icon.className = 'fas fa-check-circle'; }
+      else if (status === 'active') { el.classList.add('active'); icon.className = 'fas fa-circle-notch fa-spin'; }
+      else if (status === 'error') { icon.className = 'fas fa-exclamation-circle'; }
+
+      const progress = (step / 4) * 100;
+      document.getElementById('progressFill').style.width = `${progress}%`;
+      const texts = ['Initializing...', 'Connecting to Discord...', 'Verifying code...', 'Retrieving info...', 'Almost there...'];
+      document.getElementById('progressText').textContent = texts[step] || 'Initializing...';
+    }
+
+    async function handleDiscordCallback() {
+      const code = getUrlParameter('code'), error = getUrlParameter('error');
+      if (error || !code) { showError(error ? `Discord error: ${getUrlParameter('error_description') || error}` : 'No code received.'); return; }
+
+      try {
+        updateLoadingStep(1, 'active'); await delay(1000);
+        updateLoadingStep(1, 'completed'); updateLoadingStep(2, 'active');
+
+        const res = await fetch(`/.netlify/functions/discord?code=${encodeURIComponent(code)}`);
+        updateLoadingStep(2, 'completed'); updateLoadingStep(3, 'active'); await delay(800);
+
+        if (res.status === 302) { const loc = res.headers.get('Location'); if (loc) { updateLoadingStep(3, 'completed'); updateLoadingStep(4, 'active'); await delay(500); window.location.href = loc; return; } }
+        if (!res.ok) throw new Error(await res.text());
+
+        const data = await res.json();
+        updateLoadingStep(3, 'completed'); updateLoadingStep(4, 'active'); await delay(500);
+        if (data.redirect_url) window.location.href = data.redirect_url;
+        else { successRedirect(); }
+      } catch (err) {
+        updateLoadingStep(currentStep, 'error');
+        if (retryCount < maxRetries) { retryCount++; showError(`Retrying... (${retryCount}/${maxRetries})`, true); setTimeout(() => { hideError(); handleDiscordCallback(); }, 2000); }
+        else showError(`Failed: ${err.message}`);
+      }
+    }
+
+    function successRedirect() {
+      document.getElementById('loadingSteps').style.display = 'none';
+      document.getElementById('message').textContent = 'Success! Redirecting...';
+      const loader = document.querySelector('.loader-container');
+      loader.innerHTML = `<div style="text-align:center"><div style="width:40px;height:40px;border:4px solid #4aff8c;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1rem"></div><div style="color:#4aff8c">Success!</div></div>`;
+      setTimeout(() => window.location.href = '/verify-auto.html', 1500);
+    }
+
+    function showError(msg, isRetry = false) {
+      document.getElementById('loadingSteps').style.display = 'none';
+      const container = document.getElementById('errorContainer');
+      document.getElementById('errorMessage').textContent = msg;
+      container.classList.add('show');
+      if (!isRetry && 'vibrate' in navigator) navigator.vibrate(200);
+    }
+
+    function hideError() {
+      document.getElementById('errorContainer').classList.remove('show');
+      document.getElementById('loadingSteps').style.display = 'flex';
+    }
+
+    function retryAuthentication() { retryCount = 0; hideError(); handleDiscordCallback(); }
+
+    function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && document.getElementById('errorContainer').classList.contains('show')) retryAuthentication();
+      if (e.key === 'Escape') window.history.back();
+    });
+
+    window.addEventListener('load', () => setTimeout(handleDiscordCallback, 300));
+  </script>
+</body>
+</html>
