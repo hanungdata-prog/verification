@@ -41,15 +41,30 @@ limiter = Limiter(key_func=get_remote_address)
 def create_db_and_tables():
     # Initialize Supabase connection
     try:
-        from supabase_db import get_supabase_client
+        # Try multiple import paths for serverless compatibility
+        try:
+            from supabase_db import get_supabase_client
+        except ImportError:
+            try:
+                from .supabase_db import get_supabase_client
+            except ImportError:
+                import sys
+                import os
+                sys.path.append(os.path.dirname(__file__))
+                from supabase_db import get_supabase_client
+
         supabase_client = get_supabase_client()
-        logger.info("Supabase verification system initialized")
+        if supabase_client:
+            logger.info("Supabase verification system initialized")
+            return True
+        else:
+            logger.error("Supabase client initialization returned None")
+            return False
     except Exception as e:
         logger.error(f"Failed to initialize Supabase: {str(e)}")
         # Fallback to JSON storage if Supabase is not available
         logger.warning("Falling back to JSON storage")
         return False
-    return True
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
@@ -107,9 +122,91 @@ except ImportError as e:
     def get_user_agent(request: Request) -> Optional[str]:
         return request.headers.get("user-agent", "")
 
-    # Create dummy get_supabase_client function
+    # Create robust fallback get_supabase_client function
     def get_supabase_client():
-        return None
+        """Fallback Supabase client when import fails"""
+        try:
+            # Try to create a working Supabase client directly
+            import os
+            import httpx
+            from typing import Optional, Dict, Any
+
+            supabase_url = os.getenv("SUPABASE_URL")
+            supabase_key = os.getenv("SUPABASE_KEY")
+
+            if not supabase_url or not supabase_key:
+                logger.error("Missing SUPABASE_URL or SUPABASE_KEY environment variables")
+                return None
+
+            class FallbackSupabaseClient:
+                def __init__(self, url, key):
+                    self.supabase_url = url
+                    self.supabase_key = key
+                    self.headers = {
+                        "apikey": key,
+                        "Authorization": f"Bearer {key}",
+                        "Content-Type": "application/json",
+                        "Prefer": "return=minimal"
+                    }
+
+                async def check_existing_verification(self, discord_id: str) -> Optional[Dict[str, Any]]:
+                    try:
+                        url = f"{self.supabase_url}/rest/v1/verifications"
+                        params = {
+                            "discord_id": f"eq.{discord_id}",
+                            "limit": 1,
+                            "order": "created_at.desc"
+                        }
+                        async with httpx.AsyncClient(timeout=30.0) as client:
+                            response = await client.get(url, headers=self.headers, params=params)
+                            if response.status_code == 200:
+                                data = response.json()
+                                return data[0] if data else None
+                            return None
+                    except Exception as e:
+                        logger.error(f"Error checking existing verification: {e}")
+                        return None
+
+                async def insert_verification(self, verification_data: Dict[str, Any]) -> bool:
+                    try:
+                        url = f"{self.supabase_url}/rest/v1/verifications"
+                        async with httpx.AsyncClient(timeout=30.0) as client:
+                            response = await client.post(url, headers=self.headers, json=verification_data)
+                            return response.status_code in [200, 201, 204]
+                    except Exception as e:
+                        logger.error(f"Error inserting verification: {e}")
+                        return False
+
+                async def check_ip_verification_count(self, ip_address: str, time_window_hours: int = 24) -> int:
+                    try:
+                        from datetime import datetime, timedelta
+                        time_threshold = (datetime.utcnow() - timedelta(hours=time_window_hours)).isoformat()
+
+                        url = f"{self.supabase_url}/rest/v1/verifications"
+                        params = {
+                            "ip_address": f"eq.{ip_address}",
+                            "created_at": f"gte.{time_threshold}",
+                            "select": "count"
+                        }
+                        async with httpx.AsyncClient(timeout=30.0) as client:
+                            response = await client.get(url, headers=self.headers, params=params)
+                            if response.status_code == 200:
+                                content_range = response.headers.get("content-range", "")
+                                if content_range:
+                                    return int(content_range.split("/")[-1])
+                                else:
+                                    data = response.json()
+                                    return len(data) if isinstance(data, list) else 0
+                            return 0
+                    except:
+                        return 0
+
+            logger.info("✅ Created fallback Supabase client")
+            return FallbackSupabaseClient(supabase_url, supabase_key)
+
+        except Exception as e:
+            logger.error(f"Failed to create fallback Supabase client: {e}")
+            return None
 
 class VerifyRequest(BaseModel):
     discord_id: str
@@ -1434,6 +1531,7 @@ async def check_user_verification(discord_id: str):
         if not validate_discord_id(discord_id):
             raise HTTPException(status_code=400, detail="Invalid Discord ID format")
 
+        # Get Supabase client (fallback function handles import issues)
         supabase_client = get_supabase_client()
         if not supabase_client:
             return {
