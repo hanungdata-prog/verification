@@ -115,6 +115,10 @@
       "dest": "api/index.py"
     },
     {
+      "src": "/verify-auto",
+      "dest": "dist/verify-auto.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "api/index.py"
     }

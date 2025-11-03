@@ -528,6 +528,48 @@
     const HCAPTCHA_SITE_KEY = "f9b8d3ba-9142-42c8-9ee6-57f23258f83a";
     let currentToken = '';
 
+    // Prevent redirect loop - check if we have required parameters
+    (function preventRedirectLoop() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasToken = urlParams.has('token');
+      const hasDiscordId = urlParams.has('discord_id');
+      const hasDiscordUsername = urlParams.has('discord_username');
+      const hasCode = urlParams.has('code'); // OAuth callback parameter
+
+      // If no parameters at all, this might be a direct access without proper authentication
+      if (!hasToken && !hasDiscordId && !hasDiscordUsername && !hasCode) {
+        console.warn('Direct access to verify-auto.html without authentication parameters');
+
+        // Check if we were redirected from Discord OAuth flow (check for state in session)
+        const sessionState = sessionStorage.getItem('discord_oauth_state');
+
+        if (!sessionState) {
+          console.error('No authentication state found, preventing redirect loop');
+          // Show a clear message instead of redirecting
+          document.addEventListener('DOMContentLoaded', function() {
+            const userInfo = document.querySelector('.user-info');
+            if (userInfo) {
+              userInfo.innerHTML = `
+                <h3 style="color: var(--error);">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  Authentication Required
+                </h3>
+                <p style="color: var(--muted); margin: 10px 0;">
+                  Please complete Discord authentication first.
+                </p>
+                <div style="margin-top: 15px;">
+                  <a href="/verify.html" class="switch-link" style="background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none;">
+                    <i class="fab fa-discord"></i> Start Authentication
+                  </a>
+                </div>
+              `;
+            }
+          });
+          return;
+        }
+      }
+    })();
+
     function getUrlParameter(name) {
       name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
       const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -591,6 +633,50 @@
           // Add success animation
           const userInfo = document.querySelector('.user-info');
           userInfo.style.animation = 'pulse 0.5s ease-out';
+        } else if (finalDiscordId === '' && finalDiscordUsername === '') {
+          // Check if we have decoded data but failed due to expiration logic
+          console.log('Data extraction resulted in empty strings, checking for fallback...');
+
+          // Try to get data from the decoded JWT token if it exists
+          const urlParams = new URLSearchParams(window.location.search);
+          const token = urlParams.get('token');
+
+          if (token) {
+            console.log('Attempting direct data extraction from expired token...');
+            try {
+              const directDecoded = tryDecodeBase64(token);
+              if (directDecoded && directDecoded.discord_id && directDecoded.discord_username) {
+                console.log('Successfully extracted data from expired token as fallback');
+
+                // Show the data even though token is expired
+                idEl.classList.remove('loading-skeleton');
+                nameEl.classList.remove('loading-skeleton');
+
+                idEl.textContent = directDecoded.discord_id;
+                nameEl.textContent = directDecoded.discord_username;
+
+                // Update hidden fields
+                document.getElementById('discordId').value = directDecoded.discord_id;
+                document.getElementById('discordUsername').value = directDecoded.discord_username;
+
+                // Add warning styling to indicate expired session
+                idEl.style.color = 'var(--warning)';
+                nameEl.style.color = 'var(--warning)';
+
+                // Show warning message
+                showMessage('Using expired session data. You can proceed, but re-authentication is recommended.', 'warning');
+
+                // Add warning animation
+                const userInfo = document.querySelector('.user-info');
+                userInfo.style.animation = 'pulse 0.5s ease-out';
+                userInfo.style.borderColor = 'var(--warning)';
+
+                return; // Exit early since we handled the data
+              }
+            } catch (e) {
+              console.error('Failed to extract data from expired token:', e);
+            }
+          }
         } else {
           // Remove loading skeleton and show error
           idEl.classList.remove('loading-skeleton');
@@ -602,7 +688,23 @@
           nameEl.style.color = 'var(--error)';
 
           console.error('Discord data not found:', { finalDiscordId, finalDiscordUsername });
-          showMessage('Discord user information not found. Please try logging in again.', 'error');
+
+          // Check if we have URL parameters that might indicate this is a callback
+          const hasCallbackParams = window.location.search.includes('code=') ||
+                                   window.location.search.includes('state=');
+
+          if (hasCallbackParams) {
+            showMessage('Processing Discord authentication... If this persists, please try again.', 'warning');
+            // Don't redirect automatically, let the user decide
+          } else {
+            showMessage('Discord user information not found. Please check if you were redirected correctly from Discord.', 'error');
+            // Add a manual retry button option instead of auto-redirect
+            setTimeout(() => {
+              if (confirm('Would you like to try Discord authentication again?')) {
+                window.location.href = '/verify.html';
+              }
+            }, 2000);
+          }
         }
       }, 800);
     }
@@ -670,24 +772,74 @@
 
         // Validate token expiration
         if (decodedData.expires_at) {
-          const expirationTime = new Date(decodedData.expires_at).getTime();
+          // Fix timezone issue - ensure proper parsing of the expiration time
+          let expirationTime;
+          try {
+            // Try parsing as ISO string first
+            expirationTime = new Date(decodedData.expires_at).getTime();
+
+            // If parsing fails or results in invalid date, try alternative formats
+            if (isNaN(expirationTime)) {
+              // Try parsing with timezone correction
+              const dateString = decodedData.expires_at;
+              if (dateString.includes('T') && !dateString.includes('Z')) {
+                // Add UTC timezone if missing
+                expirationTime = new Date(dateString + 'Z').getTime();
+              } else {
+                expirationTime = new Date(dateString).getTime();
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing expiration date:', e);
+            expirationTime = Date.now(); // Set to current time to force expiration
+          }
+
           const currentTime = new Date().getTime();
 
           console.log('Token expiration check:');
           console.log('- Current time:', new Date(currentTime).toISOString());
-          console.log('- Expiration time:', new Date(expirationTime).toISOString());
+          console.log('- Expiration time (original):', decodedData.expires_at);
+          console.log('- Expiration time (parsed):', new Date(expirationTime).toISOString());
           console.log('- Time until expiration (minutes):', Math.floor((expirationTime - currentTime) / (1000 * 60)));
 
           if (currentTime > expirationTime) {
             console.error('Token has expired');
-            showMessage('Session has expired. Please log in again.', 'error');
 
-            // Auto-redirect to login after showing error
-            setTimeout(() => {
-              window.location.href = '/discord/login';
-            }, 3000);
+            // Check if we're already on verify-auto.html to prevent redirect loop
+            const currentPath = window.location.pathname;
+            const currentPage = currentPath.includes('verify-auto.html') || currentPath.includes('/verify-auto');
 
-            return null;
+            if (currentPage) {
+              console.log('User already on verify-auto.html, preventing redirect loop');
+              console.error('Token has expired but user is already on verification page');
+
+              // Show user-friendly error and option to continue with expired token
+              const userChoice = confirm('Your session has expired, but your Discord data is available. Would you like to continue verification?');
+              if (userChoice) {
+                // Allow user to proceed with expired token but show warning
+                showMessage('Session expired but proceeding with available data. Complete verification quickly.', 'warning');
+                return {
+                  discord_id: decodedData.discord_id,
+                  discord_username: decodedData.discord_username,
+                  timestamp: decodedData.timestamp,
+                  expires_at: decodedData.expires_at,
+                  expired: true
+                };
+              } else {
+                showMessage('Session has expired. Please start the authentication process again.', 'error');
+                return null;
+              }
+            } else {
+              showMessage('Session has expired. Please log in again.', 'error');
+
+              // Auto-redirect to login after showing error
+              setTimeout(() => {
+                console.log('Redirecting to Discord login due to expired token');
+                window.location.href = '/discord/login';
+              }, 3000);
+
+              return null;
+            }
           }
 
           // Warning if token expires soon (less than 5 minutes)
@@ -995,6 +1147,18 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      // Check if we've already initialized this page to prevent duplicate processing
+      const pageInitialized = localStorage.getItem('verifyAutoInitialized');
+      const currentPage = window.location.pathname;
+
+      if (pageInitialized === currentPage && !window.location.search) {
+        console.log('Page already initialized, skipping duplicate processing');
+        return;
+      }
+
+      // Mark this page as initialized
+      localStorage.setItem('verifyAutoInitialized', currentPage);
+
       populateDiscordData();
       if (HCAPTCHA_SITE_KEY) loadHcaptcha();
     });
