@@ -174,6 +174,26 @@ async def verify_user(
             logger.error("❌ CRITICAL: Supabase client is None - initialization failed")
             raise HTTPException(status_code=500, detail="Database connection failed")
 
+        # FIXED: Check if user already exists before insertion
+        logger.info(f"🔍 Checking existing verification for Discord ID: {verify_request.discord_id}")
+        existing_user = await supabase_client.check_existing_verification(verify_request.discord_id)
+
+        if existing_user:
+            # FIXED: Return error response for existing user
+            logger.warning(f"⚠️ VERIFICATION FAILED: User {verify_request.discord_id} already exists in database")
+            logger.warning(f"⚠️ Existing verification data: {existing_user}")
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "error": "User already verified",
+                    "message": f"Discord user {verify_request.discord_username} has already been verified",
+                    "discord_id": verify_request.discord_id,
+                    "existing_verification_id": existing_user.get("verification_id")
+                }
+            )
+
+        # FIXED: Proceed with insertion only if user doesn't exist
+        logger.info(f"✅ User not found in database, proceeding with insertion: {verify_request.discord_id}")
         logger.info(f"🔄 Attempting to save verification data: {verification_data}")
         success = await supabase_client.insert_verification(verification_data)
 
@@ -183,8 +203,11 @@ async def verify_user(
             raise HTTPException(status_code=500, detail="Error saving verification to database")
 
         logger.info(f"✅ SUCCESS: Verification saved to Supabase for user: {verify_request.discord_id}")
+    except HTTPException as http_ex:
+        # Re-raise HTTP exceptions (including our 409 conflict)
+        raise http_ex
     except Exception as e:
-        logger.error(f"❌ CRITICAL ERROR during Supabase insertion: {str(e)}", exc_info=True)
+        logger.error(f"❌ CRITICAL ERROR during Supabase operation: {str(e)}", exc_info=True)
         logger.error(f"❌ FINAL: Verification was NOT saved to Supabase by any method")
         raise HTTPException(status_code=500, detail="Error saving verification to database")
     

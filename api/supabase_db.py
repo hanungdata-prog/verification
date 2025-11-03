@@ -43,7 +43,7 @@ class SupabaseClient:
         Returns the existing verification data if found, None otherwise
         """
         try:
-            logger.info(f"🔍 Checking existing verification for Discord ID: {discord_id}")
+            logger.info(f"🔍 CHECKING EXISTING VERIFICATION - Discord ID: {discord_id}")
 
             # Query for existing verification
             url = f"{self.supabase_url}/rest/v1/verifications"
@@ -53,6 +53,10 @@ class SupabaseClient:
                 "order": "created_at.desc"
             }
 
+            # FIXED: Added debug logging for query parameters
+            logger.info(f"🔍 DATABASE QUERY - URL: {url}")
+            logger.info(f"🔍 DATABASE QUERY - Params: {params}")
+
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(
                     url,
@@ -60,25 +64,46 @@ class SupabaseClient:
                     params=params
                 )
 
-            logger.info(f"📋 Existing verification check status: {response.status_code}")
+            # FIXED: Enhanced debug logging
+            logger.info(f"📋 DATABASE RESPONSE - Status: {response.status_code}")
+            logger.info(f"📋 DATABASE RESPONSE - Headers: {dict(response.headers)}")
+            logger.info(f"📋 DATABASE RESPONSE - Content-Type: {response.headers.get('content-type')}")
 
             if response.status_code == 200:
                 data = response.json()
+                logger.info(f"📊 DATABASE RESPONSE - Data length: {len(data) if data else 0}")
+                logger.info(f"📊 DATABASE RESPONSE - Raw data: {data}")
+
                 if data and len(data) > 0:
                     existing_verification = data[0]
-                    logger.info(f"✅ Found existing verification for Discord ID {discord_id}")
-                    logger.info(f"📊 Existing data: {existing_verification}")
+                    # FIXED: Added comprehensive logging for existing user
+                    logger.info(f"✅ EXISTING USER FOUND - Discord ID: {discord_id}")
+                    logger.info(f"✅ EXISTING USER DATA - Username: {existing_verification.get('discord_username')}")
+                    logger.info(f"✅ EXISTING USER DATA - Verification ID: {existing_verification.get('verification_id')}")
+                    logger.info(f"✅ EXISTING USER DATA - Created At: {existing_verification.get('created_at')}")
+                    logger.info(f"✅ EXISTING USER DATA - Full record: {existing_verification}")
                     return existing_verification
                 else:
-                    logger.info(f"ℹ️ No existing verification found for Discord ID {discord_id}")
+                    # FIXED: Clear logging for new user case
+                    logger.info(f"✅ NEW USER DETECTED - No existing verification for Discord ID: {discord_id}")
+                    logger.info(f"✅ NEW USER - Safe to proceed with verification")
                     return None
             else:
-                logger.error(f"❌ Failed to check existing verification. Status: {response.status_code}")
-                logger.error(f"❌ Response: {response.text}")
+                # FIXED: Enhanced error logging
+                logger.error(f"❌ DATABASE ERROR - Failed to check existing verification")
+                logger.error(f"❌ DATABASE ERROR - Status: {response.status_code}")
+                logger.error(f"❌ DATABASE ERROR - Response text: {response.text}")
+                logger.error(f"❌ DATABASE ERROR - Response headers: {dict(response.headers)}")
                 return None
 
         except Exception as e:
-            logger.error(f"❌ Error checking existing verification: {str(e)}", exc_info=True)
+            # FIXED: Enhanced exception logging
+            logger.error(f"❌ CRITICAL ERROR - Checking existing verification failed")
+            logger.error(f"❌ CRITICAL ERROR - Discord ID: {discord_id}")
+            logger.error(f"❌ CRITICAL ERROR - Exception: {str(e)}")
+            logger.error(f"❌ CRITICAL ERROR - Exception type: {type(e).__name__}")
+            import traceback
+            logger.error(f"❌ CRITICAL ERROR - Traceback: {traceback.format_exc()}")
             return None
 
     async def check_ip_verification_count(self, ip_address: str, time_window_hours: int = 24) -> int:
