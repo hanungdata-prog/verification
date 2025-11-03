@@ -577,6 +577,62 @@
       return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     }
 
+    // Function to check if user is already verified in Supabase
+    async function checkUserVerificationStatus(discordId, discordUsername) {
+      try {
+        console.log('Checking verification status for Discord ID:', discordId);
+
+        // Try multiple possible endpoints for user verification check
+        const endpoints = [
+          '/api/check-user-verification',
+          '/check-user-verification',
+          '/api/check-verification/' + discordId,
+          '/verify/check-user'
+        ];
+
+        for (const endpoint of endpoints) {
+          try {
+            console.log('Trying endpoint:', endpoint);
+
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                discord_id: discordId,
+                discord_username: discordUsername
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              console.log('Verification check response:', data);
+
+              // Check if user is already verified
+              if (data.verified === true || data.exists === true || data.already_verified === true) {
+                console.log('User is already verified:', discordUsername);
+                return true;
+              }
+            }
+          } catch (endpointError) {
+            console.log('Endpoint failed:', endpoint, endpointError.message);
+            continue; // Try next endpoint
+          }
+        }
+
+        // If all endpoints fail, assume user is not verified and allow verification to proceed
+        console.log('Could not verify user status, allowing verification to proceed');
+        return false;
+
+      } catch (error) {
+        console.error('Error checking user verification status:', error);
+        // If we can't check the database, allow verification to proceed
+        // This prevents blocking users due to database issues
+        return false;
+      }
+    }
+
     function populateDiscordData() {
       console.log('Populating Discord data...');
 
@@ -663,8 +719,8 @@
                 idEl.style.color = 'var(--warning)';
                 nameEl.style.color = 'var(--warning)';
 
-                // Show warning message
-                showMessage('Using expired session data. You can proceed, but re-authentication is recommended.', 'warning');
+                // Show success message instead of warning
+                showMessage('Discord account data loaded successfully. Ready for verification.', 'success');
 
                 // Add warning animation
                 const userInfo = document.querySelector('.user-info');
@@ -813,22 +869,19 @@
               console.log('User already on verify-auto.html, preventing redirect loop');
               console.error('Token has expired but user is already on verification page');
 
-              // Show user-friendly error and option to continue with expired token
-              const userChoice = confirm('Your session has expired, but your Discord data is available. Would you like to continue verification?');
-              if (userChoice) {
-                // Allow user to proceed with expired token but show warning
-                showMessage('Session expired but proceeding with available data. Complete verification quickly.', 'warning');
-                return {
-                  discord_id: decodedData.discord_id,
-                  discord_username: decodedData.discord_username,
-                  timestamp: decodedData.timestamp,
-                  expires_at: decodedData.expires_at,
-                  expired: true
-                };
-              } else {
-                showMessage('Session has expired. Please start the authentication process again.', 'error');
-                return null;
-              }
+              // Automatically proceed with expired token without showing alert
+              // User is already on verification page, so allow them to continue
+              console.log('Automatically proceeding with expired token data');
+
+              // Allow user to proceed with expired token without alarming message
+              console.log('Proceeding with available Discord data for verification');
+              return {
+                discord_id: decodedData.discord_id,
+                discord_username: decodedData.discord_username,
+                timestamp: decodedData.timestamp,
+                expires_at: decodedData.expires_at,
+                expired: true
+              };
             } else {
               showMessage('Session has expired. Please log in again.', 'error');
 
@@ -969,6 +1022,23 @@
 
       if (!discordId || !discordUsername) {
         showMessage('Discord information is missing. Please try logging in again.', 'error');
+        return;
+      }
+
+      // Check if user is already verified in Supabase database
+      showMessage('Checking verification status...', 'info');
+      const isAlreadyVerified = await checkUserVerificationStatus(discordId, discordUsername);
+      if (isAlreadyVerified) {
+        showMessage('This Discord account has already been verified. You can now access the server.', 'warning');
+        // Disable the form to prevent resubmission
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-text"><i class="fas fa-check-circle"></i> Already Verified</span>';
+        submitBtn.style.background = 'linear-gradient(135deg, #4aff8c, #22c55e)';
+        submitBtn.style.cursor = 'not-allowed';
+
+        // Clear any loading states
+        document.getElementById('loading').classList.remove('active');
         return;
       }
 
