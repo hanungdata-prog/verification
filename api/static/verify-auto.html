@@ -713,50 +713,160 @@
             try {
                 console.log('Decoding token:', token);
 
-                // The token appears to be in format: base64(data).base64(sig)
-                // Let's try to decode it
-                const parts = token.split('.');
-                console.log('Token parts:', parts);
-
-                if (parts.length >= 2) {
-                    // Decode the data part (first part)
-                    const dataPart = parts[0];
-                    console.log('Data part to decode:', dataPart);
-
-                    // Add padding if necessary
-                    const padding = '='.repeat((4 - dataPart.length % 4) % 4);
-                    const paddedData = dataPart + padding;
-
-                    const decodedData = atob(paddedData);
-                    console.log('Decoded data string:', decodedData);
-
-                    const parsedData = JSON.parse(decodedData);
-                    console.log('Parsed data:', parsedData);
-
-                    // Validate token expiration
-                    if (parsedData.expires_at) {
-                        const expirationTime = new Date(parsedData.expires_at).getTime();
-                        const currentTime = new Date().getTime();
-
-                        if (currentTime > expirationTime) {
-                            console.error('Token has expired');
-                            showMessage('Session has expired. Please log in again.', 'error');
-                            return null;
-                        }
-                    }
-
-                    return {
-                        discord_id: parsedData.discord_id,
-                        discord_username: parsedData.discord_username,
-                        timestamp: parsedData.timestamp,
-                        expires_at: parsedData.expires_at
-                    };
-                } else {
-                    console.error('Invalid token format');
+                if (!token || token === '') {
+                    console.error('Empty token provided');
                     return null;
                 }
+
+                // Try multiple decoding strategies
+                let decodedData = null;
+
+                // Strategy 1: Try standard JWT format (data.signature)
+                if (token.includes('.')) {
+                    console.log('Trying standard JWT format...');
+                    const parts = token.split('.');
+                    console.log('Token parts:', parts);
+
+                    if (parts.length >= 1) {
+                        decodedData = tryDecodeBase64(parts[0]);
+                        if (decodedData) {
+                            console.log('Successfully decoded using JWT format');
+                        }
+                    }
+                }
+
+                // Strategy 2: Try direct base64 decoding (entire token is data)
+                if (!decodedData) {
+                    console.log('Trying direct base64 decoding...');
+                    decodedData = tryDecodeBase64(token);
+                    if (decodedData) {
+                        console.log('Successfully decoded using direct base64');
+                    }
+                }
+
+                // Strategy 3: Try to extract from nested structure
+                if (!decodedData) {
+                    console.log('Trying nested structure extraction...');
+                    decodedData = tryExtractNestedData(token);
+                    if (decodedData) {
+                        console.log('Successfully extracted from nested structure');
+                    }
+                }
+
+                if (!decodedData) {
+                    console.error('All decoding strategies failed');
+                    showMessage('Invalid token format. Please log in again.', 'error');
+                    return null;
+                }
+
+                console.log('Final decoded data:', decodedData);
+
+                // Validate required fields
+                if (!decodedData.discord_id || !decodedData.discord_username) {
+                    console.error('Token missing required Discord fields');
+                    console.error('Available fields:', Object.keys(decodedData));
+                    showMessage('Invalid token format. Missing Discord user information.', 'error');
+                    return null;
+                }
+
+                // Validate token expiration
+                if (decodedData.expires_at) {
+                    const expirationTime = new Date(decodedData.expires_at).getTime();
+                    const currentTime = new Date().getTime();
+
+                    console.log('Token expiration check:');
+                    console.log('- Current time:', new Date(currentTime).toISOString());
+                    console.log('- Expiration time:', new Date(expirationTime).toISOString());
+                    console.log('- Time until expiration (minutes):', Math.floor((expirationTime - currentTime) / (1000 * 60)));
+
+                    if (currentTime > expirationTime) {
+                        console.error('Token has expired');
+                        showMessage('Session has expired. Please log in again.', 'error');
+
+                        // Auto-redirect to login after showing error
+                        setTimeout(() => {
+                            window.location.href = '/discord/login';
+                        }, 3000);
+
+                        return null;
+                    }
+
+                    // Warning if token expires soon (less than 5 minutes)
+                    if (expirationTime - currentTime < 5 * 60 * 1000) {
+                        console.warn('Token expires soon');
+                        showMessage('Your session will expire soon. Complete verification quickly.', 'warning');
+                    }
+                }
+
+                return {
+                    discord_id: decodedData.discord_id,
+                    discord_username: decodedData.discord_username,
+                    timestamp: decodedData.timestamp,
+                    expires_at: decodedData.expires_at
+                };
+
             } catch (error) {
                 console.error('Error decoding JWT token:', error);
+                showMessage('Invalid token format. Please log in again.', 'error');
+                return null;
+            }
+        }
+
+        // Helper function to try base64 decoding
+        function tryDecodeBase64(data) {
+            try {
+                console.log('Attempting to decode base64 data:', data.substring(0, 50) + '...');
+
+                // Add padding if necessary
+                const padding = '='.repeat((4 - data.length % 4) % 4);
+                const paddedData = data + padding;
+
+                console.log('Padded data length:', paddedData.length);
+
+                const decodedString = atob(paddedData);
+                console.log('Decoded string:', decodedString);
+
+                const parsedData = JSON.parse(decodedString);
+                console.log('Parsed data:', parsedData);
+
+                return parsedData;
+            } catch (error) {
+                console.error('Base64 decoding failed:', error);
+                return null;
+            }
+        }
+
+        // Helper function to try extracting nested data
+        function tryExtractNestedData(token) {
+            try {
+                console.log('Attempting to extract nested data from token...');
+
+                // Try to decode the entire token first
+                const padding = '='.repeat((4 - token.length % 4) % 4);
+                const paddedToken = token + padding;
+
+                console.log('Token length:', token.length);
+                console.log('Padding added:', padding.length);
+                console.log('Padded token length:', paddedToken.length);
+
+                const decodedString = atob(paddedToken);
+                console.log('Decoded full token:', decodedString);
+
+                const parsedData = JSON.parse(decodedString);
+                console.log('Parsed full token data:', parsedData);
+
+                // Check if it has a nested structure with "data" field
+                if (parsedData.data && typeof parsedData.data === 'object') {
+                    console.log('Found nested data structure in "data" field');
+                    console.log('Nested data:', parsedData.data);
+                    return parsedData.data;
+                }
+
+                // Return the parsed data as-is if no nested structure found
+                console.log('No nested structure found, returning parsed data directly');
+                return parsedData;
+            } catch (error) {
+                console.error('Nested data extraction failed:', error);
                 return null;
             }
         }
