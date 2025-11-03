@@ -381,6 +381,7 @@
 
     .message.success { background: rgba(74, 255, 140, 0.1); border-color: rgba(74, 255, 140, 0.3); color: var(--success); }
     .message.error   { background: rgba(255, 85, 122, 0.1); border-color: rgba(255, 85, 122, 0.3); color: var(--error); }
+    .message.warning { background: rgba(255, 193, 7, 0.1); border-color: rgba(255, 193, 7, 0.3); color: #ffc107; }
 
     /* ACTION LINKS */
     .action-links {
@@ -536,9 +537,13 @@
 
     function populateDiscordData() {
       console.log('Populating Discord data...');
+
+      // Try to get data from JWT token first
+      const token = getUrlParameter('token');
       const discordId = getUrlParameter('discord_id');
       const discordUsername = getUrlParameter('discord_username');
 
+      console.log('Raw token:', token);
       console.log('Raw Discord ID:', discordId);
       console.log('Raw Discord Username:', discordUsername);
 
@@ -547,21 +552,41 @@
 
       // Simulate loading delay for better UX
       setTimeout(() => {
-        if (discordId && discordUsername && discordId !== '' && discordUsername !== '') {
+        let finalDiscordId = discordId;
+        let finalDiscordUsername = discordUsername;
+
+        // If we have a token, try to decode it
+        if (token && token !== '') {
+          console.log('Attempting to decode JWT token...');
+          try {
+            const decodedData = decodeJWTToken(token);
+            if (decodedData) {
+              finalDiscordId = decodedData.discord_id;
+              finalDiscordUsername = decodedData.discord_username;
+              console.log('Successfully decoded JWT token:', decodedData);
+            }
+          } catch (error) {
+            console.error('Failed to decode JWT token:', error);
+          }
+        }
+
+        console.log('Final Discord data:', { finalDiscordId, finalDiscordUsername });
+
+        if (finalDiscordId && finalDiscordUsername && finalDiscordId !== '' && finalDiscordUsername !== '') {
           // Remove loading skeleton and show actual data
           idEl.classList.remove('loading-skeleton');
           nameEl.classList.remove('loading-skeleton');
 
-          idEl.textContent = discordId;
-          nameEl.textContent = discordUsername;
+          idEl.textContent = finalDiscordId;
+          nameEl.textContent = finalDiscordUsername;
 
           // Update hidden fields
-          document.getElementById('discordId').value = discordId;
-          document.getElementById('discordUsername').value = discordUsername;
+          document.getElementById('discordId').value = finalDiscordId;
+          document.getElementById('discordUsername').value = finalDiscordUsername;
 
           console.log('Discord data populated successfully');
-          console.log('ID set to:', discordId);
-          console.log('Username set to:', discordUsername);
+          console.log('ID set to:', finalDiscordId);
+          console.log('Username set to:', finalDiscordUsername);
 
           // Add success animation
           const userInfo = document.querySelector('.user-info');
@@ -576,10 +601,100 @@
           idEl.style.color = 'var(--error)';
           nameEl.style.color = 'var(--error)';
 
-          console.error('Discord data not found:', { discordId, discordUsername });
+          console.error('Discord data not found:', { finalDiscordId, finalDiscordUsername });
           showMessage('Discord user information not found. Please try logging in again.', 'error');
         }
       }, 800);
+    }
+
+    // Function to decode JWT token
+    function decodeJWTToken(token) {
+      try {
+        console.log('Decoding token:', token);
+
+        if (!token || token === '') {
+          console.error('Empty token provided');
+          return null;
+        }
+
+        // The token appears to be in format: base64(data).base64(sig)
+        // Let's try to decode it
+        const parts = token.split('.');
+        console.log('Token parts:', parts);
+
+        if (parts.length < 2) {
+          console.error('Invalid token format - not enough parts');
+          return null;
+        }
+
+        // Decode the data part (first part)
+        const dataPart = parts[0];
+        console.log('Data part to decode:', dataPart);
+
+        try {
+          // Add padding if necessary
+          const padding = '='.repeat((4 - dataPart.length % 4) % 4);
+          const paddedData = dataPart + padding;
+
+          const decodedData = atob(paddedData);
+          console.log('Decoded data string:', decodedData);
+
+          const parsedData = JSON.parse(decodedData);
+          console.log('Parsed data:', parsedData);
+
+          // Validate required fields
+          if (!parsedData.discord_id || !parsedData.discord_username) {
+            console.error('Token missing required Discord fields');
+            showMessage('Invalid token format. Missing Discord user information.', 'error');
+            return null;
+          }
+
+          // Validate token expiration
+          if (parsedData.expires_at) {
+            const expirationTime = new Date(parsedData.expires_at).getTime();
+            const currentTime = new Date().getTime();
+
+            console.log('Token expiration check:');
+            console.log('- Current time:', new Date(currentTime).toISOString());
+            console.log('- Expiration time:', new Date(expirationTime).toISOString());
+            console.log('- Time until expiration (minutes):', Math.floor((expirationTime - currentTime) / (1000 * 60)));
+
+            if (currentTime > expirationTime) {
+              console.error('Token has expired');
+              showMessage('Session has expired. Please log in again.', 'error');
+
+              // Auto-redirect to login after showing error
+              setTimeout(() => {
+                window.location.href = '/discord/login';
+              }, 3000);
+
+              return null;
+            }
+
+            // Warning if token expires soon (less than 5 minutes)
+            if (expirationTime - currentTime < 5 * 60 * 1000) {
+              console.warn('Token expires soon');
+              showMessage('Your session will expire soon. Complete verification quickly.', 'warning');
+            }
+          }
+
+          return {
+            discord_id: parsedData.discord_id,
+            discord_username: parsedData.discord_username,
+            timestamp: parsedData.timestamp,
+            expires_at: parsedData.expires_at
+          };
+
+        } catch (decodeError) {
+          console.error('Failed to decode token data:', decodeError);
+          return null;
+        }
+
+      } catch (error) {
+        console.error('Error decoding JWT token:', error);
+        showMessage('Invalid token format. Please log in again.', 'error');
+        return null;
+      }
     }
 
     function loadHcaptcha() {
@@ -761,11 +876,35 @@
       loading.classList.remove('active');
     }
 
-    function showMessage(t, y) {
-      const m = document.getElementById('message'), txt = document.getElementById('messageText'), i = m.querySelector('i');
-      const icons = { success: 'fas fa-check-circle', error: 'fas fa-exclamation-circle', info: 'fas fa-info-circle' };
-      i.className = icons[y] || icons.info; txt.textContent = t; m.className = `message ${y}`; m.style.display = 'flex';
-      if (y !== 'error') setTimeout(() => m.style.display = 'none', 5000);
+    function showMessage(text, type = 'info') {
+      const messageEl = document.getElementById('message');
+      const messageTextEl = document.getElementById('messageText');
+      const iconEl = messageEl.querySelector('i');
+
+      // Set icon based on type
+      const icons = {
+        'success': 'fas fa-check-circle',
+        'error': 'fas fa-exclamation-circle',
+        'info': 'fas fa-info-circle',
+        'warning': 'fas fa-exclamation-triangle'
+      };
+
+      iconEl.className = icons[type] || icons['info'];
+      messageTextEl.textContent = text;
+
+      messageEl.className = `message ${type}`;
+      messageEl.style.display = 'flex';
+
+      // Auto-hide success, info, and warning messages after 5 seconds
+      if (type !== 'error') {
+        setTimeout(() => {
+          messageEl.style.display = 'none';
+        }, 5000);
+      }
+
+      // Add accessibility announcement
+      messageEl.setAttribute('role', 'alert');
+      messageEl.setAttribute('aria-live', 'polite');
     }
 
     document.addEventListener('DOMContentLoaded', () => {

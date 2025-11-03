@@ -629,45 +629,71 @@
 
         // Function to populate Discord user data with enhanced loading states
         function populateDiscordData() {
+            console.log('Populating Discord data...');
+
+            // Try to get data from JWT token first
+            const token = getUrlParameter('token');
             const discordId = getUrlParameter('discord_id');
             const discordUsername = getUrlParameter('discord_username');
 
-            console.log('Discord ID:', discordId);
-            console.log('Discord Username:', discordUsername);
+            console.log('Raw token:', token);
+            console.log('Raw Discord ID:', discordId);
+            console.log('Raw Discord Username:', discordUsername);
+
+            const userIdEl = document.getElementById('userId');
+            const userNameEl = document.getElementById('userName');
 
             // Simulate loading delay for better UX
             setTimeout(() => {
-                if (discordId && discordUsername) {
-                    // Remove loading skeleton and show actual data
-                    const userIdEl = document.getElementById('userId');
-                    const userNameEl = document.getElementById('userName');
+                let finalDiscordId = discordId;
+                let finalDiscordUsername = discordUsername;
 
+                // If we have a token, try to decode it
+                if (token && token !== '') {
+                    console.log('Attempting to decode JWT token...');
+                    try {
+                        const decodedData = decodeJWTToken(token);
+                        if (decodedData) {
+                            finalDiscordId = decodedData.discord_id;
+                            finalDiscordUsername = decodedData.discord_username;
+                            console.log('Successfully decoded JWT token:', decodedData);
+                        }
+                    } catch (error) {
+                        console.error('Failed to decode JWT token:', error);
+                    }
+                }
+
+                console.log('Final Discord data:', { finalDiscordId, finalDiscordUsername });
+
+                if (finalDiscordId && finalDiscordUsername && finalDiscordId !== '' && finalDiscordUsername !== '') {
+                    // Remove loading skeleton and show actual data
                     userIdEl.classList.remove('loading-skeleton');
                     userNameEl.classList.remove('loading-skeleton');
 
-                    userIdEl.textContent = discordId;
-                    userNameEl.textContent = discordUsername;
+                    userIdEl.textContent = finalDiscordId;
+                    userNameEl.textContent = finalDiscordUsername;
 
                     // Update all hidden fields with Discord ID
                     const discordIdFields = document.querySelectorAll('#discordId');
                     discordIdFields.forEach(field => {
-                        field.value = discordId;
+                        field.value = finalDiscordId;
                     });
 
                     // Update all hidden fields with Discord username
                     const discordUsernameFields = document.querySelectorAll('#discordUsername');
                     discordUsernameFields.forEach(field => {
-                        field.value = discordUsername;
+                        field.value = finalDiscordUsername;
                     });
+
+                    console.log('Discord data populated successfully');
+                    console.log('ID set to:', finalDiscordId);
+                    console.log('Username set to:', finalDiscordUsername);
 
                     // Add success animation
                     const userInfo = document.querySelector('.user-info');
                     userInfo.style.animation = 'pulse 0.5s ease-out';
                 } else {
                     // Remove loading skeleton and show error
-                    const userIdEl = document.getElementById('userId');
-                    const userNameEl = document.getElementById('userName');
-
                     userIdEl.classList.remove('loading-skeleton');
                     userNameEl.classList.remove('loading-skeleton');
 
@@ -676,9 +702,63 @@
                     userIdEl.style.color = 'var(--color-error)';
                     userNameEl.style.color = 'var(--color-error)';
 
+                    console.error('Discord data not found:', { finalDiscordId, finalDiscordUsername });
                     showMessage('Discord user information not found. Please try logging in again.', 'error');
                 }
             }, 800); // Simulate network delay
+        }
+
+        // Function to decode JWT token
+        function decodeJWTToken(token) {
+            try {
+                console.log('Decoding token:', token);
+
+                // The token appears to be in format: base64(data).base64(sig)
+                // Let's try to decode it
+                const parts = token.split('.');
+                console.log('Token parts:', parts);
+
+                if (parts.length >= 2) {
+                    // Decode the data part (first part)
+                    const dataPart = parts[0];
+                    console.log('Data part to decode:', dataPart);
+
+                    // Add padding if necessary
+                    const padding = '='.repeat((4 - dataPart.length % 4) % 4);
+                    const paddedData = dataPart + padding;
+
+                    const decodedData = atob(paddedData);
+                    console.log('Decoded data string:', decodedData);
+
+                    const parsedData = JSON.parse(decodedData);
+                    console.log('Parsed data:', parsedData);
+
+                    // Validate token expiration
+                    if (parsedData.expires_at) {
+                        const expirationTime = new Date(parsedData.expires_at).getTime();
+                        const currentTime = new Date().getTime();
+
+                        if (currentTime > expirationTime) {
+                            console.error('Token has expired');
+                            showMessage('Session has expired. Please log in again.', 'error');
+                            return null;
+                        }
+                    }
+
+                    return {
+                        discord_id: parsedData.discord_id,
+                        discord_username: parsedData.discord_username,
+                        timestamp: parsedData.timestamp,
+                        expires_at: parsedData.expires_at
+                    };
+                } else {
+                    console.error('Invalid token format');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error decoding JWT token:', error);
+                return null;
+            }
         }
 
         // DOM elements

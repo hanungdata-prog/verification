@@ -343,9 +343,17 @@ async function storeInSupabase(data) {
     const SUPABASE_URL = process.env.SUPABASE_URL;
     const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
+    console.log('=== SUPABASE STORAGE ATTEMPT ===');
+    console.log('SUPABASE_URL exists:', !!SUPABASE_URL);
+    console.log('SUPABASE_KEY exists:', !!SUPABASE_KEY);
+    console.log('SUPABASE_URL:', SUPABASE_URL ? SUPABASE_URL.substring(0, 20) + '...' : 'NULL');
+    console.log('SUPABASE_KEY length:', SUPABASE_KEY ? SUPABASE_KEY.length : 0);
+
     if (!SUPABASE_URL || !SUPABASE_KEY) {
-      throw new Error('Supabase credentials not configured');
+      throw new Error('Supabase credentials not configured in environment variables');
     }
+
+    console.log('Data to be stored:', JSON.stringify(data, null, 2));
 
     const response = await fetch(`${SUPABASE_URL}/rest/v1/verifications`, {
       method: 'POST',
@@ -353,26 +361,51 @@ async function storeInSupabase(data) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${SUPABASE_KEY}`,
         'apikey': SUPABASE_KEY,
-        'Prefer': 'return=minimal'
+        'Prefer': 'return=representation'
       },
       body: JSON.stringify(data)
     });
 
+    console.log('Supabase response status:', response.status);
+    console.log('Supabase response headers:', JSON.stringify(Object.fromEntries(response.headers), null, 2));
+
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`Supabase error: ${response.status} - ${errorText}`);
+      console.error('Supabase error response:', errorText);
+      throw new Error(`Supabase error ${response.status}: ${errorText}`);
     }
 
-    // Get the ID of the inserted record
-    const location = response.headers.get('location');
-    if (location) {
-      const id = location.split('/').pop();
-      return { data: { id }, error: null };
+    // Try to get the response body which should contain the inserted record
+    let responseData;
+    try {
+      responseData = await response.json();
+      console.log('Supabase response data:', responseData);
+    } catch (jsonError) {
+      console.warn('Could not parse Supabase response as JSON:', jsonError);
+      responseData = null;
     }
 
-    return { data: null, error: null };
+    // Return the inserted data if available, otherwise a success indicator
+    return {
+      data: responseData && responseData.length > 0 ? responseData[0] : { stored: true },
+      error: null
+    };
+
   } catch (error) {
-    console.error('Supabase storage error:', error);
-    return { data: null, error: error.message };
+    console.error('=== SUPABASE STORAGE ERROR ===');
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+
+    // Return detailed error information
+    return {
+      data: null,
+      error: error.message,
+      details: {
+        supabase_url_configured: !!process.env.SUPABASE_URL,
+        supabase_key_configured: !!process.env.SUPABASE_KEY,
+        supabase_url_length: process.env.SUPABASE_URL ? process.env.SUPABASE_URL.length : 0,
+        supabase_key_length: process.env.SUPABASE_KEY ? process.env.SUPABASE_KEY.length : 0
+      }
+    };
   }
 }
