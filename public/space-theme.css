@@ -1,25 +1,106 @@
-/* Space Theme CSS - Consistent with verify.html style */
+/* Space Theme CSS with cosmic background and improved color palette */
 :root {
-  --primary-color: #667eea;
-  --secondary-color: #764ba2;
-  --accent-color: #ff6b6b;
-  --success-color: #4ecdc4;
-  --warning-color: #f7dc6f;
-  --error-color: #f8d7da;
-  --text-color: #2c3e50;
-  --background-color: #0a0a12;
-  --card-background: rgba(15, 15, 30, 0.9);
-  --border-radius: 12px;
-  --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.2);
+  /* Core colors - improved palette */
+  --background: #0a0a12; /* Deep space black */
+  --card-bg: rgba(15, 15, 30, 0.8); /* Space card background */
+  --card-border: rgba(100, 100, 200, 0.2); /* Cosmic purple-blue border */
+  --foreground: #e0e0ff; /* Cosmic white */
+  --muted: #a0a0c0; /* Soft space gray */
+  --accent: #7080ff; /* Cosmic blue */
+  --accent-hover: #5060d0; /* Hover variant */
+  --success: #4aff8c; /* Space green */
+  --error: #ff557a; /* Cosmic red */
+  --warning: #ffcc66; /* Cosmic yellow */
+  --info: #66b3ff; /* Space blue */
+  
+  /* Sizing */
+  --radius-sm: 0.125rem;
+  --radius: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+  
+  /* Spacing */
+  --space-px: 0.0625rem;
+  --space-0: 0rem;
+  --space-0-5: 0.125rem;
+  --space-1: 0.25rem;
+  --space-1-5: 0.375rem;
+  --space-2: 0.5rem;
+  --space-2-5: 0.625rem;
+  --space-3: 0.75rem;
+  --space-3-5: 0.875rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 1.75rem;
+  --space-8: 2rem;
+  --space-9: 2.25rem;
+  --space-10: 2.5rem;
+  --space-11: 2.75rem;
+  --space-12: 3rem;
+  --space-14: 3.5rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-28: 7rem;
+  --space-32: 8rem;
+  --space-36: 9rem;
+  --space-40: 10rem;
+  --space-44: 11rem;
+  --space-48: 12rem;
+  --space-52: 13rem;
+  --space-56: 14rem;
+  --space-60: 15rem;
+  --space-64: 16rem;
+  --space-72: 18rem;
+  --space-80: 20rem;
+  --space-96: 24rem;
+  
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-mono: 'Geist Mono', 'Fira Code', Consolas, monospace;
+  
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+  --text-8xl: 6rem;
+  --text-9xl: 8rem;
+  
+  --font-thin: 100;
+  --font-extralight: 200;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  --font-black: 900;
+  
+  /* Line heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
 }
 
+/* Background with stars and cosmic effect */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-  color: #e0e0ff;
-  background: var(--background-color);
-  background-image:
+  background: #0a0a12;
+  background-image: 
     radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
     radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
     radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
@@ -32,147 +113,455 @@ body {
     radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
   background-size: 240px 120px;
   min-height: 100vh;
-  margin: 0;
-  padding: 20px;
+  overflow-x: hidden;
 }
 
-.container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.verification-card {
-  background: var(--card-background);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
-  padding: 2rem;
-  margin: 1rem 0;
+/* Cosmic card with glow effect */
+.card {
+  background: var(--card-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-6);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 
+    0 0 15px rgba(100, 100, 200, 0.2),
+    0 0 30px rgba(80, 80, 180, 0.1);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.verification-card:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #7080ff, transparent);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
 }
 
+/* Cosmic button styles */
 .btn {
-  display: inline-block;
-  padding: 12px 24px;
-  font-weight: 600;
-  text-decoration: none;
-  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--muted);
+  border-radius: var(--radius-full);
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
   cursor: pointer;
   transition: all 0.3s ease;
-  border: none;
-  font-size: 14px;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(112, 128, 255, 0.3);
+}
+
+.btn:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(135deg, #4a55d6, #7080ff);
   color: white;
+  border: none;
 }
 
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #5a65e6, #8090ff);
+  box-shadow: 0 0 20px rgba(112, 128, 255, 0.4);
 }
 
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.btn-secondary {
+  background: transparent;
+  color: var(--foreground);
+  border: 1px solid var(--muted);
 }
 
-/* Animations */
+.btn-secondary:hover {
+  border-color: var(--foreground);
+  background: rgba(224, 224, 255, 0.05);
+}
+
+/* Special cosmic button with glow */
+.btn-cosmic {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-cosmic::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #7080ff, #4aff8c, #ff557a, #ffcc66, #7080ff);
+  border-radius: var(--radius-full);
+  z-index: -1;
+  animation: rotate 4s linear infinite;
+}
+
+.btn-cosmic span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Cosmic input fields */
+.form-input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: rgba(15, 15, 30, 0.5);
+  color: var(--foreground);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(112, 128, 255, 0.2);
+}
+
+/* Cosmic status messages */
+.status-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  margin: var(--space-4) 0;
+  font-size: var(--text-sm);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.status-message.success {
+  background: rgba(74, 255, 140, 0.1);
+  border-color: rgba(74, 255, 140, 0.3);
+  color: var(--success);
+}
+
+.status-message.error {
+  background: rgba(255, 85, 122, 0.1);
+  border-color: rgba(255, 85, 122, 0.3);
+  color: var(--error);
+}
+
+.status-message.info {
+  background: rgba(102, 179, 255, 0.1);
+  border-color: rgba(102, 179, 255, 0.3);
+  color: var(--info);
+}
+
+/* Cosmic glow effects */
+.glow {
+  box-shadow: 0 0 15px rgba(112, 128, 255, 0.3);
+}
+
+.glow-success {
+  box-shadow: 0 0 15px rgba(74, 255, 140, 0.3);
+}
+
+.glow-error {
+  box-shadow: 0 0 15px rgba(255, 85, 122, 0.3);
+}
+
+/* Cosmic animations */
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 @keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.05); opacity: 0.8; }
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
-@keyframes slideIn {
-  from { transform: translateX(-100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
+/* Rocket assembly animations */
+@keyframes assembleRocketPart {
+  0% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes assembleRocketBody {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
 }
 
-/* Discord themed elements */
-.discord-button {
-  background: #5865F2;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
+@keyframes rocketFlame {
+  0% {
+    opacity: 0;
+    height: 0;
+    transform: translateX(-50%) scale(0);
+  }
+  50% {
+    opacity: 1;
+    height: 30px;
+    transform: translateX(-50%) scale(1.2);
+  }
+  100% {
+    opacity: 0.8;
+    height: 25px;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes launchRocket {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) translateY(-20px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0) translateY(-100px);
+    opacity: 0;
+  }
+}
+
+@keyframes launchRocket {
+  0% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) translateY(-20px);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0) translateY(-100px);
+    opacity: 0;
+  }
+}
+
+@keyframes rocketPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(112, 128, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(112, 128, 255, 0.5);
+  }
+}
+
+/* Enhanced rocket hover effect for all buttons */
+.rocket-button, .discord-button, .submit-btn {
+  position: relative;
+  transform: perspective(500px) rotateX(0deg);
   transition: all 0.3s ease;
+}
+
+.rocket-button:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(112, 128, 255, 0.6);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: rocketPulse 2s ease-in-out infinite;
+}
+
+.rocket-button:active {
+  transform: translateY(0) scale(0.95);
+  transition: all 0.1s ease;
+}
+
+/* Rocket parts */
+.rocket-button:hover span::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 20px;
+  height: 30px;
+  background: linear-gradient(45deg, #ffcc66, #ff557a);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform: scale(0);
+  animation: assembleRocketPart 0.4s ease-out forwards;
+}
+
+.rocket-button:hover span::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: -25px;
+  width: 30px;
+  height: 10px;
+  background: linear-gradient(90deg, #7080ff, #4aff8c);
+  border-radius: 2px;
+  transform: scaleX(0);
+  animation: assembleRocketBody 0.3s ease-out 0.2s forwards;
+}
+
+/* Rocket flame effect */
+.rocket-button:hover::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15px;
+  height: 25px;
+  background: linear-gradient(to top, #ff557a, #ffcc66, transparent);
+  border-radius: 50% 50% 20% 20%;
+  opacity: 0;
+  animation: rocketFlame 0.5s ease-in-out 0.3s forwards;
+  box-shadow: 0 0 10px #ff557a, 0 0 20px #ffcc66;
+}
+
+/* Launch effect */
+.rocket-button:active span::before {
+  animation: launchRocket 0.5s ease-in forwards;
+}
+
+/* Rocket button effect for all buttons */
+.discord-button:hover span::before,
+.submit-btn:hover span::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 20px;
+  height: 30px;
+  background: linear-gradient(45deg, #ffcc66, #ff557a);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  transform: scale(0);
+  animation: assembleRocketPart 0.4s ease-out forwards;
+}
+
+.discord-button:hover span::after,
+.submit-btn:hover span::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  right: -25px;
+  width: 30px;
+  height: 10px;
+  background: linear-gradient(90deg, #7080ff, #4aff8c);
+  border-radius: 2px;
+  transform: scaleX(0);
+  animation: assembleRocketBody 0.3s ease-out 0.2s forwards;
+}
+
+/* Rocket flame effect for all buttons */
+.discord-button:hover::after,
+.submit-btn:hover::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 15px;
+  height: 25px;
+  background: linear-gradient(to top, #ff557a, #ffcc66, transparent);
+  border-radius: 50% 50% 20% 20%;
+  opacity: 0;
+  animation: rocketFlame 0.5s ease-in-out 0.3s forwards;
+  box-shadow: 0 0 10px #ff557a, 0 0 20px #ffcc66;
+}
+
+/* Launch effect for all buttons */
+.discord-button:active span::before,
+.submit-btn:active span::before {
+  animation: launchRocket 0.5s ease-in forwards;
+}
+
+/* Cosmic floating elements */
+.cosmic-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Cosmic pulsing effect */
+.cosmic-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Centered layout */
+.card-centered {
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--space-4);
+  position: relative;
+  z-index: 2;
+}
+
+/* Space-themed captcha container */
+.captcha-container {
+  background: rgba(15, 15, 30, 0.5);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin: var(--space-4) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Space-themed account switch */
+.account-switch a {
+  color: var(--muted);
   text-decoration: none;
-  display: inline-block;
+  font-weight: var(--font-medium);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  background: rgba(15, 15, 30, 0.5);
+  border: 1px solid var(--card-border);
+  width: 100%;
+  justify-content: center;
 }
 
-.discord-button:hover {
-  background: #4752CC;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
-}
-
-/* Status messages */
-.status-message {
-  padding: 15px;
-  border-radius: 8px;
-  margin: 15px 0;
-  font-weight: 500;
-}
-
-.status-success {
-  background: var(--success-color);
-  color: white;
-  border: 1px solid #c3e6cb;
-}
-
-.status-error {
-  background: var(--error-color);
-  color: white;
-  border: 1px solid #f5c6cb;
-}
-
-.status-warning {
-  background: var(--warning-color);
-  color: #856404;
-  border: 1px solid #ffeaa7;
-}
-
-.status-info {
-  background: var(--background-color);
-  color: var(--text-color);
-  border: 1px solid #ced4da;
-}
-
-/* Utility classes */
-.text-center { text-align: center; }
-.hidden { display: none; }
-.show { display: block; }
-
-/* Responsive design */
-@media (max-width: 768px) {
-  .container {
-    padding: 10px;
-  }
-
-  .verification-card {
-    padding: 1.5rem;
-    margin: 0.5rem 0;
-  }
+.account-switch a:hover {
+  color: var(--foreground);
+  border-color: var(--accent);
 }
