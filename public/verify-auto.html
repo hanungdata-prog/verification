@@ -381,7 +381,6 @@
 
     .message.success { background: rgba(74, 255, 140, 0.1); border-color: rgba(74, 255, 140, 0.3); color: var(--success); }
     .message.error   { background: rgba(255, 85, 122, 0.1); border-color: rgba(255, 85, 122, 0.3); color: var(--error); }
-    .message.warning { background: rgba(255, 193, 7, 0.1); border-color: rgba(255, 193, 7, 0.3); color: #ffc107; }
 
     /* ACTION LINKS */
     .action-links {
@@ -521,267 +520,77 @@
   </div>
 
   <!-- Scripts -->
+  <script src="security.js"></script>
+  <script src="verification-bridge.js"></script>
+  <script src="token-handler.js"></script>
+  <script src="verification-check.js"></script>
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
+  <script src="debug.js"></script>
 
   <script>
     const HCAPTCHA_SITE_KEY = "f9b8d3ba-9142-42c8-9ee6-57f23258f83a";
     let currentToken = '';
 
-    function getUrlParameter(name) {
-      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-      const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-      const results = regex.exec(location.search);
-      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    function getUrlParameter(n) {
+      const r = new RegExp('[\\?&]' + n + '=([^&#]*)');
+      const m = r.exec(location.search);
+      return m ? decodeURIComponent(m[1]) : '';
     }
 
-    function populateDiscordData() {
-      console.log('Populating Discord data...');
+    async function populateDiscordData() {
+      setTimeout(async () => {
+        const idEl = document.getElementById('userId'), nameEl = document.getElementById('userName');
 
-      // Get Discord data from URL parameters (this is the correct flow)
-      const discordId = getUrlParameter('discord_id');
-      const discordUsername = getUrlParameter('discord_username');
-      const token = getUrlParameter('token');
+        try {
+          // Try to get Discord info from token handler first
+          if (window.tokenHandler) {
+            const discordInfo = await window.tokenHandler.getDiscordInfoFromURL();
 
-      console.log('Raw Discord ID:', discordId);
-      console.log('Raw Discord Username:', discordUsername);
-      console.log('Raw token:', token);
+            if (discordInfo && discordInfo.discord_id && discordInfo.discord_username) {
+              // Use token-based Discord info
+              idEl.classList.remove('loading-skeleton');
+              nameEl.classList.remove('loading-skeleton');
+              idEl.textContent = discordInfo.discord_id;
+              nameEl.textContent = discordInfo.discord_username;
+              document.getElementById('discordId').value = discordInfo.discord_id;
+              document.getElementById('discordUsername').value = discordInfo.discord_username;
 
-      const idEl = document.getElementById('userId');
-      const nameEl = document.getElementById('userName');
-
-      // Simulate loading delay for better UX
-      setTimeout(() => {
-        let finalDiscordId = discordId;
-        let finalDiscordUsername = discordUsername;
-
-        // Try to decode token if present (fallback method)
-        if (token && token !== '' && (!discordId || !discordUsername)) {
-          console.log('No URL parameters found, attempting to decode JWT token...');
-          try {
-            const decodedData = decodeJWTToken(token);
-            if (decodedData) {
-              finalDiscordId = decodedData.discord_id;
-              finalDiscordUsername = decodedData.discord_username;
-              console.log('Successfully decoded JWT token:', decodedData);
+              console.log('✅ Discord data loaded from token:', discordInfo);
+              return;
             }
-          } catch (error) {
-            console.error('Failed to decode JWT token:', error);
           }
-        }
 
-        console.log('Final Discord data:', { finalDiscordId, finalDiscordUsername });
+          // Fallback to direct URL parameters (for backward compatibility)
+          const id = getUrlParameter('discord_id'), name = getUrlParameter('discord_username');
+          if (id && name) {
+            idEl.classList.remove('loading-skeleton');
+            nameEl.classList.remove('loading-skeleton');
+            idEl.textContent = id;
+            nameEl.textContent = name;
+            document.getElementById('discordId').value = id;
+            document.getElementById('discordUsername').value = name;
+            console.log('⚠️ Using direct URL parameters (consider upgrading to tokens)');
+          } else {
+            // No Discord info found
+            idEl.textContent = 'Not available';
+            nameEl.textContent = 'Not available';
+            idEl.style.color = nameEl.style.color = 'var(--error)';
+            showMessage('Discord authentication required. Please authenticate with Discord first.', 'error');
 
-        if (finalDiscordId && finalDiscordUsername && finalDiscordId !== '' && finalDiscordUsername !== '') {
-          // Remove loading skeleton and show actual data
-          idEl.classList.remove('loading-skeleton');
-          nameEl.classList.remove('loading-skeleton');
-
-          idEl.textContent = finalDiscordId;
-          nameEl.textContent = finalDiscordUsername;
-
-          // Update hidden fields
-          document.getElementById('discordId').value = finalDiscordId;
-          document.getElementById('discordUsername').value = finalDiscordUsername;
-
-          console.log('Discord data populated successfully');
-          console.log('ID set to:', finalDiscordId);
-          console.log('Username set to:', finalDiscordUsername);
-
-          // Add success animation
-          const userInfo = document.querySelector('.user-info');
-          userInfo.style.animation = 'pulse 0.5s ease-out';
-        } else {
-          // Remove loading skeleton and show error
-          idEl.classList.remove('loading-skeleton');
-          nameEl.classList.remove('loading-skeleton');
-
-          idEl.textContent = 'Not available';
-          nameEl.textContent = 'Not available';
-          idEl.style.color = 'var(--error)';
-          nameEl.style.color = 'var(--error)';
-
-          console.error('Discord data not found:', { finalDiscordId, finalDiscordUsername });
-          showMessage('Discord user information not found. Please try logging in again.', 'error');
+            // Show authentication prompt
+            if (window.tokenHandler) {
+              window.tokenHandler.showAuthenticationPrompt();
+            }
+          }
+        } catch (error) {
+          console.error('❌ Error populating Discord data:', error);
+          idEl.textContent = 'Error loading';
+          nameEl.textContent = 'Error loading';
+          idEl.style.color = nameEl.style.color = 'var(--error)';
+          showMessage('Failed to load Discord information. Please try again.', 'error');
         }
       }, 800);
-    }
-
-    // Function to decode JWT token
-    function decodeJWTToken(token) {
-      try {
-        console.log('Decoding token:', token);
-
-        if (!token || token === '') {
-          console.error('Empty token provided');
-          return null;
-        }
-
-        // Try multiple decoding strategies
-        let decodedData = null;
-
-        // Strategy 1: Try standard JWT format (data.signature)
-        if (token.includes('.')) {
-          console.log('Trying standard JWT format...');
-          const parts = token.split('.');
-          console.log('Token parts:', parts);
-
-          if (parts.length >= 1) {
-            decodedData = tryDecodeBase64(parts[0]);
-            if (decodedData) {
-              console.log('Successfully decoded using JWT format');
-            }
-          }
-        }
-
-        // Strategy 2: Try direct base64 decoding (entire token is data)
-        if (!decodedData) {
-          console.log('Trying direct base64 decoding...');
-          decodedData = tryDecodeBase64(token);
-          if (decodedData) {
-            console.log('Successfully decoded using direct base64');
-          }
-        }
-
-        // Strategy 3: Try to extract from nested structure
-        if (!decodedData) {
-          console.log('Trying nested structure extraction...');
-          decodedData = tryExtractNestedData(token);
-          if (decodedData) {
-            console.log('Successfully extracted from nested structure');
-          }
-        }
-
-        if (!decodedData) {
-          console.error('All decoding strategies failed');
-          showMessage('Invalid token format. Please log in again.', 'error');
-          return null;
-        }
-
-        console.log('Final decoded data:', decodedData);
-
-        // Validate required fields
-        if (!decodedData.discord_id || !decodedData.discord_username) {
-          console.error('Token missing required Discord fields');
-          console.error('Available fields:', Object.keys(decodedData));
-          showMessage('Invalid token format. Missing Discord user information.', 'error');
-          return null;
-        }
-
-        // Validate token expiration
-        if (decodedData.expires_at) {
-          const expirationTime = new Date(decodedData.expires_at).getTime();
-          const currentTime = new Date().getTime();
-
-          console.log('Token expiration check:');
-          console.log('- Current time:', new Date(currentTime).toISOString());
-          console.log('- Expiration time:', new Date(expirationTime).toISOString());
-          console.log('- Time until expiration (minutes):', Math.floor((expirationTime - currentTime) / (1000 * 60)));
-
-          if (currentTime > expirationTime) {
-            console.error('Token has expired');
-            showMessage('Session has expired. Please log in again.', 'error');
-
-            // Auto-redirect to login after showing error
-            setTimeout(() => {
-              window.location.href = '/discord/login';
-            }, 3000);
-
-            return null;
-          }
-
-          // Warning if token expires soon (less than 5 minutes)
-          if (expirationTime - currentTime < 5 * 60 * 1000) {
-            console.warn('Token expires soon');
-            showMessage('Your session will expire soon. Complete verification quickly.', 'warning');
-          }
-        }
-
-        return {
-          discord_id: decodedData.discord_id,
-          discord_username: decodedData.discord_username,
-          timestamp: decodedData.timestamp,
-          expires_at: decodedData.expires_at
-        };
-
-      } catch (error) {
-        console.error('Error decoding JWT token:', error);
-        showMessage('Invalid token format. Please log in again.', 'error');
-        return null;
-      }
-    }
-
-    // Helper function to try base64 decoding
-    function tryDecodeBase64(data) {
-      try {
-        console.log('Attempting to decode base64 data:', data.substring(0, 50) + '...');
-
-        // Add padding if necessary
-        const padding = '='.repeat((4 - data.length % 4) % 4);
-        const paddedData = data + padding;
-
-        console.log('Padded data length:', paddedData.length);
-
-        const decodedString = atob(paddedData);
-        console.log('Decoded string:', decodedString);
-
-        const parsedData = JSON.parse(decodedString);
-        console.log('Parsed data:', parsedData);
-
-        // Check if this is a nested structure with "data" field
-        if (parsedData.data && typeof parsedData.data === 'object') {
-          console.log('Found nested data structure in base64 decode, extracting data field');
-          console.log('Extracted data:', parsedData.data);
-          return parsedData.data;
-        }
-
-        // Check if the parsed data itself has the Discord fields
-        if (parsedData.discord_id && parsedData.discord_username) {
-          console.log('Found Discord fields directly in parsed data');
-          return parsedData;
-        }
-
-        console.log('No Discord fields found in base64 decoded data');
-        return parsedData;
-      } catch (error) {
-        console.error('Base64 decoding failed:', error);
-        return null;
-      }
-    }
-
-    // Helper function to try extracting nested data
-    function tryExtractNestedData(token) {
-      try {
-        console.log('Attempting to extract nested data from token...');
-
-        // Try to decode the entire token first
-        const padding = '='.repeat((4 - token.length % 4) % 4);
-        const paddedToken = token + padding;
-
-        console.log('Token length:', token.length);
-        console.log('Padding added:', padding.length);
-        console.log('Padded token length:', paddedToken.length);
-
-        const decodedString = atob(paddedToken);
-        console.log('Decoded full token:', decodedString);
-
-        const parsedData = JSON.parse(decodedString);
-        console.log('Parsed full token data:', parsedData);
-
-        // Check if it has a nested structure with "data" field
-        if (parsedData.data && typeof parsedData.data === 'object') {
-          console.log('Found nested data structure in "data" field');
-          console.log('Nested data:', parsedData.data);
-          return parsedData.data;
-        }
-
-        // Return the parsed data as-is if no nested structure found
-        console.log('No nested structure found, returning parsed data directly');
-        return parsedData;
-      } catch (error) {
-        console.error('Nested data extraction failed:', error);
-        return null;
-      }
     }
 
     function loadHcaptcha() {
@@ -800,202 +609,224 @@
       showMessage('Verification completed', 'success');
     }
 
-    document.getElementById('verificationForm').addEventListener('submit', async function(e) {
+    document.getElementById('verificationForm').addEventListener('submit', async e => {
       e.preventDefault();
+      if (!currentToken) return showMessage('Complete security check', 'error');
 
-      // Get form values from hidden fields
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true; btn.classList.add('loading');
+      document.getElementById('loading').classList.add('active');
+
+      // Get Discord data
       const discordId = document.getElementById('discordId').value;
       const discordUsername = document.getElementById('discordUsername').value;
 
-      console.log('Form submitted with:', { discordId, discordUsername, currentToken });
+      // Use enhanced moon UFO loading with database verification
+      if (window.moonUFOLoading && typeof window.moonUFOLoading.verifyDatabaseAndProceed === 'function') {
+        const discordData = {
+          discordId: discordId,
+          discordUsername: discordUsername
+        };
 
-      // Check for CAPTCHA token
-      if (!currentToken) {
-        showMessage('Please complete the security verification', 'error');
-        return;
+        window.moonUFOLoading.verifyDatabaseAndProceed(
+          discordData,
+          // Success callback
+          async (result) => {
+            console.log('✅ Database verification successful:', result);
+            await sendVerification();
+          },
+          // Error callback
+          (error) => {
+            console.log('❌ Database verification failed:', error);
+
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            document.getElementById('loading').classList.remove('active');
+
+            if (error.type === 'already_verified') {
+              showMessage(`User ${discordUsername} is already verified ${error.data?.time_ago || 'previously'}`, 'error');
+            } else if (error.type === 'database_unavailable') {
+              showMessage('Database temporarily unavailable - please try again later', 'error');
+            } else if (error.type === 'network_error_blocked') {
+              showMessage('Network error - please check your connection and try again', 'error');
+            } else {
+              showMessage(error.message || 'Verification failed', 'error');
+            }
+          }
+        );
+      } else {
+        // Fallback to traditional verification with bridge check
+        console.warn('Enhanced database verification not available, using fallback');
+
+        if (window.verificationBridge) {
+          console.log('🔍 Checking existing verification before proceeding...');
+          const canProceed = await window.verificationBridge.checkVerificationWithUI(discordId);
+
+          if (!canProceed) {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            document.getElementById('loading').classList.remove('active');
+            return; // Stop verification process
+          }
+        }
+
+        await sendVerification();
       }
+    });
 
-      if (!discordId || !discordUsername) {
-        showMessage('Discord information is missing. Please try logging in again.', 'error');
-        return;
-      }
-
-      // Show loading states
-      const submitBtn = document.getElementById('submitBtn');
-      const loading = document.getElementById('loading');
-
-      submitBtn.disabled = true;
-      submitBtn.classList.add('loading');
-      loading.classList.add('active');
-      document.getElementById('message').style.display = 'none';
-
-      // Add haptic feedback for mobile (if supported)
-      if ('vibrate' in navigator) {
-        navigator.vibrate(50);
+    async function sendVerification() {
+      // Debug logging
+      if (window.authDebugger) {
+        window.authDebugger.logVerificationStart();
       }
 
       try {
-        // Prepare request data
-        const requestData = {
+        // Wait for security manager to be ready
+        if (window.securityManager && !window.securityManager.isInitialized) {
+          await window.securityManager.initialize();
+          if (window.authDebugger) {
+            window.authDebugger.logStep('Security', 'Security manager initialized', 'success');
+          }
+        }
+
+        // Get Discord ID from form
+        const discordId = document.getElementById('discordId').value;
+        const discordUsername = document.getElementById('discordUsername').value;
+
+        // Skip duplicate check here - already handled by moon UFO loading
+        console.log('✅ Database verification already completed - proceeding with final verification');
+
+        // Prepare base data
+        const baseData = {
           discord_id: discordId,
           discord_username: discordUsername,
           captcha_token: currentToken,
           metadata: {
             timestamp: new Date().toISOString(),
-            source: 'auto_detected_discord_oauth',
+            source: 'discord_oauth',
             captcha_provider: 'hcaptcha',
-            user_agent: navigator.userAgent
+            user_agent: navigator.userAgent,
+            domain: window.location.hostname,
+            referrer: document.referrer,
+            duplicate_check: 'handled_by_moon_ufo_loading',
           }
         };
 
-        console.log('Sending verification request:', requestData);
-
-        // ANIMASI UFO SAAT KLIK
-        if (window.moonUFOLoading && typeof window.moonUFOLoading.show === 'function') {
-          console.log('Using UFO loading animation');
-          window.moonUFOLoading.show(async () => {
-            await sendVerificationRequest(requestData);
-          });
-        } else {
-          console.log('UFO loading not available, using standard loading');
-          await sendVerificationRequest(requestData);
+        // Add security metadata if security manager is available
+        let data = baseData;
+        if (window.securityManager) {
+          data = await window.securityManager.verifyRequest(baseData);
         }
-      } catch (error) {
-        console.error('Error in form submission:', error);
-        handleSubmissionError(error);
-      }
-    });
 
-    async function sendVerificationRequest(requestData) {
-      let response;
-
-      try {
-        // Try the main endpoint first
-        console.log('Trying main endpoint: /verify');
-        response = await fetch('/verify', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestData)
-        });
-
-        console.log('Main endpoint response status:', response.status);
-
-        // If the main endpoint fails, try the direct function endpoint
-        if (!response.ok) {
-          console.log('Main endpoint failed, trying direct function endpoint...');
-          response = await fetch('/.netlify/functions/verify', {
+        // Send secure request
+        let res;
+        if (window.securityManager) {
+          res = await window.securityManager.secureFetch('/verify', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestData)
+            body: JSON.stringify(data)
           });
-
-          console.log('Direct function response status:', response.status);
-        }
-
-        const result = await response.json();
-        console.log('Verification response:', result);
-
-        if (response.ok) {
-          handleSubmissionSuccess(result);
         } else {
-          handleSubmissionError(new Error(result.error || result.message || 'Verification failed'));
+          // Fallback to regular fetch
+          res = await fetch('/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
         }
-      } catch (error) {
-        console.error('Network error:', error);
-        handleSubmissionError(error);
+
+        // Try fallback if first request fails
+        if (!res.ok) {
+          res = await fetch('/.netlify/functions/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+        }
+
+        const result = await res.json();
+
+        if (res.ok) {
+          // Hide UFO loading animation
+          if (window.moonUFOLoading && typeof window.moonUFOLoading.hideLoading === 'function') {
+            window.moonUFOLoading.hideLoading();
+          }
+
+          // Debug logging
+          if (window.authDebugger) {
+            window.authDebugger.logVerificationSuccess(result);
+          }
+
+          document.getElementById('successCheckmark').classList.add('show');
+          showMessage(result.message || 'Success! Redirecting...', 'success');
+          if ('vibrate' in navigator) navigator.vibrate([100,50,100]);
+
+          setTimeout(() => {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease-out';
+            setTimeout(() => window.location.href = result.redirect_url || 'https://discord.gg/UNpRpJMt', 500);
+          }, 2000);
+        } else {
+          // Hide UFO loading animation on error
+          if (window.moonUFOLoading && typeof window.moonUFOLoading.showError === 'function') {
+            window.moonUFOLoading.showError(result.error || result.message || 'Verification failed');
+          } else if (window.moonUFOLoading && typeof window.moonUFOLoading.hideLoading === 'function') {
+            window.moonUFOLoading.hideLoading();
+          }
+
+          // Debug logging
+          if (window.authDebugger) {
+            window.authDebugger.logVerificationError(new Error(result.error || result.message || 'Verification failed'));
+          }
+
+          showMessage((result.error || result.message || 'Failed') + (result.details ? ` (${result.details})` : ''), 'error');
+          if ('vibrate' in navigator) navigator.vibrate(200);
+        }
+      } catch (err) {
+        console.error('Verification error:', err);
+
+        // Hide UFO loading animation on exception
+        if (window.moonUFOLoading && typeof window.moonUFOLoading.showError === 'function') {
+          window.moonUFOLoading.showError(`Network error: ${err.message}`);
+        } else if (window.moonUFOLoading && typeof window.moonUFOLoading.hideLoading === 'function') {
+          window.moonUFOLoading.hideLoading();
+        }
+
+        // Debug logging
+        if (window.authDebugger) {
+          window.authDebugger.logVerificationError(err);
+        }
+
+        showMessage(`Error: ${err.message}`, 'error');
+        if ('vibrate' in navigator) navigator.vibrate(200);
+      } finally {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        document.getElementById('loading').classList.remove('active');
       }
     }
 
-    function handleSubmissionSuccess(result) {
-      console.log('Verification successful:', result);
-
-      // Hide loading states
-      const submitBtn = document.getElementById('submitBtn');
-      const loading = document.getElementById('loading');
-
-      submitBtn.classList.remove('loading');
-      loading.classList.remove('active');
-
-      // Show success checkmark
-      const checkmark = document.getElementById('successCheckmark');
-      checkmark.classList.add('show');
-
-      showMessage(result.message || 'Verification successful! Redirecting to Discord...', 'success');
-
-      // Add success haptic feedback
-      if ('vibrate' in navigator) {
-        navigator.vibrate([100, 50, 100]);
-      }
-
-      // Redirect to Discord after success
-      setTimeout(() => {
-        // Add fade out effect
-        document.body.style.opacity = '0';
-        document.body.style.transition = 'opacity 0.5s ease-out';
-
-        setTimeout(() => {
-          window.location.href = result.redirect_url || 'https://discord.gg/9ZmvQFsP';
-        }, 500);
-      }, 2000);
+    function showMessage(t, y) {
+      const m = document.getElementById('message'), txt = document.getElementById('messageText'), i = m.querySelector('i');
+      const icons = { success: 'fas fa-check-circle', error: 'fas fa-exclamation-circle', info: 'fas fa-info-circle' };
+      i.className = icons[y] || icons.info; txt.textContent = t; m.className = `message ${y}`; m.style.display = 'flex';
+      if (y !== 'error') setTimeout(() => m.style.display = 'none', 5000);
     }
 
-    function handleSubmissionError(error) {
-      console.error('Verification error:', error);
-
-      const errorMessage = error.message || 'Verification failed';
-      showMessage(errorMessage, 'error');
-
-      // Add error haptic feedback
-      if ('vibrate' in navigator) {
-        navigator.vibrate(200);
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Initialize token handler first
+      if (window.tokenHandler) {
+        try {
+          await window.tokenHandler.initialize();
+          console.log('✅ Token handler initialized');
+        } catch (error) {
+          console.error('❌ Token handler initialization failed:', error);
+        }
       }
 
-      // Re-enable submit button and hide loading states
-      const submitBtn = document.getElementById('submitBtn');
-      const loading = document.getElementById('loading');
-
-      submitBtn.disabled = false;
-      submitBtn.classList.remove('loading');
-      loading.classList.remove('active');
-    }
-
-    function showMessage(text, type = 'info') {
-      const messageEl = document.getElementById('message');
-      const messageTextEl = document.getElementById('messageText');
-      const iconEl = messageEl.querySelector('i');
-
-      // Set icon based on type
-      const icons = {
-        'success': 'fas fa-check-circle',
-        'error': 'fas fa-exclamation-circle',
-        'info': 'fas fa-info-circle',
-        'warning': 'fas fa-exclamation-triangle'
-      };
-
-      iconEl.className = icons[type] || icons['info'];
-      messageTextEl.textContent = text;
-
-      messageEl.className = `message ${type}`;
-      messageEl.style.display = 'flex';
-
-      // Auto-hide success, info, and warning messages after 5 seconds
-      if (type !== 'error') {
-        setTimeout(() => {
-          messageEl.style.display = 'none';
-        }, 5000);
-      }
-
-      // Add accessibility announcement
-      messageEl.setAttribute('role', 'alert');
-      messageEl.setAttribute('aria-live', 'polite');
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      populateDiscordData();
+      // Then populate Discord data
+      await populateDiscordData();
       if (HCAPTCHA_SITE_KEY) loadHcaptcha();
     });
 
