@@ -1003,11 +1003,20 @@
         console.log('Sending verification request:', requestData);
 
         // ANIMASI UFO SAAT KLIK
-        if (window.moonUFOLoading && typeof window.moonUFOLoading.show === 'function') {
+        if (window.moonUFOLoading && typeof window.moonUFOLoading.showOnVerifyClick === 'function') {
           console.log('Using UFO loading animation');
-          window.moonUFOLoading.show(async () => {
+          window.moonUFOLoading.showOnVerifyClick(async () => {
             await sendVerificationRequest(requestData);
           });
+        } else if (window.moonUFOLoading && typeof window.moonUFOLoading.show === 'function') {
+          console.log('Using basic UFO loading animation');
+          window.moonUFOLoading.show();
+          try {
+            await sendVerificationRequest(requestData);
+          } finally {
+            // Hide loading after completion
+            window.moonUFOLoading.hide();
+          }
         } else {
           console.log('UFO loading not available, using standard loading');
           await sendVerificationRequest(requestData);
@@ -1065,6 +1074,15 @@
     function handleSubmissionSuccess(result) {
       console.log('Verification successful:', result);
 
+      // Hide UFO loading animation if it's active
+      if (window.moonUFOLoading && typeof window.moonUFOLoading.hide === 'function') {
+        try {
+          window.moonUFOLoading.hide();
+        } catch (e) {
+          console.warn('Failed to hide UFO loading animation:', e);
+        }
+      }
+
       // Hide loading states
       const submitBtn = document.getElementById('submitBtn');
       const loading = document.getElementById('loading');
@@ -1097,6 +1115,15 @@
 
     function handleSubmissionError(error) {
       console.error('Verification error:', error);
+
+      // Hide UFO loading animation if it's active
+      if (window.moonUFOLoading && typeof window.moonUFOLoading.hide === 'function') {
+        try {
+          window.moonUFOLoading.hide();
+        } catch (e) {
+          console.warn('Failed to hide UFO loading animation:', e);
+        }
+      }
 
       const errorMessage = error.message || 'Verification failed';
       showMessage(errorMessage, 'error');
