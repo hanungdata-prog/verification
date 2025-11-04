@@ -43,7 +43,7 @@ def create_db_and_tables():
     try:
         # Try multiple import paths for serverless compatibility
         try:
-            from supabase_db import get_supabase_client
+            from app.supabase_db import get_supabase_client
         except ImportError:
             try:
                 from .supabase_db import get_supabase_client
@@ -51,7 +51,7 @@ def create_db_and_tables():
                 import sys
                 import os
                 sys.path.append(os.path.dirname(__file__))
-                from supabase_db import get_supabase_client
+                from app.supabase_db import get_supabase_client
 
         supabase_client = get_supabase_client()
         if supabase_client:
@@ -97,12 +97,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Import internal modules
 try:
-    from schemas import VerificationResponse
-    from auth import encrypt_ip, decrypt_ip
-    from captcha import validate_captcha
-    from webhooks import send_webhook
-    from utils import validate_discord_id, get_user_agent, get_client_ip
-    from supabase_db import get_supabase_client
+    from app.schemas import VerificationResponse
+    from app.auth import encrypt_ip, decrypt_ip
+    from app.captcha import validate_captcha
+    from app.webhooks import send_webhook
+    from app.utils import validate_discord_id, get_user_agent, get_client_ip
+    from app.supabase_db import get_supabase_client
     logger.info("Successfully imported all modules")
 except ImportError as e:
     logger.error(f"Failed to import modules: {e}")
