@@ -231,7 +231,7 @@ async def verify_user(
         success=True,
         message="Verification successful!",
         verification_id=verification_data["id"],
-        redirect_url="https://discord.gg/9ZmvQFsP"  # Redirect to Discord after verification
+        redirect_url="https://discord.gg/6sBPEhN6YU"  # Redirect to Discord after verification
     )
 
 @app.get("/", response_class=HTMLResponse)

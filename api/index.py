@@ -734,12 +734,30 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
 
     logger.info(f"✅ FINAL: Successfully verified and saved user: {verify_request.discord_id}")
 
+    # Send webhook to Discord bot for role assignment
+    try:
+        logger.info(f"📡 Sending webhook to Discord bot for {verify_request.discord_username}")
+        webhook_success = await send_webhook(
+            success=True,
+            discord_id=verify_request.discord_id,
+            discord_username=verify_request.discord_username,
+            ip_address=ip_address,  # Plain IP address as required
+            verification_id=verification_data["verification_id"]
+        )
+        if webhook_success:
+            logger.info(f"✅ Webhook sent successfully to Discord bot")
+        else:
+            logger.error(f"❌ Webhook failed to send to Discord bot")
+    except Exception as e:
+        logger.error(f"❌ Webhook delivery failed: {str(e)}")
+        # Don't fail the verification if webhook fails, but log it
+
     # Return success
     return VerificationResponse(
         success=True,
         message="Verification successful! Data saved to database.",
         verification_id="saved_to_supabase",
-        redirect_url="https://discord.gg/9ZmvQFsP"
+        redirect_url="https://discord.gg/6sBPEhN6YU"
     )
 
 @app.get("/")
