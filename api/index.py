@@ -22,6 +22,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 import httpx
 from pydantic import BaseModel
+
+# Import webhook proxy
+try:
+    from webhook_proxy import router as webhook_proxy_router
+    logger.info("Webhook proxy module loaded successfully")
+except ImportError as e:
+    logger.warning(f"Failed to import webhook proxy: {e}")
+    webhook_proxy_router = None
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
@@ -94,6 +102,13 @@ app.add_middleware(
 # Add rate limiting middleware
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Add webhook proxy router
+if webhook_proxy_router:
+    app.include_router(webhook_proxy_router)
+    logger.info("Webhook proxy routes registered")
+else:
+    logger.warning("Webhook proxy router not available")
 
 # Import internal modules
 try:

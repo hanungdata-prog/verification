@@ -21,18 +21,22 @@ async def send_webhook(
 ) -> bool:
     """
     Send a webhook to Discord bot with verification result
-    This sends data to the bot's webhook listener instead of Discord channel webhook
+    This uses AuthGateway website as proxy to reach local Discord bot
     """
-    # Get webhook URL from environment
-    webhook_url = os.getenv("DISCORD_BOT_WEBHOOK_URL")
-    if not webhook_url:
-        logger.warning("No DISCORD_BOT_WEBHOOK_URL set, skipping webhook to bot")
-        # Fallback to original Discord webhook if available
-        webhook_url = DISCORD_WEBHOOK_URL
+    # Get AuthGateway base URL
+    authgateway_url = os.getenv("AUTH_GATEWAY_URL", "https://apinode1a2b3c4d5e6f7g8h9i0j1k2l3m4n.vercel.app")
 
-    if not webhook_url:
-        logger.warning("No webhook URL configured, skipping webhook")
-        return True  # Don't fail if webhook URL is not configured
+    # Get local Discord bot URL
+    local_bot_url = os.getenv("DISCORD_BOT_LOCAL_URL", "http://localhost:3000/webhook/verification")
+
+    logger.info(f"Attempting to send webhook via AuthGateway proxy for user {discord_username} ({discord_id})")
+    logger.info(f"AuthGateway URL: {authgateway_url}")
+    logger.info(f"Target Discord Bot: {local_bot_url}")
+
+    # Use AuthGateway as proxy to reach local Discord bot
+    webhook_url = f"{authgateway_url}/webhook-proxy/direct-to-discord?discord_bot_url={local_bot_url}"
+
+    logger.info(f"Proxy webhook URL: {webhook_url}")
 
     # Prepare verification data for bot
     verification_data = {
