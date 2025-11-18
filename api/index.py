@@ -729,7 +729,7 @@ async def verify_user(request: Request, verify_request: VerifyRequest):
             success=True,
             message="Verification successful! (Note: Database save failed)",
             verification_id="local_only",
-            redirect_url="https://discord.gg/9ZmvQFsP"
+            redirect_url="https://discord.gg/6sBPEhN6YU"
         )
 
     logger.info(f"✅ FINAL: Successfully verified and saved user: {verify_request.discord_id}")
