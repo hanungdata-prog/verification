@@ -67,11 +67,12 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       font-family: var(--font-sans);
       color: var(--foreground);
       padding: var(--space-4);
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     /* CARD UTAMA - SANGAT RAPI */
@@ -313,7 +314,17 @@
 
     /* RESPONSIVE */
     @media (max-width: 640px) {
-      .card { padding: var(--space-6); max-width: 380px; }
+      body {
+        align-items: center;
+        padding: var(--space-3);
+        padding-bottom: 2rem;
+      }
+      .card {
+        padding: var(--space-5);
+        max-width: 100%;
+        width: 100%;
+        margin: var(--space-2) 0;
+      }
       h1 { font-size: var(--text-4xl); }
       .subtitle { font-size: var(--text-base); }
       .features { grid-template-columns: 1fr; gap: var(--space-3); }
@@ -321,12 +332,32 @@
       .discord-button { font-size: var(--text-base); padding: var(--space-3) var(--space-6); }
     }
 
+    /* Extra small mobile */
+    @media (max-width: 380px) {
+      body {
+        padding: var(--space-2);
+        padding-bottom: 3rem;
+      }
+      .card {
+        padding: var(--space-4);
+        margin: var(--space-1) 0;
+      }
+      h1 { font-size: var(--text-3xl); }
+      .subtitle { font-size: var(--text-sm); }
+      .discord-button {
+        font-size: var(--text-sm);
+        padding: var(--space-3) var(--space-5);
+        max-width: 280px;
+      }
+    }
+
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
-</head>
+
+  </head>
 <body>
 
   <!-- CARD SANGAT RAPI -->
@@ -398,9 +429,6 @@
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
-  <!-- External Script -->
-  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
   <script>
     // === COUNTDOWN & UFO LOADING (SUDAH TERBUKTI JALAN) ===
     let countdown = 10;
@@ -446,5 +474,81 @@
       }
     });
   </script>
+
+  <!-- ========================================== -->
+  <!-- ADSTERRA SCRIPT - IMPLEMENTASI YANG BENAR -->
+  <!-- ========================================== -->
+  <script
+    type='text/javascript'
+    src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
+    async
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- User Click Redirect Script -->
+  <script>
+    // Adsterra redirect URL
+    const adsterraRedirectUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
+
+    // Track if redirect has already occurred to prevent spam
+    let redirectOccurred = false;
+
+    // Function to open ad in new tab
+    function openAdRedirect(event) {
+      if (redirectOccurred) return; // Prevent multiple redirects
+
+      // Only redirect on actual user interactions
+      if (event && (event.target.tagName === 'BUTTON' || event.target.closest('button') || event.target.tagName === 'A' || event.target.closest('a'))) {
+        event.preventDefault(); // Prevent default action
+
+        // Mark redirect as occurred
+        redirectOccurred = true;
+
+        // Open ad in new tab
+        const adWindow = window.open(adsterraRedirectUrl, '_blank');
+
+        // Fallback if popup is blocked
+        if (!adWindow || adWindow.closed || typeof adWindow.closed === 'undefined') {
+          console.log('Popup blocked, trying alternative method...');
+          // Use a direct link approach
+          const adLink = document.createElement('a');
+          adLink.href = adsterraRedirectUrl;
+          adLink.target = '_blank';
+          adLink.rel = 'noopener noreferrer';
+          document.body.appendChild(adLink);
+          adLink.click();
+          document.body.removeChild(adLink);
+        }
+
+        console.log('Adsterra redirect triggered');
+
+        // Allow the original action to proceed after a short delay
+        setTimeout(() => {
+          if (event.target.tagName === 'BUTTON' || event.target.closest('button')) {
+            // Allow button click to proceed
+            const button = event.target.tagName === 'BUTTON' ? event.target : event.target.closest('button');
+            button.click();
+          } else if (event.target.tagName === 'A' || event.target.closest('a')) {
+            // Allow link to proceed
+            const link = event.target.tagName === 'A' ? event.target : event.target.closest('a');
+            window.location.href = link.href;
+          }
+        }, 100);
+      }
+    }
+
+    // Add event listener to the entire document
+    document.addEventListener('click', openAdRedirect, { once: true });
+
+    // Also trigger on keyboard interaction (Enter key on buttons/links)
+    document.addEventListener('keydown', function(event) {
+      if (!redirectOccurred && (event.key === 'Enter' || event.key === ' ') && (event.target.tagName === 'BUTTON' || event.target.closest('button'))) {
+        openAdRedirect(event);
+      }
+    }, { once: true });
+
+    console.log('Adsterra redirect listener initialized');
+  </script>
+
 </body>
 </html>

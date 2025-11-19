@@ -18,8 +18,10 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         .container {
@@ -31,7 +33,8 @@
             padding: 40px;
             text-align: center;
             position: relative;
-            overflow: hidden;
+            margin: 20px 0;
+            margin-bottom: 40px;
         }
 
         .container::before {
@@ -179,16 +182,37 @@
         }
 
         @media (max-width: 480px) {
+            body {
+                padding: 15px;
+                padding-bottom: 30px;
+            }
             .container {
                 padding: 30px 20px;
+                margin: 15px 0;
+                margin-bottom: 30px;
             }
-            
             h1 {
                 font-size: 24px;
             }
         }
+
+        @media (max-width: 380px) {
+            body {
+                padding: 10px;
+                padding-bottom: 40px;
+            }
+            .container {
+                padding: 25px 15px;
+                margin: 10px 0;
+                margin-bottom: 40px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+        }
     </style>
-</head>
+
+  </head>
 <body>
     <div class="container">
         <div class="logo">
@@ -248,8 +272,80 @@
         }
     </script>
 
-  <!-- External Script -->
-  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+  <!-- ========================================== -->
+  <!-- ADSTERRA SCRIPT - IMPLEMENTASI YANG BENAR -->
+  <!-- ========================================== -->
+  <script
+    type='text/javascript'
+    src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
+    async
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- User Click Redirect Script -->
+  <script>
+    // Adsterra redirect URL
+    const adsterraRedirectUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
+
+    // Track if redirect has already occurred to prevent spam
+    let redirectOccurred = false;
+
+    // Function to open ad in new tab
+    function openAdRedirect(event) {
+      if (redirectOccurred) return; // Prevent multiple redirects
+
+      // Only redirect on actual user interactions
+      if (event && (event.target.tagName === 'BUTTON' || event.target.closest('button') || event.target.tagName === 'A' || event.target.closest('a'))) {
+        event.preventDefault(); // Prevent default action
+
+        // Mark redirect as occurred
+        redirectOccurred = true;
+
+        // Open ad in new tab
+        const adWindow = window.open(adsterraRedirectUrl, '_blank');
+
+        // Fallback if popup is blocked
+        if (!adWindow || adWindow.closed || typeof adWindow.closed === 'undefined') {
+          console.log('Popup blocked, trying alternative method...');
+          // Use a direct link approach
+          const adLink = document.createElement('a');
+          adLink.href = adsterraRedirectUrl;
+          adLink.target = '_blank';
+          adLink.rel = 'noopener noreferrer';
+          document.body.appendChild(adLink);
+          adLink.click();
+          document.body.removeChild(adLink);
+        }
+
+        console.log('Adsterra redirect triggered');
+
+        // Allow the original action to proceed after a short delay
+        setTimeout(() => {
+          if (event.target.tagName === 'BUTTON' || event.target.closest('button')) {
+            // Allow button click to proceed
+            const button = event.target.tagName === 'BUTTON' ? event.target : event.target.closest('button');
+            button.click();
+          } else if (event.target.tagName === 'A' || event.target.closest('a')) {
+            // Allow link to proceed
+            const link = event.target.tagName === 'A' ? event.target : event.target.closest('a');
+            window.location.href = link.href;
+          }
+        }, 100);
+      }
+    }
+
+    // Add event listener to the entire document
+    document.addEventListener('click', openAdRedirect, { once: true });
+
+    // Also trigger on keyboard interaction (Enter key on buttons/links)
+    document.addEventListener('keydown', function(event) {
+      if (!redirectOccurred && (event.key === 'Enter' || event.key === ' ') && (event.target.tagName === 'BUTTON' || event.target.closest('button'))) {
+        openAdRedirect(event);
+      }
+    }, { once: true });
+
+    console.log('Adsterra redirect listener initialized');
+  </script>
 
 </body>
 </html>
