@@ -2,11 +2,6 @@ const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
   try {
-    console.log('=== VERIFICATION FUNCTION CALLED ===');
-    console.log('HTTP Method:', event.httpMethod);
-    console.log('Path:', event.path);
-    console.log('Headers:', JSON.stringify(event.headers, null, 2));
-    console.log('Body:', event.body);
 
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
@@ -24,13 +19,9 @@ exports.handler = async (event, context) => {
 
     // Parse the request body
     const requestBody = JSON.parse(event.body);
-    console.log('Request body:', requestBody);
 
     const { discord_id, discord_username, captcha_token, metadata } = requestBody;
 
-    console.log('Captcha token received:', captcha_token ? 'YES' : 'NO');
-    console.log('Captcha token length:', captcha_token ? captcha_token.length : 0);
-    console.log('Captcha token starts with:', captcha_token ? captcha_token.substring(0, 20) + '...' : 'NULL');
 
     // Validate required fields
     if (!discord_id || !discord_username || !captcha_token) {
@@ -47,9 +38,6 @@ exports.handler = async (event, context) => {
     }
 
     // Validate CAPTCHA token (using hCaptcha)
-    console.log('Validating hCaptcha token...');
-    console.log('CAPTCHA_SECRET exists:', !!process.env.CAPTCHA_SECRET);
-    console.log('CAPTCHA_SECRET value:', process.env.CAPTCHA_SECRET);
 
     // Skip hCaptcha validation if secret key is not set or is a placeholder value
     const isPlaceholderSecret = !process.env.CAPTCHA_SECRET || 
@@ -57,11 +45,6 @@ exports.handler = async (event, context) => {
                                process.env.CAPTCHA_SECRET.includes('ES_67a2630d8c19468297fa9832fb8966c6') ||
                                process.env.CAPTCHA_SECRET.trim() === '';
                                
-    console.log('CAPTCHA_SECRET analysis:');
-    console.log('- CAPTCHA_SECRET exists:', !!process.env.CAPTCHA_SECRET);
-    console.log('- CAPTCHA_SECRET length:', process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.length : 0);
-    console.log('- Is placeholder:', isPlaceholderSecret);
-    console.log('- CAPTCHA_SECRET preview:', process.env.CAPTCHA_SECRET ? process.env.CAPTCHA_SECRET.substring(0, 10) + '...' : 'N/A');
     
     // Check if we have a standard hCaptcha token (starts with 0x and reasonable length)
     // Or a custom token (starts with P1_ or similar)
@@ -72,18 +55,10 @@ exports.handler = async (event, context) => {
                                    
     const isCustomToken = captcha_token && captcha_token.startsWith('P1_');
 
-    console.log('Token analysis:');
-    console.log('- Standard hCaptcha format:', isStandardHcaptchaToken);
-    console.log('- Custom token format:', isCustomToken);
-    console.log('- Token length:', captcha_token ? captcha_token.length : 0);
-    console.log('- Token starts with:', captcha_token ? captcha_token.substring(0, 5) : 'N/A');
 
     if (isPlaceholderSecret) {
-      console.log('WARNING: CAPTCHA_SECRET not properly configured, skipping CAPTCHA validation');
-      console.log('Real CAPTCHA_SECRET should be set in environment variables');
     } else if (isCustomToken) {
       // If this is a custom token (P1_ format), we need to extract the actual hCaptcha token
-      console.log('Processing custom token format - attempting to extract hCaptcha token');
       
       // The format appears to be P1_.[JWT_HEADER].[JWT_PAYLOAD].[JWT_SIGNATURE]
       // Let's try to decode the JWT payload to see if it contains the original hCaptcha token
@@ -104,7 +79,6 @@ exports.handler = async (event, context) => {
             const payloadDecoded = Buffer.from(payloadPadded, 'base64').toString('utf8');
             const payloadObj = JSON.parse(payloadDecoded);
             
-            console.log('Decoded JWT payload:', payloadObj);
             
             // Check if the payload contains the original hCaptcha token
             // Common field names where it might be stored
@@ -113,11 +87,9 @@ exports.handler = async (event, context) => {
                                            payloadObj.hcaptcha_token || 
                                            payloadObj.token;
               
-              console.log('Found potential hCaptcha token inside JWT:', originalHcaptchaToken.substring(0, 20) + '...');
               
               // Validate the original hCaptcha token instead
               let captchaValid = await validateHcaptcha(originalHcaptchaToken, event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp);
-              console.log('Original hCaptcha token validation result:', captchaValid);
               
               if (!captchaValid) {
                 return {
@@ -144,15 +116,12 @@ exports.handler = async (event, context) => {
                   })
                 };
               } else {
-                console.log('Original hCaptcha token validation successful');
               }
               useCustom = false; // We've already validated with the original token
             } else {
-              console.log('No hCaptcha token found inside JWT payload');
             }
           }
         } catch (decodeError) {
-          console.error('Error decoding custom token:', decodeError);
           // If decoding fails, proceed with the original custom token
         }
       }
@@ -163,9 +132,7 @@ exports.handler = async (event, context) => {
         let captchaValid = false;
         try {
           captchaValid = await validateHcaptcha(extractedToken, event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp);
-          console.log('Custom token validation result:', captchaValid);
         } catch (captchaError) {
-          console.error('Custom token validation error:', captchaError);
         }
         
         if (!captchaValid) {
@@ -191,16 +158,13 @@ exports.handler = async (event, context) => {
             })
           };
         } else {
-          console.log('Custom token validation successful');
         }
       }
     } else {
       // Process as standard hCaptcha token
       let captchaValid;
       try {
-        console.log('Starting standard CAPTCHA validation with token length:', captcha_token ? captcha_token.length : 0);
         captchaValid = await validateHcaptcha(captcha_token, event.headers['x-forwarded-for'] || event.requestContext.identity.sourceIp);
-        console.log('Standard CAPTCHA validation result:', captchaValid);
 
         if (!captchaValid) {
           return {
@@ -225,10 +189,8 @@ exports.handler = async (event, context) => {
             })
           };
         } else {
-          console.log('Standard CAPTCHA validation successful');
         }
       } catch (captchaError) {
-        console.error('Standard CAPTCHA validation error:', captchaError);
         return {
           statusCode: 400,
           headers: {
@@ -255,15 +217,10 @@ exports.handler = async (event, context) => {
       verified_at: new Date().toISOString()
     };
 
-    console.log('Storing verification data in Supabase...');
-    console.log('SUPABASE_URL exists:', !!process.env.SUPABASE_URL);
-    console.log('SUPABASE_KEY exists:', !!process.env.SUPABASE_KEY);
 
     const supabaseResult = await storeInSupabase(verificationData);
-    console.log('Supabase result:', supabaseResult);
 
     if (supabaseResult.error) {
-      console.error('Supabase error:', supabaseResult.error);
       return {
         statusCode: 500,
         headers: {
@@ -293,7 +250,6 @@ exports.handler = async (event, context) => {
     };
 
   } catch (error) {
-    console.error('Error in verification function:', error);
     return {
       statusCode: 500,
       headers: {
@@ -311,11 +267,6 @@ exports.handler = async (event, context) => {
 // Validate hCaptcha token
 async function validateHcaptcha(token, ip) {
   try {
-    console.log('Sending hCaptcha verification request...');
-    console.log('Token length:', token ? token.length : 'null');
-    console.log('IP:', ip);
-    console.log('Secret configured:', !!process.env.CAPTCHA_SECRET);
-    console.log('Secret starts with "0x":', process.env.CAPTCHA_SECRET && process.env.CAPTCHA_SECRET.startsWith('0x'));
 
     const response = await fetch('https://api.hcaptcha.com/siteverify', {
       method: 'POST',
@@ -325,14 +276,11 @@ async function validateHcaptcha(token, ip) {
       body: `response=${encodeURIComponent(token)}&secret=${encodeURIComponent(process.env.CAPTCHA_SECRET)}&remoteip=${encodeURIComponent(ip || '')}`
     });
 
-    console.log('hCaptcha API response status:', response.status);
 
     const result = await response.json();
-    console.log('hCaptcha API response:', result);
 
     return result.success;
   } catch (error) {
-    console.error('CAPTCHA validation error:', error);
     return false;
   }
 }
@@ -343,17 +291,11 @@ async function storeInSupabase(data) {
     const SUPABASE_URL = process.env.SUPABASE_URL;
     const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
-    console.log('=== SUPABASE STORAGE ATTEMPT ===');
-    console.log('SUPABASE_URL exists:', !!SUPABASE_URL);
-    console.log('SUPABASE_KEY exists:', !!SUPABASE_KEY);
-    console.log('SUPABASE_URL:', SUPABASE_URL ? SUPABASE_URL.substring(0, 20) + '...' : 'NULL');
-    console.log('SUPABASE_KEY length:', SUPABASE_KEY ? SUPABASE_KEY.length : 0);
 
     if (!SUPABASE_URL || !SUPABASE_KEY) {
       throw new Error('Supabase credentials not configured in environment variables');
     }
 
-    console.log('Data to be stored:', JSON.stringify(data, null, 2));
 
     const response = await fetch(`${SUPABASE_URL}/rest/v1/verifications`, {
       method: 'POST',
@@ -366,12 +308,9 @@ async function storeInSupabase(data) {
       body: JSON.stringify(data)
     });
 
-    console.log('Supabase response status:', response.status);
-    console.log('Supabase response headers:', JSON.stringify(Object.fromEntries(response.headers), null, 2));
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Supabase error response:', errorText);
       throw new Error(`Supabase error ${response.status}: ${errorText}`);
     }
 
@@ -379,9 +318,7 @@ async function storeInSupabase(data) {
     let responseData;
     try {
       responseData = await response.json();
-      console.log('Supabase response data:', responseData);
     } catch (jsonError) {
-      console.warn('Could not parse Supabase response as JSON:', jsonError);
       responseData = null;
     }
 
@@ -392,9 +329,6 @@ async function storeInSupabase(data) {
     };
 
   } catch (error) {
-    console.error('=== SUPABASE STORAGE ERROR ===');
-    console.error('Error message:', error.message);
-    console.error('Error stack:', error.stack);
 
     // Return detailed error information
     return {

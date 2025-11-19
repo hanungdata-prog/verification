@@ -629,16 +629,12 @@
 
         // Function to populate Discord user data with enhanced loading states
         function populateDiscordData() {
-            console.log('Populating Discord data...');
 
             // Get Discord data from URL parameters (this is the correct flow)
             const discordId = getUrlParameter('discord_id');
             const discordUsername = getUrlParameter('discord_username');
             const token = getUrlParameter('token');
 
-            console.log('Raw Discord ID:', discordId);
-            console.log('Raw Discord Username:', discordUsername);
-            console.log('Raw token:', token);
 
             const userIdEl = document.getElementById('userId');
             const userNameEl = document.getElementById('userName');
@@ -650,20 +646,16 @@
 
                 // Try to decode token if present (fallback method)
                 if (token && token !== '' && (!discordId || !discordUsername)) {
-                    console.log('No URL parameters found, attempting to decode JWT token...');
                     try {
                         const decodedData = decodeJWTToken(token);
                         if (decodedData) {
                             finalDiscordId = decodedData.discord_id;
                             finalDiscordUsername = decodedData.discord_username;
-                            console.log('Successfully decoded JWT token:', decodedData);
                         }
                     } catch (error) {
-                        console.error('Failed to decode JWT token:', error);
                     }
                 }
 
-                console.log('Final Discord data:', { finalDiscordId, finalDiscordUsername });
 
                 if (finalDiscordId && finalDiscordUsername && finalDiscordId !== '' && finalDiscordUsername !== '') {
                     // Remove loading skeleton and show actual data
@@ -685,9 +677,6 @@
                         field.value = finalDiscordUsername;
                     });
 
-                    console.log('Discord data populated successfully');
-                    console.log('ID set to:', finalDiscordId);
-                    console.log('Username set to:', finalDiscordUsername);
 
                     // Add success animation
                     const userInfo = document.querySelector('.user-info');
@@ -702,7 +691,6 @@
                     userIdEl.style.color = 'var(--color-error)';
                     userNameEl.style.color = 'var(--color-error)';
 
-                    console.error('Discord data not found:', { finalDiscordId, finalDiscordUsername });
                     showMessage('Discord user information not found. Please try logging in again.', 'error');
                 }
             }, 800); // Simulate network delay
@@ -711,10 +699,8 @@
         // Function to decode JWT token
         function decodeJWTToken(token) {
             try {
-                console.log('Decoding token:', token);
 
                 if (!token || token === '') {
-                    console.error('Empty token provided');
                     return null;
                 }
 
@@ -723,48 +709,37 @@
 
                 // Strategy 1: Try standard JWT format (data.signature)
                 if (token.includes('.')) {
-                    console.log('Trying standard JWT format...');
                     const parts = token.split('.');
-                    console.log('Token parts:', parts);
 
                     if (parts.length >= 1) {
                         decodedData = tryDecodeBase64(parts[0]);
                         if (decodedData) {
-                            console.log('Successfully decoded using JWT format');
                         }
                     }
                 }
 
                 // Strategy 2: Try direct base64 decoding (entire token is data)
                 if (!decodedData) {
-                    console.log('Trying direct base64 decoding...');
                     decodedData = tryDecodeBase64(token);
                     if (decodedData) {
-                        console.log('Successfully decoded using direct base64');
                     }
                 }
 
                 // Strategy 3: Try to extract from nested structure
                 if (!decodedData) {
-                    console.log('Trying nested structure extraction...');
                     decodedData = tryExtractNestedData(token);
                     if (decodedData) {
-                        console.log('Successfully extracted from nested structure');
                     }
                 }
 
                 if (!decodedData) {
-                    console.error('All decoding strategies failed');
                     showMessage('Invalid token format. Please log in again.', 'error');
                     return null;
                 }
 
-                console.log('Final decoded data:', decodedData);
 
                 // Validate required fields
                 if (!decodedData.discord_id || !decodedData.discord_username) {
-                    console.error('Token missing required Discord fields');
-                    console.error('Available fields:', Object.keys(decodedData));
                     showMessage('Invalid token format. Missing Discord user information.', 'error');
                     return null;
                 }
@@ -774,13 +749,8 @@
                     const expirationTime = new Date(decodedData.expires_at).getTime();
                     const currentTime = new Date().getTime();
 
-                    console.log('Token expiration check:');
-                    console.log('- Current time:', new Date(currentTime).toISOString());
-                    console.log('- Expiration time:', new Date(expirationTime).toISOString());
-                    console.log('- Time until expiration (minutes):', Math.floor((expirationTime - currentTime) / (1000 * 60)));
 
                     if (currentTime > expirationTime) {
-                        console.error('Token has expired');
                         showMessage('Session has expired. Please log in again.', 'error');
 
                         // Auto-redirect to login after showing error
@@ -793,7 +763,6 @@
 
                     // Warning if token expires soon (less than 5 minutes)
                     if (expirationTime - currentTime < 5 * 60 * 1000) {
-                        console.warn('Token expires soon');
                         showMessage('Your session will expire soon. Complete verification quickly.', 'warning');
                     }
                 }
@@ -806,7 +775,6 @@
                 };
 
             } catch (error) {
-                console.error('Error decoding JWT token:', error);
                 showMessage('Invalid token format. Please log in again.', 'error');
                 return null;
             }
@@ -815,37 +783,28 @@
         // Helper function to try base64 decoding
         function tryDecodeBase64(data) {
             try {
-                console.log('Attempting to decode base64 data:', data.substring(0, 50) + '...');
 
                 // Add padding if necessary
                 const padding = '='.repeat((4 - data.length % 4) % 4);
                 const paddedData = data + padding;
 
-                console.log('Padded data length:', paddedData.length);
 
                 const decodedString = atob(paddedData);
-                console.log('Decoded string:', decodedString);
 
                 const parsedData = JSON.parse(decodedString);
-                console.log('Parsed data:', parsedData);
 
                 // Check if this is a nested structure with "data" field
                 if (parsedData.data && typeof parsedData.data === 'object') {
-                    console.log('Found nested data structure in base64 decode, extracting data field');
-                    console.log('Extracted data:', parsedData.data);
                     return parsedData.data;
                 }
 
                 // Check if the parsed data itself has the Discord fields
                 if (parsedData.discord_id && parsedData.discord_username) {
-                    console.log('Found Discord fields directly in parsed data');
                     return parsedData;
                 }
 
-                console.log('No Discord fields found in base64 decoded data');
                 return parsedData;
             } catch (error) {
-                console.error('Base64 decoding failed:', error);
                 return null;
             }
         }
@@ -853,34 +812,24 @@
         // Helper function to try extracting nested data
         function tryExtractNestedData(token) {
             try {
-                console.log('Attempting to extract nested data from token...');
 
                 // Try to decode the entire token first
                 const padding = '='.repeat((4 - token.length % 4) % 4);
                 const paddedToken = token + padding;
 
-                console.log('Token length:', token.length);
-                console.log('Padding added:', padding.length);
-                console.log('Padded token length:', paddedToken.length);
 
                 const decodedString = atob(paddedToken);
-                console.log('Decoded full token:', decodedString);
 
                 const parsedData = JSON.parse(decodedString);
-                console.log('Parsed full token data:', parsedData);
 
                 // Check if it has a nested structure with "data" field
                 if (parsedData.data && typeof parsedData.data === 'object') {
-                    console.log('Found nested data structure in "data" field');
-                    console.log('Nested data:', parsedData.data);
                     return parsedData.data;
                 }
 
                 // Return the parsed data as-is if no nested structure found
-                console.log('No nested structure found, returning parsed data directly');
                 return parsedData;
             } catch (error) {
-                console.error('Nested data extraction failed:', error);
                 return null;
             }
         }
@@ -965,8 +914,6 @@
                 };
 
                 // Send verification request to serverless function
-                console.log('Sending verification request:', requestData);
-                console.log('Request URL: /verify');
 
                 let response;
                 try {
@@ -979,12 +926,9 @@
                         body: JSON.stringify(requestData)
                     });
 
-                    console.log('Response status:', response.status);
-                    console.log('Response headers:', response.headers);
 
                     // If the main endpoint fails, try the direct function endpoint
                     if (!response.ok) {
-                        console.log('Main endpoint failed, trying direct function endpoint...');
                         response = await fetch('/.netlify/functions/verify', {
                             method: 'POST',
                             headers: {
@@ -993,11 +937,8 @@
                             body: JSON.stringify(requestData)
                         });
 
-                        console.log('Direct function response status:', response.status);
-                        console.log('Direct function response headers:', response.headers);
                     }
                 } catch (fetchError) {
-                    console.error('Fetch error, trying direct function endpoint:', fetchError);
                     response = await fetch('/.netlify/functions/verify', {
                         method: 'POST',
                         headers: {
@@ -1006,15 +947,11 @@
                         body: JSON.stringify(requestData)
                     });
 
-                    console.log('Fallback response status:', response.status);
-                    console.log('Fallback response headers:', response.headers);
                 }
 
                 const result = await response.json();
-                console.log('Verification response:', result);
 
                 if (response.ok) {
-                    console.log('Verification response:', result);
 
                     // Hide loading states
                     submitBtn.classList.remove('loading');
@@ -1042,7 +979,6 @@
                         }, 500);
                     }, 2000);
                 } else {
-                    console.error('Verification failed:', result);
                     const errorMessage = result.error || result.message || 'Verification failed';
                     const details = result.details ? ` (${result.details})` : '';
                     showMessage(`${errorMessage}${details}`, 'error');
@@ -1053,7 +989,6 @@
                     }
                 }
             } catch (error) {
-                console.error('Verification error:', error);
                 if (error.message.includes('Unexpected token')) {
                     showMessage('Server error: Invalid response format. The /verify endpoint may not be configured correctly.', 'error');
                 } else {
@@ -1107,7 +1042,6 @@
         // hCaptcha callback function
         function onHcaptchaSuccess(token) {
             currentToken = token;
-            console.log('hCaptcha verified:', token);
 
             // Add visual feedback when captcha is completed
             const captchaContainer = document.querySelector('.captcha-container');
@@ -1211,7 +1145,6 @@
         try {
             populateDiscordData();
         } catch (error) {
-            console.error('Failed to populate Discord data:', error);
             showMessage('Failed to load user information. Please try again.', 'error');
         }
     </script>

@@ -119,6 +119,10 @@
       "dest": "dist/verify-auto.html"
     },
     {
+      "src": "/webhook-proxy/(.*)",
+      "dest": "api/index.py"
+    },
+    {
       "src": "/(.*)",
       "dest": "api/index.py"
     }

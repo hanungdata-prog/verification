@@ -477,8 +477,6 @@
                     }
                 });
 
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
 
                 // Update step 3: Retrieving user information
                 updateLoadingStep(2, 'completed');
@@ -500,12 +498,10 @@
 
                 if (response.ok) {
                     const contentType = response.headers.get('content-type');
-                    console.log('Content type:', contentType);
 
                     if (contentType && contentType.includes('application/json')) {
                         // Try to parse as JSON
                         const data = await response.json();
-                        console.log('Received JSON data:', data);
 
                         updateLoadingStep(3, 'completed');
                         updateLoadingStep(4, 'active');
@@ -540,16 +536,13 @@
                     } else {
                         // Got HTML instead of JSON - likely an error page
                         const htmlText = await response.text();
-                        console.log('Received HTML instead of JSON:', htmlText.substring(0, 200));
                         throw new Error('Server returned HTML instead of JSON. Function may not be deployed correctly.');
                     }
                 } else {
                     const errorText = await response.text();
-                    console.log('Error response:', errorText);
                     throw new Error(`Server responded with ${response.status}: ${errorText.substring(0, 100)}`);
                 }
             } catch (error) {
-                console.error('Error during Discord callback:', error);
 
                 // Mark current step as error
                 updateLoadingStep(currentStep, 'error');

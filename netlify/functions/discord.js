@@ -1,7 +1,5 @@
 exports.handler = async (event, context) => {
   try {
-    console.log('Discord callback function called');
-    console.log('Event:', event);
 
     // Extract query parameters
     const code = event.queryStringParameters?.code;
@@ -151,7 +149,6 @@ exports.handler = async (event, context) => {
       };
 
     } catch (error) {
-      console.error('Error exchanging Discord code:', error);
       return {
         statusCode: 500,
         headers: {
@@ -166,7 +163,6 @@ exports.handler = async (event, context) => {
     }
 
   } catch (error) {
-    console.error('Error in Discord callback:', error);
     return {
       statusCode: 500,
       headers: {

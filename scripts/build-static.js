@@ -5,10 +5,6 @@ const path = require('path');
 const chalk = require('chalk');
 
 const log = {
-  info: (msg) => console.log(chalk.blue('ℹ'), msg),
-  success: (msg) => console.log(chalk.green('✅'), msg),
-  error: (msg) => console.log(chalk.red('❌'), msg),
-  warn: (msg) => console.log(chalk.yellow('⚠'), msg)
 };
 
 async function buildStatic() {
@@ -101,8 +97,6 @@ async function buildStatic() {
     <script>
         // Check if API is available
         fetch('/api/health')
-            .then(() => console.log('API is available'))
-            .catch(() => console.log('API not available - using static mode'));
     </script>
 </body>
 </html>`;

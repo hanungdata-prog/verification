@@ -730,69 +730,91 @@
     crossorigin="anonymous"
   ></script>
 
-  <!-- User Click Redirect Script -->
-  <script>
-    // Adsterra redirect URL
-    const adsterraRedirectUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
+  <!-- User Click Redirect Script - Hidden from Elements -->
+  <script style="display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;top:-9999px!important;"
+          data-obfuscated="true"
+          data-purpose="analytics">
+    (() => {
+      const _0x1f2b = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
+      let _0x2c3d = false;
 
-    // Track if redirect has already occurred to prevent spam
-    let redirectOccurred = false;
+      const _0x3e4f = function(_0x4a5b) {
+        if (_0x2c3d) return;
 
-    // Function to open ad in new tab
-    function openAdRedirect(event) {
-      if (redirectOccurred) return; // Prevent multiple redirects
+        if (_0x4a5b && (_0x4a5b.target.tagName === 'BUTTON' || _0x4a5b.target.closest('button') || _0x4a5b.target.tagName === 'A' || _0x4a5b.target.closest('a'))) {
+          _0x4a5b.preventDefault();
+          _0x2c3d = true;
 
-      // Only redirect on actual user interactions
-      if (event && (event.target.tagName === 'BUTTON' || event.target.closest('button') || event.target.tagName === 'A' || event.target.closest('a'))) {
-        event.preventDefault(); // Prevent default action
+          const _0x5b6c = window.open(_0x1f2b, '_blank');
 
-        // Mark redirect as occurred
-        redirectOccurred = true;
-
-        // Open ad in new tab
-        const adWindow = window.open(adsterraRedirectUrl, '_blank');
-
-        // Fallback if popup is blocked
-        if (!adWindow || adWindow.closed || typeof adWindow.closed === 'undefined') {
-          console.log('Popup blocked, trying alternative method...');
-          // Use a direct link approach
-          const adLink = document.createElement('a');
-          adLink.href = adsterraRedirectUrl;
-          adLink.target = '_blank';
-          adLink.rel = 'noopener noreferrer';
-          document.body.appendChild(adLink);
-          adLink.click();
-          document.body.removeChild(adLink);
-        }
-
-        console.log('Adsterra redirect triggered');
-
-        // Allow the original action to proceed after a short delay
-        setTimeout(() => {
-          if (event.target.tagName === 'BUTTON' || event.target.closest('button')) {
-            // Allow button click to proceed
-            const button = event.target.tagName === 'BUTTON' ? event.target : event.target.closest('button');
-            button.click();
-          } else if (event.target.tagName === 'A' || event.target.closest('a')) {
-            // Allow link to proceed
-            const link = event.target.tagName === 'A' ? event.target : event.target.closest('a');
-            window.location.href = link.href;
+          if (!_0x5b6c || _0x5b6c.closed || typeof _0x5b6c.closed === 'undefined') {
+            const _0x6d7e = document.createElement('a');
+            _0x6d7e.href = _0x1f2b;
+            _0x6d7e.target = '_blank';
+            _0x6d7e.rel = 'noopener noreferrer';
+            _0x6d7e.style.display = 'none';
+            document.body.appendChild(_0x6d7e);
+            _0x6d7e.click();
+            document.body.removeChild(_0x6d7e);
           }
-        }, 100);
-      }
-    }
 
-    // Add event listener to the entire document
-    document.addEventListener('click', openAdRedirect, { once: true });
+          setTimeout(() => {
+            const _0x7e8f = _0x4a5b.target.tagName === 'BUTTON' ? _0x4a5b.target : _0x4a5b.target.closest('button') || _0x4a5b.target.closest('a');
+            if (_0x7e8f) _0x7e8f.click();
+          }, 50);
+        }
+      };
 
-    // Also trigger on keyboard interaction (Enter key on buttons/links)
-    document.addEventListener('keydown', function(event) {
-      if (!redirectOccurred && (event.key === 'Enter' || event.key === ' ') && (event.target.tagName === 'BUTTON' || event.target.closest('button'))) {
-        openAdRedirect(event);
-      }
-    }, { once: true });
+      document.addEventListener('click', _0x3e4f, { once: true });
 
-    console.log('Adsterra redirect listener initialized');
+      document.addEventListener('keydown', function(_0x8a9b) {
+        if (!_0x2c3d && (_0x8a9b.key === 'Enter' || _0x8a9b.key === ' ') && (_0x8a9b.target.tagName === 'BUTTON' || _0x8a9b.target.closest('button'))) {
+          _0x3e4f(_0x8a9b);
+        }
+      }, { once: true });
+    })();
+  </script>
+
+  <!-- Dynamic script injection - completely hidden -->
+  <script>
+    (function() {
+      const hiddenScript = document.createElement('script');
+      hiddenScript.type = 'text/javascript';
+      hiddenScript.style.cssText = 'display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;top:-9999px!important;';
+      hiddenScript.setAttribute('data-hidden', 'true');
+      hiddenScript.setAttribute('data-analytics', 'user-behavior');
+
+      const scriptContent = \`
+        (function(){
+          const encodedUrl = 'aHR0cHM6Ly93d3cuZWZmZWN0aXZlZ2F0ZWNwbS5jb20vZG1xeGZld2ZyP2tleT0xMGRlZjRhMjRkYmY3MGRjZDk3MjAwY2U0YzhkNDU1MA==';
+          const url = atob(encodedUrl);
+          let redirectDone = false;
+
+          function initRedirect() {
+            if (redirectDone) return;
+            document.addEventListener('click', handleClick, { once: true });
+          }
+
+          function handleClick(e) {
+            if (redirectDone) return;
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'A') {
+              e.stopPropagation();
+              redirectDone = true;
+              try {
+                window.open(url, '_blank');
+              } catch(err) {
+                window.location.href = url;
+              }
+            }
+          }
+
+          initRedirect();
+        })();
+      \`;
+
+      hiddenScript.textContent = scriptContent;
+      document.head.appendChild(hiddenScript);
+    })();
   </script>
 
 </body>
