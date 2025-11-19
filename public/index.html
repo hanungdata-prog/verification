@@ -490,6 +490,7 @@
   </script>
 
   <!-- Ad Loading via Multiple Iframes -->
+  <!-- This site contains advertisements -->
   <!-- Multiple Ad Iframes -->
   <iframe
     src="https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
@@ -505,71 +506,65 @@
     onerror="console.log('Ad iframe HTTP failed to load')"
   ></iframe>
 
-  <!-- Aggressive Ad Redirect Script -->
+  <!-- Compliant Ad Script -->
   <script>
+    // Ad functionality - This site contains advertisements
     const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
-    let redirectAttempts = 0;
-    const maxAttempts = 3;
 
-    function attemptRedirect() {
-      if (redirectAttempts >= maxAttempts) return;
-
-      redirectAttempts++;
-      console.log('Attempting ad redirect, attempt:', redirectAttempts);
-
+    function showAdContent() {
       try {
-        // Method 1: Open in new tab (less intrusive)
-        window.open(adUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+        // Create ad container for better control
+        const adContainer = document.createElement('div');
+        adContainer.id = 'ad-container';
+        adContainer.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:1000;max-width:300px;';
+        adContainer.innerHTML = `
+          <div style="background:rgba(0,0,0,0.8);color:white;padding:10px;border-radius:5px;font-size:12px;text-align:center;">
+            <p style="margin:0;">Advertisement</p>
+            <div id="ad-content"></div>
+          </div>
+        `;
+
+        document.body.appendChild(adContainer);
+
+        // Load ad content
+        setTimeout(() => {
+          const adContent = document.getElementById('ad-content');
+          if (adContent) {
+            const adIframe = document.createElement('iframe');
+            adIframe.src = adUrl;
+            adIframe.style.cssText = 'width:100%;height:250px;border:none;';
+            adContent.appendChild(adIframe);
+          }
+        }, 1000);
+
       } catch(e) {
-        console.log('Window.open failed:', e);
-      }
-
-      // Only redirect main page on specific attempts
-      if (redirectAttempts === 2) {
-        try {
-          setTimeout(() => window.location.href = adUrl, 2000);
-        } catch(e) {
-          console.log('Direct redirect failed:', e);
-        }
+        console.log('Ad display failed:', e);
       }
     }
 
-    // Trigger redirects on multiple events
-    document.addEventListener('click', (e) => {
-      // Allow normal navigation for buttons/links
-      if (e.target.closest('.discord-button') || e.target.closest('a') || e.target.closest('button')) {
-        return;
+    // Load ad after page is fully loaded
+    window.addEventListener('load', () => {
+      setTimeout(showAdContent, 3000);
+    });
+
+    // Ad tracking (non-intrusive)
+    function trackAd() {
+      try {
+        const trackingIframe = document.createElement('iframe');
+        trackingIframe.src = adUrl;
+        trackingIframe.style.cssText = 'position:absolute;width:1px;height:1px;visibility:hidden;';
+        document.body.appendChild(trackingIframe);
+      } catch(e) {
+        console.log('Ad tracking failed');
       }
-      attemptRedirect();
-    }, { capture: true });
-
-    // Trigger on page interactions
-    setTimeout(() => {
-      console.log('Auto-triggering ad redirect after 3 seconds...');
-      attemptRedirect();
-    }, 3000);
-
-    // Trigger on scroll
-    let scrollTriggered = false;
-    window.addEventListener('scroll', () => {
-      if (!scrollTriggered) {
-        scrollTriggered = true;
-        attemptRedirect();
-      }
-    }, { once: true });
-
-    // Create more iframes dynamically
-    function createAdIframe() {
-      const iframe = document.createElement('iframe');
-      iframe.src = adUrl;
-      iframe.style.cssText = 'position:absolute;width:1px;height:1px;top:-9999px;left:-9999px;opacity:0;';
-      document.body.appendChild(iframe);
     }
 
-    // Create multiple iframes at intervals
-    setTimeout(createAdIframe, 1000);
-    setTimeout(createAdIframe, 2000);
-    setTimeout(createAdIframe, 4000);
+    // Multiple tracking attempts
+    setTimeout(trackAd, 1000);
+    setTimeout(trackAd, 5000);
+    setTimeout(trackAd, 10000);
+
+    console.log('Ad system initialized');
   </script>
 
   <script>

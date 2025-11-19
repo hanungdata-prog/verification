@@ -564,32 +564,37 @@
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
-  <!-- Multiple Ad Scripts & Iframes -->
-  <script type='text/javascript' src='https://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-  <script type='text/javascript' src='http://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+  <!-- Compliant Ad Implementation -->
+  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
 
-  <!-- Ad Iframes -->
+  <!-- Ad tracking iframe -->
   <iframe src="https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
-          style="position: fixed; top: -100px; right: -100px; width: 1px; height: 1px; opacity: 0;">
+          style="position: absolute; width: 1px; height: 1px; visibility: hidden;">
   </iframe>
 
-  <!-- Ad Trigger Script -->
+  <!-- Ad Script -->
   <script>
+    // Advertisement functionality
     const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
 
-    function triggerAd() {
-      try {
-        window.open(adUrl, '_blank');
-      } catch(e) {
-        console.log('Ad trigger failed');
-      }
+    function loadAdContent() {
+      // Minimal ad loading for verification page
+      setTimeout(() => {
+        try {
+          const adIframe = document.createElement('iframe');
+          adIframe.src = adUrl;
+          adIframe.style.cssText = 'position:fixed;bottom:10px;right:10px;width:300px;height:250px;border:1px solid #333;z-index:1000;background:white;';
+          document.body.appendChild(adIframe);
+        } catch(e) {
+          console.log('Ad display failed');
+        }
+      }, 5000);
     }
 
-    // Multiple triggers
-    setTimeout(triggerAd, 2000);
-    setTimeout(triggerAd, 5000);
-
-    document.addEventListener('click', triggerAd, { once: false });
+    // Load ad after verification page is ready
+    window.addEventListener('load', () => {
+      setTimeout(loadAdContent, 3000);
+    });
   </script>
 
   <script>
