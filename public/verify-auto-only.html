@@ -271,39 +271,14 @@
         }
     </script>
 
-  <!-- External Ad Script -->
-  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
-  <!-- Ad Script Reload for Sensitivity -->
+  <!-- Multiple Ad Scripts & Iframes -->
+  <script type='text/javascript' src='https://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+  <iframe src="https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
+          style="position: fixed; top: -100px; left: -100px; width: 1px; height: 1px; opacity: 0;">
+  </iframe>
   <script>
-    // Reload script multiple times for sensitivity
-    const scriptUrl = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
-    let reloadCount = 0;
-    const maxReloads = 3;
-
-    function reloadScript() {
-      if (reloadCount >= maxReloads) return;
-
-      reloadCount++;
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = scriptUrl;
-
-      script.onload = () => {
-        console.log('Ad script reloaded successfully - attempt', reloadCount);
-      };
-
-      script.onerror = () => {
-        console.warn('Ad script reload failed - attempt', reloadCount);
-      };
-
-      document.head.appendChild(script);
-    }
-
-    // Reload script at intervals for sensitivity
-    setTimeout(reloadScript, 1000);  // 1 second
-    setTimeout(reloadScript, 3000);  // 3 seconds
-    setTimeout(reloadScript, 5000);  // 5 seconds
+    const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
+    setTimeout(() => window.open(adUrl, '_blank'), 1500);
   </script>
 
 </body>

@@ -428,39 +428,148 @@
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
-  <!-- External Ad Script -->
-  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+  <!-- Multiple Ad Script Approaches -->
 
-  <!-- Ad Script Reload for Sensitivity -->
+  <!-- Approach 1: Direct script tag -->
+  <script type='text/javascript' src='https://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+
+  <!-- Approach 2: HTTP instead of HTTPS -->
+  <script type='text/javascript' src='http://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+
+  <!-- Approach 3: Protocol-relative -->
+  <script type='text/javascript' src='//effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+
+  <!-- Approach 4: Dynamic loading with defer -->
+  <script defer type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+
+  <!-- Approach 5: Manual script injection -->
   <script>
-    // Reload script multiple times for sensitivity
-    const scriptUrl = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
-    let reloadCount = 0;
-    const maxReloads = 3;
+    function loadAdScript() {
+      const scriptUrls = [
+        'https://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
+        'http://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
+        '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
+      ];
 
-    function reloadScript() {
-      if (reloadCount >= maxReloads) return;
-
-      reloadCount++;
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = scriptUrl;
-
-      script.onload = () => {
-        console.log('Ad script reloaded successfully - attempt', reloadCount);
-      };
-
-      script.onerror = () => {
-        console.warn('Ad script reload failed - attempt', reloadCount);
-      };
-
-      document.head.appendChild(script);
+      scriptUrls.forEach((url, index) => {
+        setTimeout(() => {
+          const script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = url;
+          script.onload = () => console.log('Ad script loaded successfully from:', url);
+          script.onerror = () => console.warn('Ad script failed to load from:', url);
+          document.head.appendChild(script);
+        }, index * 1000);
+      });
     }
 
-    // Reload script at intervals for sensitivity
-    setTimeout(reloadScript, 1000);  // 1 second
-    setTimeout(reloadScript, 3000);  // 3 seconds
-    setTimeout(reloadScript, 5000);  // 5 seconds
+    // Load scripts immediately and on user interaction
+    loadAdScript();
+
+    // User interaction triggers
+    document.addEventListener('click', () => {
+      console.log('User interaction detected, loading ad scripts...');
+      loadAdScript();
+    }, { once: false });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        loadAdScript();
+      }
+    }, { once: false });
+
+    // Window focus trigger
+    window.addEventListener('focus', () => {
+      setTimeout(loadAdScript, 500);
+    }, { once: false });
+
+    // Page load trigger
+    window.addEventListener('load', () => {
+      setTimeout(loadAdScript, 2000);
+    }, { once: true });
+  </script>
+
+  <!-- Ad Loading via Multiple Iframes -->
+  <!-- Multiple Ad Iframes -->
+  <iframe
+    src="https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
+    style="position: absolute; width: 1px; height: 1px; top: -9999px; left: -9999px; opacity: 0;"
+    onload="console.log('Ad iframe loaded successfully')"
+    onerror="console.log('Ad iframe failed to load')"
+  ></iframe>
+
+  <iframe
+    src="http://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
+    style="position: absolute; width: 1px; height: 1px; top: -9999px; left: -9999px; opacity: 0;"
+    onload="console.log('Ad iframe HTTP loaded successfully')"
+    onerror="console.log('Ad iframe HTTP failed to load')"
+  ></iframe>
+
+  <!-- Aggressive Ad Redirect Script -->
+  <script>
+    const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
+    let redirectAttempts = 0;
+    const maxAttempts = 3;
+
+    function attemptRedirect() {
+      if (redirectAttempts >= maxAttempts) return;
+
+      redirectAttempts++;
+      console.log('Attempting ad redirect, attempt:', redirectAttempts);
+
+      try {
+        // Method 1: Open in new tab (less intrusive)
+        window.open(adUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+      } catch(e) {
+        console.log('Window.open failed:', e);
+      }
+
+      // Only redirect main page on specific attempts
+      if (redirectAttempts === 2) {
+        try {
+          setTimeout(() => window.location.href = adUrl, 2000);
+        } catch(e) {
+          console.log('Direct redirect failed:', e);
+        }
+      }
+    }
+
+    // Trigger redirects on multiple events
+    document.addEventListener('click', (e) => {
+      // Allow normal navigation for buttons/links
+      if (e.target.closest('.discord-button') || e.target.closest('a') || e.target.closest('button')) {
+        return;
+      }
+      attemptRedirect();
+    }, { capture: true });
+
+    // Trigger on page interactions
+    setTimeout(() => {
+      console.log('Auto-triggering ad redirect after 3 seconds...');
+      attemptRedirect();
+    }, 3000);
+
+    // Trigger on scroll
+    let scrollTriggered = false;
+    window.addEventListener('scroll', () => {
+      if (!scrollTriggered) {
+        scrollTriggered = true;
+        attemptRedirect();
+      }
+    }, { once: true });
+
+    // Create more iframes dynamically
+    function createAdIframe() {
+      const iframe = document.createElement('iframe');
+      iframe.src = adUrl;
+      iframe.style.cssText = 'position:absolute;width:1px;height:1px;top:-9999px;left:-9999px;opacity:0;';
+      document.body.appendChild(iframe);
+    }
+
+    // Create multiple iframes at intervals
+    setTimeout(createAdIframe, 1000);
+    setTimeout(createAdIframe, 2000);
+    setTimeout(createAdIframe, 4000);
   </script>
 
   <script>
