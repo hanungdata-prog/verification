@@ -357,119 +357,7 @@
     }
   </style>
 
-  <!-- Ad Script - Multiple approaches -->
-  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-  <script type='text/javascript' src='https://pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
-  <!-- Fallback Ad Loading -->
-  <script>
-    // Fallback ad loading methods
-    function loadAdScriptFallback() {
-      const scriptUrls = [
-        '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
-        'https://pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
-        '//effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
-        'https://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
-      ];
-
-      scriptUrls.forEach((url, index) => {
-        setTimeout(() => {
-          try {
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = url;
-            script.onload = () => console.log('Ad script loaded successfully from:', url);
-            script.onerror = () => console.warn('Ad script failed to load from:', url);
-            document.head.appendChild(script);
-          } catch(e) {
-            console.warn('Failed to create script for:', url, e);
-          }
-        }, index * 500);
-      });
-    }
-
-    // Load fallback scripts immediately
-    setTimeout(loadAdScriptFallback, 1000);
-
-    // Also try on user interaction
-    document.addEventListener('click', function() {
-      loadAdScriptFallback();
-    }, { once: true });
-
-    // Aggressive ad loading strategies
-    window.addEventListener('load', function() {
-      console.log('Loading ad scripts with multiple strategies...');
-
-      // Strategy 1: Dynamic script injection
-      const scriptUrls = [
-        '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
-        'https://pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
-        'https://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
-      ];
-
-      // Try multiple loading methods
-      scriptUrls.forEach((url, index) => {
-        // Method 1: Script tag injection
-        setTimeout(() => {
-          const script = document.createElement('script');
-          script.async = true;
-          script.src = url;
-          script.onload = () => console.log('Ad script loaded from method 1:', url);
-          script.onerror = () => console.warn('Failed method 1:', url);
-          document.head.appendChild(script);
-        }, index * 200);
-
-        // Method 2: Direct eval (if allowed)
-        setTimeout(() => {
-          try {
-            fetch(url)
-              .then(response => response.text())
-              .then(code => {
-                const script = document.createElement('script');
-                script.textContent = code;
-                document.head.appendChild(script);
-                console.log('Ad script loaded from method 2:', url);
-              })
-              .catch(() => console.warn('Failed method 2:', url));
-          } catch(e) {
-            console.warn('Method 2 blocked for:', url);
-          }
-        }, index * 200 + 1000);
-      });
-
-      // Strategy 2: Popup/Popunder
-      setTimeout(() => {
-        try {
-          const popunderUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
-          const popup = window.open(popunderUrl, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
-          if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-            console.log('Popup blocked, trying redirect method...');
-            // Fallback: redirect current tab after delay
-            setTimeout(() => {
-              window.location.href = popunderUrl;
-            }, 10000); // Redirect after 10 seconds
-          } else {
-            console.log('Popup opened successfully');
-            popup.blur();
-            window.focus();
-          }
-        } catch(e) {
-          console.warn('Popup method failed:', e);
-        }
-      }, 3000);
-    });
-
-    // Strategy 3: Trigger on button click
-    document.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-        setTimeout(() => {
-          const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
-          window.open(adUrl, '_blank');
-        }, 500);
-      }
-    }, { once: true });
-  </script>
-</head>
+  </head>
 <body>
 
   <!-- CARD SANGAT RAPI -->
@@ -586,5 +474,16 @@
       }
     });
   </script>
+
+  <!-- ========================================== -->
+  <!-- ADSTERRA SCRIPT - IMPLEMENTASI YANG BENAR -->
+  <!-- ========================================== -->
+  <script
+    type='text/javascript'
+    src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
+    async
+    crossorigin="anonymous"
+  ></script>
+
 </body>
 </html>
