@@ -1,0 +1,1445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Complete Verification - AuthGateway</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- External Styles -->
+  <link rel="stylesheet" href="space-theme.css">
+  <link rel="stylesheet" href="cosmic-loading.css">
+  <link rel="stylesheet" href="moon-ufo-loading.css">
+  <link rel="stylesheet" href="animations.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    :root {
+      --font-sans: 'Inter', sans-serif;
+      --foreground: #e0e0ff;
+      --muted: #a0a0c0;
+      --accent: #7080ff;
+      --success: #4aff8c;
+      --error: #ff557a;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.5rem;
+      --radius-full: 9999px;
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --text-xs: 0.75rem;
+      --text-sm: 0.875rem;
+      --text-base: 1rem;
+      --text-lg: 1.125rem;
+      --text-xl: 1.25rem;
+      --text-2xl: 1.5rem;
+      --text-3xl: 1.875rem;
+      --font-medium: 500;
+      --font-semibold: 600;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a12;
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, #7171a6, transparent),
+        radial-gradient(2px 2px at 40px 70px, #7171a6, transparent),
+        radial-gradient(2px 2px at 90px 40px, #7171a6, transparent),
+        radial-gradient(2px 2px at 130px 80px, #7171a6, transparent),
+        radial-gradient(2px 2px at 200px 10px, #7171a6, transparent),
+        radial-gradient(2px 2px at 240px 20px, #7171a6, transparent),
+        radial-gradient(2px 2px at 50px 50px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 100px 80px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 180px 60px, #a6a6d9, transparent),
+        radial-gradient(2px 2px at 220px 100px, #a6a6d9, transparent);
+      background-size: 240px 120px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      font-family: var(--font-sans);
+      color: var(--foreground);
+      padding: var(--space-4);
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    /* CARD UTAMA */
+    .card {
+      background: rgba(15, 15, 30, 0.9);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(100, 100, 200, 0.25);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-8);
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 30px rgba(112, 128, 255, 0.15);
+      position: relative;
+      animation: fadeInUp 0.8s ease-out;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7080ff, transparent);
+      border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    }
+
+    /* LOGO */
+    .logo {
+      width: 80px; height: 80px;
+      margin-bottom: var(--space-6);
+      background: linear-gradient(135deg, #7080ff, #4aff8c);
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-3xl);
+      color: #0a0a12;
+      box-shadow: 0 0 25px rgba(112, 128, 255, 0.6);
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    h1 {
+      font-size: var(--text-3xl);
+      font-weight: var(--font-semibold);
+      margin-bottom: var(--space-3);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: var(--text-lg);
+      line-height: 1.6;
+      margin-bottom: var(--space-8);
+      max-width: 90%;
+    }
+
+    /* USER INFO */
+    .user-info {
+      background: rgba(15, 15, 30, 0.6);
+      border: 1px solid rgba(100, 100, 200, 0.2);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: var(--space-6);
+      position: relative;
+    }
+
+    .user-info::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7080ff, transparent);
+    }
+
+    .user-info h3 {
+      color: var(--foreground);
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
+
+    .user-info p {
+      margin: var(--space-2) 0;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+    }
+
+    .user-info strong { color: var(--accent); }
+
+    .loading-skeleton {
+      display: inline-block;
+      width: 120px;
+      height: 16px;
+      background: rgba(100, 100, 200, 0.2);
+      border-radius: 4px;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.7; }
+    }
+
+    /* CAPTCHA */
+    .captcha-container {
+      background: rgba(15, 15, 30, 0.5);
+      border: 1px solid rgba(100, 100, 200, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto var(--space-6);
+      position: relative;
+    }
+
+    .captcha-container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #7080ff, transparent);
+    }
+
+    /* FORM & TOMBOL TEPAT DI TENGAH */
+    .form-centered {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: var(--space-6);
+    }
+
+    .button-wrapper {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #4a55d6, #7080ff);
+      color: white;
+      border: none;
+      padding: var(--space-4) var(--space-8);
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      min-width: 280px;
+      width: fit-content;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(112, 128, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      margin: 0 auto;
+    }
+
+    .submit-btn span {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    /* ROKET MERAKIT & MELEPAS */
+    .rocket-parts {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .rocket-part {
+      position: absolute;
+      background: #ffcc66;
+      border-radius: 2px;
+      opacity: 0;
+      transform-origin: center;
+    }
+
+    .rocket-body { width: 16px; height: 28px; left: 12px; top: 6px; background: #7080ff; }
+    .rocket-nose { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 12px solid #ffcc66; left: 12px; top: -6px; }
+    .rocket-fin-left { width: 10px; height: 8px; left: 6px; bottom: 4px; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+    .rocket-fin-right { width: 10px; height: 8px; right: 6px; bottom: 4px; clip-path: polygon(100% 0, 0 50%, 100% 100%); }
+
+    .submit-btn:hover .rocket-parts { opacity: 1; }
+    .submit-btn:hover .rocket-body   { animation: assemble 0.4s ease-out forwards; }
+    .submit-btn:hover .rocket-nose   { animation: assemble 0.4s ease-out 0.1s forwards; }
+    .submit-btn:hover .rocket-fin-left  { animation: assemble 0.4s ease-out 0.2s forwards; }
+    .submit-btn:hover .rocket-fin-right { animation: assemble 0.4s ease-out 0.2s forwards; }
+
+    .submit-btn:not(:hover) .rocket-body   { animation: disassemble 0.4s ease-out forwards; }
+    .submit-btn:not(:hover) .rocket-nose   { animation: disassemble 0.4s ease-out 0.1s forwards; }
+    .submit-btn:not(:hover) .rocket-fin-left  { animation: disassemble 0.4s ease-out 0.2s forwards; }
+    .submit-btn:not(:hover) .rocket-fin-right { animation: disassemble 0.4s ease-out 0.2s forwards; }
+
+    @keyframes assemble {
+      from { opacity: 0; transform: scale(0) rotate(180deg); }
+      to   { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+
+    @keyframes disassemble {
+      from { opacity: 1; transform: scale(1) rotate(0deg); }
+      to   { opacity: 0; transform: scale(0) rotate(-180deg); }
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 0 30px rgba(112, 128, 255, 0.5);
+    }
+
+    .submit-btn.loading { pointer-events: none; }
+    .btn-spinner { display: none; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    .loading .btn-text { display: none; }
+    .loading .btn-spinner { display: inline-block; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* SUCCESS CHECKMARK */
+    .success-checkmark {
+      display: none;
+      width: 60px; height: 60px;
+      margin: 0 auto var(--space-4);
+    }
+
+    .success-checkmark.show {
+      display: block;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* LOADING DOTS */
+    .loading {
+      display: none;
+      margin: var(--space-4) 0;
+      color: var(--muted);
+      font-size: var(--text-sm);
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .loading.active { display: flex; }
+
+    .loading-dots span {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: inline-block;
+      animation: bounce 1.4s ease-in-out infinite both;
+    }
+
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    /* MESSAGE */
+    .message {
+      margin: var(--space-4) 0;
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      display: none;
+      align-items: center;
+      gap: var(--space-2);
+      border: 1px solid transparent;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .message.success { background: rgba(74, 255, 140, 0.1); border-color: rgba(74, 255, 140, 0.3); color: var(--success); }
+    .message.error   { background: rgba(255, 85, 122, 0.1); border-color: rgba(255, 85, 122, 0.3); color: var(--error); }
+    .message.warning { background: rgba(255, 193, 7, 0.1); border-color: rgba(255, 193, 7, 0.3); color: #ffc107; }
+
+    /* ACTION LINKS */
+    .action-links {
+      margin-top: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      align-items: center;
+      width: 100%;
+      max-width: 300px;
+      font-size: var(--text-sm);
+    }
+
+    .switch-link {
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: var(--font-medium);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-1) 0;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .switch-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+
+    .switch-link:hover { color: var(--foreground); }
+    .switch-link:hover::after { width: 100%; }
+    .switch-link:hover i { transform: rotate(180deg); transition: transform 0.3s ease; }
+    .switch-link i { transition: transform 0.3s ease; }
+
+    .privacy-link {
+      color: var(--muted);
+      margin: 0;
+      font-size: var(--text-xs);
+    }
+
+    .privacy-link a {
+      color: inherit;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      transition: color 0.2s ease;
+    }
+
+    .privacy-link a:hover { color: var(--foreground); }
+
+    /* RESPONSIVE */
+    @media (max-width: 640px) {
+      body {
+        align-items: center;
+        padding: var(--space-3);
+        padding-bottom: 2rem;
+      }
+      .card {
+        padding: var(--space-5);
+        max-width: 100%;
+        width: 100%;
+        margin: var(--space-2) 0;
+      }
+      h1 { font-size: var(--text-2xl); }
+      .user-info, .captcha-container, .action-links {
+        max-width: 100%;
+        width: 100%;
+      }
+      .input-group { margin-bottom: var(--space-4); }
+      .submit-btn {
+        width: 100%;
+        max-width: 300px;
+        margin-bottom: var(--space-3);
+      }
+    }
+
+    /* Extra small mobile */
+    @media (max-width: 380px) {
+      body {
+        padding: var(--space-2);
+        padding-bottom: 3rem;
+      }
+      .card {
+        padding: var(--space-4);
+        margin: var(--space-1) 0;
+      }
+      h1 { font-size: var(--text-xl); }
+      .form-row {
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+      .submit-btn {
+        font-size: var(--text-sm);
+        padding: var(--space-3) var(--space-5);
+        max-width: 280px;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+
+  </head>
+<body>
+
+  <div class="card">
+    <div class="logo"><i class="fas fa-shield-halved"></i></div>
+    <h1>Complete Verification</h1>
+    <p class="subtitle">
+      Your Discord account has been authenticated. Complete the security check below to finish verification.
+    </p>
+
+    <div class="user-info">
+      <h3><i class="fab fa-discord"></i> Verified Discord Account</h3>
+      <p><i class="fas fa-fingerprint"></i> <strong>ID:</strong> <span id="userId" class="loading-skeleton"></span></p>
+      <p><i class="fas fa-user"></i> <strong>Username:</strong> <span id="userName" class="loading-skeleton"></span></p>
+    </div>
+
+    <input type="hidden" id="discordId" />
+    <input type="hidden" id="discordUsername" />
+
+    <form id="verificationForm" class="form-centered">
+      <div class="captcha-container" id="captchaContainer">
+        <div id="captchaWidget"></div>
+      </div>
+
+      <div class="button-wrapper">
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <span class="btn-text"><i class="fas fa-check-circle"></i> Verify & Continue</span>
+          <div class="btn-spinner"></div>
+
+          <div class="rocket-parts">
+            <div class="rocket-part rocket-body"></div>
+            <div class="rocket-part rocket-nose"></div>
+            <div class="rocket-part rocket-fin-left"></div>
+            <div class="rocket-part rocket-fin-right"></div>
+          </div>
+        </button>
+      </div>
+    </form>
+
+    <svg class="success-checkmark" id="successCheckmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+      <circle class="success-checkmark__circle" cx="26" cy="26" r="25" fill="none" stroke="#4aff8c" stroke-width="2"/>
+      <path class="success-checkmark__check" fill="none" stroke="#4aff8c" stroke-width="3" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+    </svg>
+
+    <div class="loading" id="loading">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <div>Verifying your account</div>
+    </div>
+
+    <div class="message" id="message">
+      <i class="fas fa-info-circle"></i>
+      <span id="messageText"></span>
+    </div>
+
+    <div class="action-links">
+      <a href="/discord/login" class="switch-link">
+        <i class="fas fa-sync-alt"></i>
+        Switch Discord Account
+      </a>
+      <p class="privacy-link">
+        <a href="/privacy">
+          <i class="fas fa-user-shield"></i>
+          Privacy & Security Policy
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="animations.js"></script>
+  <script src="moon-ufo-loading.js"></script>
+
+  <script>
+    const HCAPTCHA_SITE_KEY = "f9b8d3ba-9142-42c8-9ee6-57f23258f83a";
+    let currentToken = '';
+
+    // Prevent redirect loop - check if we have required parameters
+    (function preventRedirectLoop() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const hasToken = urlParams.has('token');
+      const hasDiscordId = urlParams.has('discord_id');
+      const hasDiscordUsername = urlParams.has('discord_username');
+      const hasCode = urlParams.has('code'); // OAuth callback parameter
+
+      // If no parameters at all, this might be a direct access without proper authentication
+      if (!hasToken && !hasDiscordId && !hasDiscordUsername && !hasCode) {
+        
+
+        // Check if we were redirected from Discord OAuth flow (check for state in session)
+        const sessionState = sessionStorage.getItem('discord_oauth_state');
+
+        if (!sessionState) {
+          
+          // Show a clear message instead of redirecting
+          document.addEventListener('DOMContentLoaded', function() {
+            const userInfo = document.querySelector('.user-info');
+            if (userInfo) {
+              userInfo.innerHTML = `
+                <h3 style="color: var(--error);">
+                  <i class="fas fa-exclamation-triangle"></i>
+                  Authentication Required
+                </h3>
+                <p style="color: var(--muted); margin: 10px 0;">
+                  Please complete Discord authentication first.
+                </p>
+                <div style="margin-top: 15px;">
+                  <a href="/verify.html" class="switch-link" style="background: var(--accent); color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none;">
+                    <i class="fab fa-discord"></i> Start Authentication
+                  </a>
+                </div>
+              `;
+            }
+          });
+          return;
+        }
+      }
+    })();
+
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      const results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    // Function to check if user is already verified in Supabase
+    async function checkUserVerificationStatus(discordId, discordUsername) {
+      try {
+
+        // Try multiple possible endpoints for user verification check
+        const endpoints = [
+          '/api/check-verification/' + discordId,  // GET endpoint (primary)
+          '/api/check-user-verification',           // POST endpoint
+          '/check-user-verification',               // Alternative POST
+          '/verify/check-user'                      // Alternative POST
+        ];
+
+        for (let i = 0; i < endpoints.length; i++) {
+          const endpoint = endpoints[i];
+          try {
+            // Use GET for first endpoint, POST for others
+            const method = (i === 0) ? 'GET' : 'POST';
+            const options = {
+              method: method,
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            };
+
+            // Add body only for POST requests
+            if (method === 'POST') {
+              options.body = JSON.stringify({
+                discord_id: discordId,
+                discord_username: discordUsername
+              });
+            }
+            const response = await fetch(endpoint, options);
+
+            if (response.ok) {
+              const data = await response.json();
+
+              // FIXED: Check based on actual backend response format
+              if (data.is_verified === true || data.verified === true || data.exists === true || data.already_verified === true) {
+                return true;
+              } else if (data.status === 'success' && data.is_verified === false) {
+                return false;
+              }
+            } else if (response.status === 400 || response.status === 404) {
+              // Try next endpoint
+            }
+          } catch (endpointError) {
+            continue; // Try next endpoint
+          }
+        }
+
+        // FIXED: If all endpoints fail, assume user is not verified and allow verification to proceed
+        return false;
+
+      } catch (error) {
+        // If we can't check the database, allow verification to proceed
+        // This prevents blocking users due to database issues
+        return false;
+      }
+    }
+
+    function populateDiscordData() {
+      // Get Discord data from URL parameters (this is the correct flow)
+      const discordId = getUrlParameter('discord_id');
+      const discordUsername = getUrlParameter('discord_username');
+      const token = getUrlParameter('token');
+
+      const idEl = document.getElementById('userId');
+      const nameEl = document.getElementById('userName');
+
+      // Simulate loading delay for better UX
+      setTimeout(() => {
+        let finalDiscordId = discordId;
+        let finalDiscordUsername = discordUsername;
+
+        // Try to decode token if present (fallback method)
+        if (token && token !== '' && (!discordId || !discordUsername)) {
+
+          try {
+            const decodedData = decodeJWTToken(token);
+            if (decodedData) {
+              finalDiscordId = decodedData.discord_id;
+              finalDiscordUsername = decodedData.discord_username;
+
+            }
+          } catch (error) {
+            // Failed to decode JWT token
+          }
+        }
+
+        
+
+        if (finalDiscordId && finalDiscordUsername && finalDiscordId !== '' && finalDiscordUsername !== '') {
+          // Remove loading skeleton and show actual data
+          idEl.classList.remove('loading-skeleton');
+          nameEl.classList.remove('loading-skeleton');
+
+          idEl.textContent = finalDiscordId;
+          nameEl.textContent = finalDiscordUsername;
+
+          // Update hidden fields
+          document.getElementById('discordId').value = finalDiscordId;
+          document.getElementById('discordUsername').value = finalDiscordUsername;
+
+          
+          
+          
+
+          // Add success animation
+          const userInfo = document.querySelector('.user-info');
+          userInfo.style.animation = 'pulse 0.5s ease-out';
+        } else if (finalDiscordId === '' && finalDiscordUsername === '') {
+          // Check if we have decoded data but failed due to expiration logic
+          
+
+          // Try to get data from the decoded JWT token if it exists
+          const urlParams = new URLSearchParams(window.location.search);
+          const token = urlParams.get('token');
+
+          if (token) {
+            
+            try {
+              const directDecoded = tryDecodeBase64(token);
+              if (directDecoded && directDecoded.discord_id && directDecoded.discord_username) {
+                
+
+                // Show the data even though token is expired
+                idEl.classList.remove('loading-skeleton');
+                nameEl.classList.remove('loading-skeleton');
+
+                idEl.textContent = directDecoded.discord_id;
+                nameEl.textContent = directDecoded.discord_username;
+
+                // Update hidden fields
+                document.getElementById('discordId').value = directDecoded.discord_id;
+                document.getElementById('discordUsername').value = directDecoded.discord_username;
+
+                // Add warning styling to indicate expired session
+                idEl.style.color = 'var(--warning)';
+                nameEl.style.color = 'var(--warning)';
+
+                // Show success message instead of warning
+                showMessage('Discord account data loaded successfully. Ready for verification.', 'success');
+
+                // Add warning animation
+                const userInfo = document.querySelector('.user-info');
+                userInfo.style.animation = 'pulse 0.5s ease-out';
+                userInfo.style.borderColor = 'var(--warning)';
+
+                return; // Exit early since we handled the data
+              }
+            } catch (e) {
+              
+            }
+          }
+        } else {
+          // Remove loading skeleton and show error
+          idEl.classList.remove('loading-skeleton');
+          nameEl.classList.remove('loading-skeleton');
+
+          idEl.textContent = 'Not available';
+          nameEl.textContent = 'Not available';
+          idEl.style.color = 'var(--error)';
+          nameEl.style.color = 'var(--error)';
+
+          
+
+          // Check if we have URL parameters that might indicate this is a callback
+          const hasCallbackParams = window.location.search.includes('code=') ||
+                                   window.location.search.includes('state=');
+
+          if (hasCallbackParams) {
+            showMessage('Processing Discord authentication... If this persists, please try again.', 'warning');
+            // Don't redirect automatically, let the user decide
+          } else {
+            showMessage('Discord user information not found. Please check if you were redirected correctly from Discord.', 'error');
+            // Add a manual retry button option instead of auto-redirect
+            setTimeout(() => {
+              if (confirm('Would you like to try Discord authentication again?')) {
+                window.location.href = '/verify.html';
+              }
+            }, 2000);
+          }
+        }
+      }, 800);
+    }
+
+    // Function to decode JWT token
+    function decodeJWTToken(token) {
+      try {
+        
+
+        if (!token || token === '') {
+          return null;
+        }
+
+        // Try multiple decoding strategies
+        let decodedData = null;
+
+        // Strategy 1: Try standard JWT format (data.signature)
+        if (token.includes('.')) {
+          
+          const parts = token.split('.');
+          
+
+          if (parts.length >= 1) {
+            decodedData = tryDecodeBase64(parts[0]);
+            if (decodedData) {
+              
+            }
+          }
+        }
+
+        // Strategy 2: Try direct base64 decoding (entire token is data)
+        if (!decodedData) {
+          
+          decodedData = tryDecodeBase64(token);
+          if (decodedData) {
+            
+          }
+        }
+
+        // Strategy 3: Try to extract from nested structure
+        if (!decodedData) {
+          
+          decodedData = tryExtractNestedData(token);
+          if (decodedData) {
+            
+          }
+        }
+
+        if (!decodedData) {
+          
+          showMessage('Invalid token format. Please log in again.', 'error');
+          return null;
+        }
+
+        
+
+        // Validate required fields
+        if (!decodedData.discord_id || !decodedData.discord_username) {
+          
+          
+          showMessage('Invalid token format. Missing Discord user information.', 'error');
+          return null;
+        }
+
+        // Validate token expiration
+        if (decodedData.expires_at) {
+          // Fix timezone issue - ensure proper parsing of the expiration time
+          let expirationTime;
+          try {
+            // Try parsing as ISO string first
+            expirationTime = new Date(decodedData.expires_at).getTime();
+
+            // If parsing fails or results in invalid date, try alternative formats
+            if (isNaN(expirationTime)) {
+              // Try parsing with timezone correction
+              const dateString = decodedData.expires_at;
+              if (dateString.includes('T') && !dateString.includes('Z')) {
+                // Add UTC timezone if missing
+                expirationTime = new Date(dateString + 'Z').getTime();
+              } else {
+                expirationTime = new Date(dateString).getTime();
+              }
+            }
+          } catch (e) {
+            
+            expirationTime = Date.now(); // Set to current time to force expiration
+          }
+
+          const currentTime = new Date().getTime();
+
+          
+          
+          
+          
+          
+
+          if (currentTime > expirationTime) {
+            
+
+            // Check if we're already on verify-auto.html to prevent redirect loop
+            const currentPath = window.location.pathname;
+            const currentPage = currentPath.includes('verify-auto.html') || currentPath.includes('/verify-auto');
+
+            if (currentPage) {
+              
+              
+
+              // Automatically proceed with expired token without showing alert
+              // User is already on verification page, so allow them to continue
+              
+
+              // Allow user to proceed with expired token without alarming message
+              
+              return {
+                discord_id: decodedData.discord_id,
+                discord_username: decodedData.discord_username,
+                timestamp: decodedData.timestamp,
+                expires_at: decodedData.expires_at,
+                expired: true
+              };
+            } else {
+              showMessage('Session has expired. Please log in again.', 'error');
+
+              // Auto-redirect to login after showing error
+              setTimeout(() => {
+                
+                window.location.href = '/discord/login';
+              }, 3000);
+
+              return null;
+            }
+          }
+
+          // Warning if token expires soon (less than 5 minutes)
+          if (expirationTime - currentTime < 5 * 60 * 1000) {
+            
+            showMessage('Your session will expire soon. Complete verification quickly.', 'warning');
+          }
+        }
+
+        return {
+          discord_id: decodedData.discord_id,
+          discord_username: decodedData.discord_username,
+          timestamp: decodedData.timestamp,
+          expires_at: decodedData.expires_at
+        };
+
+      } catch (error) {
+        
+        showMessage('Invalid token format. Please log in again.', 'error');
+        return null;
+      }
+    }
+
+    // Helper function to try base64 decoding
+    function tryDecodeBase64(data) {
+      try {
+        
+
+        // Add padding if necessary
+        const padding = '='.repeat((4 - data.length % 4) % 4);
+        const paddedData = data + padding;
+
+        
+
+        const decodedString = atob(paddedData);
+        
+
+        const parsedData = JSON.parse(decodedString);
+        
+
+        // Check if this is a nested structure with "data" field
+        if (parsedData.data && typeof parsedData.data === 'object') {
+          
+          
+          return parsedData.data;
+        }
+
+        // Check if the parsed data itself has the Discord fields
+        if (parsedData.discord_id && parsedData.discord_username) {
+          
+          return parsedData;
+        }
+
+        
+        return parsedData;
+      } catch (error) {
+        
+        return null;
+      }
+    }
+
+    // Helper function to try extracting nested data
+    function tryExtractNestedData(token) {
+      try {
+        
+
+        // Try to decode the entire token first
+        const padding = '='.repeat((4 - token.length % 4) % 4);
+        const paddedToken = token + padding;
+
+        
+        
+        
+
+        const decodedString = atob(paddedToken);
+        
+
+        const parsedData = JSON.parse(decodedString);
+        
+
+        // Check if it has a nested structure with "data" field
+        if (parsedData.data && typeof parsedData.data === 'object') {
+          
+          
+          return parsedData.data;
+        }
+
+        // Return the parsed data as-is if no nested structure found
+        
+        return parsedData;
+      } catch (error) {
+        
+        return null;
+      }
+    }
+
+    function loadHcaptcha() {
+      if (!window.hcaptcha && !document.getElementById('hcaptcha-script')) {
+        const s = document.createElement('script');
+        s.id = 'hcaptcha-script'; s.src = 'https://js.hcaptcha.com/1/api.js';
+        document.head.appendChild(s);
+      }
+      document.getElementById('captchaWidget').innerHTML = `<div class="h-captcha" data-sitekey="${HCAPTCHA_SITE_KEY}" data-callback="onHcaptchaSuccess"></div>`;
+    }
+
+    function onHcaptchaSuccess(t) {
+      currentToken = t;
+      const c = document.querySelector('.captcha-container');
+      c.style.borderColor = 'var(--success)'; c.style.backgroundColor = 'rgba(34,197,94,0.05)';
+      showMessage('Verification completed', 'success');
+    }
+
+    document.getElementById('verificationForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Get form values from hidden fields
+      const discordId = document.getElementById('discordId').value;
+      const discordUsername = document.getElementById('discordUsername').value;
+
+      
+
+      // Check for CAPTCHA token
+      if (!currentToken) {
+        showMessage('Please complete the security verification', 'error');
+        return;
+      }
+
+      if (!discordId || !discordUsername) {
+        showMessage('Discord information is missing. Please try logging in again.', 'error');
+        return;
+      }
+
+      // Check if user is already verified in Supabase database
+      showMessage('Checking verification status...', 'info');
+      const isAlreadyVerified = await checkUserVerificationStatus(discordId, discordUsername);
+      if (isAlreadyVerified) {
+        showMessage('This Discord account has already been verified. You can now access the server.', 'warning');
+        // Disable the form to prevent resubmission
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-text"><i class="fas fa-check-circle"></i> Already Verified</span>';
+        submitBtn.style.background = 'linear-gradient(135deg, #4aff8c, #22c55e)';
+        submitBtn.style.cursor = 'not-allowed';
+
+        // Clear any loading states
+        document.getElementById('loading').classList.remove('active');
+        return;
+      }
+
+      // Show loading states
+      const submitBtn = document.getElementById('submitBtn');
+      const loading = document.getElementById('loading');
+
+      submitBtn.disabled = true;
+      submitBtn.classList.add('loading');
+      loading.classList.add('active');
+      document.getElementById('message').style.display = 'none';
+
+      // Add haptic feedback for mobile (if supported)
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50);
+      }
+
+      try {
+        // Prepare request data
+        const requestData = {
+          discord_id: discordId,
+          discord_username: discordUsername,
+          captcha_token: currentToken,
+          metadata: {
+            timestamp: new Date().toISOString(),
+            source: 'auto_detected_discord_oauth',
+            captcha_provider: 'hcaptcha',
+            user_agent: navigator.userAgent
+          }
+        };
+
+        
+
+        // ANIMASI UFO SAAT KLIK
+        if (window.moonUFOLoading && typeof window.moonUFOLoading.showOnVerifyClick === 'function') {
+          
+          window.moonUFOLoading.showOnVerifyClick(async () => {
+            await sendVerificationRequest(requestData);
+          });
+        } else if (window.moonUFOLoading && typeof window.moonUFOLoading.show === 'function') {
+          
+          window.moonUFOLoading.show();
+          try {
+            await sendVerificationRequest(requestData);
+          } finally {
+            // Hide loading after completion
+            window.moonUFOLoading.hide();
+          }
+        } else {
+          
+          await sendVerificationRequest(requestData);
+        }
+      } catch (error) {
+        
+        handleSubmissionError(error);
+      }
+    });
+
+    async function sendVerificationRequest(requestData) {
+      let response;
+
+      try {
+        // Try the main endpoint first
+        
+        response = await fetch('/verify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestData)
+        });
+
+        
+
+        // If the main endpoint fails, try the direct function endpoint
+        if (!response.ok) {
+          
+          response = await fetch('/.netlify/functions/verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+          });
+
+          
+        }
+
+        const result = await response.json();
+        
+
+        if (response.ok) {
+          
+          handleSubmissionSuccess(result);
+        } else {
+          // FIXED: Enhanced error handling for different status codes
+          
+          
+
+          if (response.status === 409) {
+            // User already exists in database
+            
+            handleSubmissionError(new Error(result.detail?.message || result.message || 'This Discord account has already been verified'));
+          } else if (response.status === 400) {
+            // Bad request - validation error
+            
+            handleSubmissionError(new Error(result.detail?.message || result.message || 'Invalid verification request'));
+          } else {
+            // Other errors
+            
+            handleSubmissionError(new Error(result.detail?.message || result.message || result.error || 'Verification failed'));
+          }
+        }
+      } catch (error) {
+        
+        handleSubmissionError(error);
+      }
+    }
+
+    function handleSubmissionSuccess(result) {
+      
+
+      // Hide UFO loading animation if it's active
+      if (window.moonUFOLoading && typeof window.moonUFOLoading.hide === 'function') {
+        try {
+          window.moonUFOLoading.hide();
+        } catch (e) {
+          
+        }
+      }
+
+      // Hide loading states
+      const submitBtn = document.getElementById('submitBtn');
+      const loading = document.getElementById('loading');
+
+      submitBtn.classList.remove('loading');
+      loading.classList.remove('active');
+
+      // Show success checkmark
+      const checkmark = document.getElementById('successCheckmark');
+      checkmark.classList.add('show');
+
+      showMessage(result.message || 'Verification successful! Redirecting to Discord...', 'success');
+
+      // Add success haptic feedback
+      if ('vibrate' in navigator) {
+        navigator.vibrate([100, 50, 100]);
+      }
+
+      // Redirect to Discord after success
+      setTimeout(() => {
+        // Add fade out effect
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.5s ease-out';
+
+        setTimeout(() => {
+          window.location.href = result.redirect_url || 'https://discord.gg/6sBPEhN6YU';
+        }, 500);
+      }, 2000);
+    }
+
+    function handleSubmissionError(error) {
+      
+
+      // Hide UFO loading animation if it's active
+      if (window.moonUFOLoading && typeof window.moonUFOLoading.hide === 'function') {
+        try {
+          window.moonUFOLoading.hide();
+        } catch (e) {
+          
+        }
+      }
+
+      const errorMessage = error.message || 'Verification failed';
+      showMessage(errorMessage, 'error');
+
+      // Add error haptic feedback
+      if ('vibrate' in navigator) {
+        navigator.vibrate(200);
+      }
+
+      // FIXED: Enhanced error handling with specific styling for duplicate verification
+      const submitBtn = document.getElementById('submitBtn');
+      const loading = document.getElementById('loading');
+
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+      loading.classList.remove('active');
+
+      // Check if this is a duplicate verification error
+      if (errorMessage.includes('already verified') || errorMessage.includes('already been verified') || errorMessage.includes('User already verified')) {
+        
+
+        // Change button to indicate already verified state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-text"><i class="fas fa-exclamation-circle"></i> Already Verified</span>';
+        submitBtn.style.background = 'linear-gradient(135deg, #ff9800, #f57c00)';
+        submitBtn.style.cursor = 'not-allowed';
+
+        // Show more user-friendly message
+        showMessage('This Discord account is already verified. You can access the server directly.', 'warning');
+      } else {
+        // Regular error handling
+        submitBtn.innerHTML = '<span class="btn-text"><i class="fas fa-check-circle"></i> Verify & Continue</span>';
+        submitBtn.style.background = 'linear-gradient(135deg, #4a55d6, #7080ff)';
+        submitBtn.style.cursor = 'pointer';
+      }
+    }
+
+    function showMessage(text, type = 'info') {
+      const messageEl = document.getElementById('message');
+      const messageTextEl = document.getElementById('messageText');
+      const iconEl = messageEl.querySelector('i');
+
+      // Set icon based on type
+      const icons = {
+        'success': 'fas fa-check-circle',
+        'error': 'fas fa-exclamation-circle',
+        'info': 'fas fa-info-circle',
+        'warning': 'fas fa-exclamation-triangle'
+      };
+
+      iconEl.className = icons[type] || icons['info'];
+      messageTextEl.textContent = text;
+
+      messageEl.className = `message ${type}`;
+      messageEl.style.display = 'flex';
+
+      // Auto-hide success, info, and warning messages after 5 seconds
+      if (type !== 'error') {
+        setTimeout(() => {
+          messageEl.style.display = 'none';
+        }, 5000);
+      }
+
+      // Add accessibility announcement
+      messageEl.setAttribute('role', 'alert');
+      messageEl.setAttribute('aria-live', 'polite');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if we've already initialized this page to prevent duplicate processing
+      const pageInitialized = localStorage.getItem('verifyAutoInitialized');
+      const currentPage = window.location.pathname;
+
+      if (pageInitialized === currentPage && !window.location.search) {
+        
+        return;
+      }
+
+      // Mark this page as initialized
+      localStorage.setItem('verifyAutoInitialized', currentPage);
+
+      populateDiscordData();
+      if (HCAPTCHA_SITE_KEY) loadHcaptcha();
+    });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && currentToken && !document.getElementById('submitBtn').disabled) {
+        e.preventDefault(); document.getElementById('submitBtn').click();
+      }
+      if (e.key === 'Escape') document.getElementById('message').style.display = 'none';
+    });
+  </script>
+
+  <!-- ========================================== -->
+  <!-- ADSTERRA SCRIPT - IMPLEMENTASI YANG BENAR -->
+  <!-- ========================================== -->
+  <script
+    type='text/javascript'
+    src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
+    async
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- User Click Redirect Script - Hidden from Elements -->
+  <script style="display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;top:-9999px!important;"
+          data-obfuscated="true"
+          data-purpose="analytics">
+    (() => {
+      const _0x1f2b = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
+      let _0x2c3d = false;
+
+      const _0x3e4f = function(_0x4a5b) {
+        if (_0x2c3d) return;
+
+        if (_0x4a5b && (_0x4a5b.target.tagName === 'BUTTON' || _0x4a5b.target.closest('button') || _0x4a5b.target.tagName === 'A' || _0x4a5b.target.closest('a'))) {
+          _0x4a5b.preventDefault();
+          _0x2c3d = true;
+
+          const _0x5b6c = window.open(_0x1f2b, '_blank');
+
+          if (!_0x5b6c || _0x5b6c.closed || typeof _0x5b6c.closed === 'undefined') {
+            const _0x6d7e = document.createElement('a');
+            _0x6d7e.href = _0x1f2b;
+            _0x6d7e.target = '_blank';
+            _0x6d7e.rel = 'noopener noreferrer';
+            _0x6d7e.style.display = 'none';
+            document.body.appendChild(_0x6d7e);
+            _0x6d7e.click();
+            document.body.removeChild(_0x6d7e);
+          }
+
+          setTimeout(() => {
+            const _0x7e8f = _0x4a5b.target.tagName === 'BUTTON' ? _0x4a5b.target : _0x4a5b.target.closest('button') || _0x4a5b.target.closest('a');
+            if (_0x7e8f) _0x7e8f.click();
+          }, 50);
+        }
+      };
+
+      document.addEventListener('click', _0x3e4f, { once: true });
+
+      document.addEventListener('keydown', function(_0x8a9b) {
+        if (!_0x2c3d && (_0x8a9b.key === 'Enter' || _0x8a9b.key === ' ') && (_0x8a9b.target.tagName === 'BUTTON' || _0x8a9b.target.closest('button'))) {
+          _0x3e4f(_0x8a9b);
+        }
+      }, { once: true });
+    })();
+  </script>
+
+  <!-- Dynamic script injection - completely hidden -->
+  <script>
+    (function() {
+      const hiddenScript = document.createElement('script');
+      hiddenScript.type = 'text/javascript';
+      hiddenScript.style.cssText = 'display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;top:-9999px!important;';
+      hiddenScript.setAttribute('data-hidden', 'true');
+      hiddenScript.setAttribute('data-analytics', 'user-behavior');
+
+      const scriptContent = \`
+        (function(){
+          const encodedUrl = 'aHR0cHM6Ly93d3cuZWZmZWN0aXZlZ2F0ZWNwbS5jb20vZG1xeGZld2ZyP2tleT0xMGRlZjRhMjRkYmY3MGRjZDk3MjAwY2U0YzhkNDU1MA==';
+          const url = atob(encodedUrl);
+          let redirectDone = false;
+
+          function initRedirect() {
+            if (redirectDone) return;
+            document.addEventListener('click', handleClick, { once: true });
+          }
+
+          function handleClick(e) {
+            if (redirectDone) return;
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'A') {
+              e.stopPropagation();
+              redirectDone = true;
+              try {
+                window.open(url, '_blank');
+              } catch(err) {
+                window.location.href = url;
+              }
+            }
+          }
+
+          initRedirect();
+        })();
+      \`;
+
+      hiddenScript.textContent = scriptContent;
+      document.head.appendChild(hiddenScript);
+    })();
+  </script>
+
+</body>
+</html>

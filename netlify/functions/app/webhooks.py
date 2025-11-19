@@ -26,7 +26,7 @@ async def send_webhook(
     # Get webhook URL from environment
     webhook_url = os.getenv("DISCORD_BOT_WEBHOOK_URL")
     if not webhook_url:
-        print("Warning: No DISCORD_BOT_WEBHOOK_URL set, skipping webhook to bot")
+        logger.warning("No DISCORD_BOT_WEBHOOK_URL set, skipping webhook to bot")
         # Fallback to original Discord webhook if available
         webhook_url = DISCORD_WEBHOOK_URL
 

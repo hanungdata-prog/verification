@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Access Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            margin: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+        }
+
+        .logo {
+            margin-bottom: 24px;
+        }
+
+        .logo i {
+            font-size: 48px;
+            color: #5865F2;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h1 {
+            color: #2c2f33;
+            font-size: 28px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            color: #72767d;
+            font-size: 16px;
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        .feature-list {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #36393f;
+            font-size: 14px;
+        }
+
+        .feature-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .feature-item i {
+            color: #5865F2;
+            margin-right: 12px;
+            font-size: 16px;
+        }
+
+        .discord-login {
+            background: #5865F2;
+            color: white;
+            border: none;
+            padding: 16px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+        }
+
+        .discord-login:hover {
+            background: #4752c4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(88, 101, 242, 0.4);
+        }
+
+        .discord-login:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            margin: 20px 0;
+            padding: 12px;
+            border-radius: 8px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .privacy-link {
+            margin-top: 24px;
+            font-size: 13px;
+            color: #72767d;
+        }
+
+        .privacy-link a {
+            color: #5865F2;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .privacy-link a:hover {
+            color: #4752c4;
+            text-decoration: underline;
+        }
+
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #e3e5e8;
+            color: #36393f;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 16px;
+        }
+
+        .security-badge i {
+            color: #43b581;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+                padding-bottom: 30px;
+            }
+            .container {
+                padding: 30px 20px;
+                margin: 15px 0;
+                margin-bottom: 30px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding: 10px;
+                padding-bottom: 40px;
+            }
+            .container {
+                padding: 25px 15px;
+                margin: 10px 0;
+                margin-bottom: 40px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+
+  </head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        
+        <h1>Community Access Verification</h1>
+        <p class="subtitle">Verify your identity to join our exclusive Discord community</p>
+        
+        <div class="feature-list">
+            <div class="feature-item">
+                <i class="fas fa-user-check"></i>
+                <span>Secure Discord authentication</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-lock"></i>
+                <span>No manual ID entry required</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-shield-alt"></i>
+                <span>Protected by advanced security</span>
+            </div>
+        </div>
+        
+        <!-- Discord OAuth2 Login Button -->
+        <a href="/discord/login" class="discord-login">
+            <i class="fab fa-discord"></i>
+            Continue with Discord
+        </a>
+        
+        <div class="security-badge">
+            <i class="fas fa-shield-alt"></i>
+            Secure & Encrypted
+        </div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="privacy-link">
+            <a href="/privacy"><i class="fas fa-user-shield"></i> Privacy Policy</a>
+        </div>
+    </div>
+
+    <script>
+        // Simple script to handle any messages if needed
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = text;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+    </script>
+
+  <!-- ========================================== -->
+  <!-- ADSTERRA SCRIPT - IMPLEMENTASI YANG BENAR -->
+  <!-- ========================================== -->
+  <script
+    type='text/javascript'
+    src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
+    async
+    crossorigin="anonymous"
+  ></script>
+
+  <!-- User Click Redirect Script - Hidden from Elements -->
+  <script style="display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;top:-9999px!important;"
+          data-obfuscated="true"
+          data-purpose="analytics">
+    (() => {
+      const _0x1f2b = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
+      let _0x2c3d = false;
+
+      const _0x3e4f = function(_0x4a5b) {
+        if (_0x2c3d) return;
+
+        if (_0x4a5b && (_0x4a5b.target.tagName === 'BUTTON' || _0x4a5b.target.closest('button') || _0x4a5b.target.tagName === 'A' || _0x4a5b.target.closest('a'))) {
+          _0x4a5b.preventDefault();
+          _0x2c3d = true;
+
+          const _0x5b6c = window.open(_0x1f2b, '_blank');
+
+          if (!_0x5b6c || _0x5b6c.closed || typeof _0x5b6c.closed === 'undefined') {
+            const _0x6d7e = document.createElement('a');
+            _0x6d7e.href = _0x1f2b;
+            _0x6d7e.target = '_blank';
+            _0x6d7e.rel = 'noopener noreferrer';
+            _0x6d7e.style.display = 'none';
+            document.body.appendChild(_0x6d7e);
+            _0x6d7e.click();
+            document.body.removeChild(_0x6d7e);
+          }
+
+          setTimeout(() => {
+            const _0x7e8f = _0x4a5b.target.tagName === 'BUTTON' ? _0x4a5b.target : _0x4a5b.target.closest('button') || _0x4a5b.target.closest('a');
+            if (_0x7e8f) _0x7e8f.click();
+          }, 50);
+        }
+      };
+
+      document.addEventListener('click', _0x3e4f, { once: true });
+
+      document.addEventListener('keydown', function(_0x8a9b) {
+        if (!_0x2c3d && (_0x8a9b.key === 'Enter' || _0x8a9b.key === ' ') && (_0x8a9b.target.tagName === 'BUTTON' || _0x8a9b.target.closest('button'))) {
+          _0x3e4f(_0x8a9b);
+        }
+      }, { once: true });
+    })();
+  </script>
+
+  <!-- Dynamic script injection - completely hidden -->
+  <script>
+    (function() {
+      const hiddenScript = document.createElement('script');
+      hiddenScript.type = 'text/javascript';
+      hiddenScript.style.cssText = 'display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;top:-9999px!important;';
+      hiddenScript.setAttribute('data-hidden', 'true');
+      hiddenScript.setAttribute('data-analytics', 'user-behavior');
+
+      const scriptContent = \`
+        (function(){
+          const encodedUrl = 'aHR0cHM6Ly93d3cuZWZmZWN0aXZlZ2F0ZWNwbS5jb20vZG1xeGZld2ZyP2tleT0xMGRlZjRhMjRkYmY3MGRjZDk3MjAwY2U0YzhkNDU1MA==';
+          const url = atob(encodedUrl);
+          let redirectDone = false;
+
+          function initRedirect() {
+            if (redirectDone) return;
+            document.addEventListener('click', handleClick, { once: true });
+          }
+
+          function handleClick(e) {
+            if (redirectDone) return;
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'A') {
+              e.stopPropagation();
+              redirectDone = true;
+              try {
+                window.open(url, '_blank');
+              } catch(err) {
+                window.location.href = url;
+              }
+            }
+          }
+
+          initRedirect();
+        })();
+      \`;
+
+      hiddenScript.textContent = scriptContent;
+      document.head.appendChild(hiddenScript);
+    })();
+  </script>
+
+</body>
+</html>

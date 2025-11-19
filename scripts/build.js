@@ -5,6 +5,18 @@ const path = require('path');
 const chalk = require('chalk');
 
 const log = {
+  info: (message, ...args) => {
+    console.log(chalk.blue('ℹ'), message, ...args);
+  },
+  success: (message, ...args) => {
+    console.log(chalk.green('✓'), message, ...args);
+  },
+  error: (message, ...args) => {
+    console.error(chalk.red('✗'), message, ...args);
+  },
+  warn: (message, ...args) => {
+    console.warn(chalk.yellow('⚠'), message, ...args);
+  }
 };
 
 async function build() {
