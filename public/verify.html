@@ -66,11 +66,12 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       font-family: var(--font-sans);
       color: var(--foreground);
       padding: var(--space-4);
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
     }
 
     /* CARD UTAMA - SAMA DENGAN HALAMAN UTAMA */
@@ -426,12 +427,45 @@
 
     /* RESPONSIVE */
     @media (max-width: 640px) {
-      .card { padding: var(--space-6); max-width: 380px; }
+      body {
+        align-items: center;
+        padding: var(--space-3);
+        padding-bottom: 2rem;
+      }
+      .card {
+        padding: var(--space-5);
+        max-width: 100%;
+        width: 100%;
+        margin: var(--space-2) 0;
+      }
       h1 { font-size: var(--text-2xl); }
       .subtitle { font-size: var(--text-base); }
-      .feature-list { padding: var(--space-5); }
+      .feature-list { padding: var(--space-4); }
       .feature-item { font-size: var(--text-sm); margin-bottom: var(--space-3); }
-      .discord-button, .security-badge, .message { font-size: var(--text-base); padding: var(--space-3) var(--space-6); }
+      .discord-button, .security-badge, .message {
+        font-size: var(--text-base);
+        padding: var(--space-3) var(--space-6);
+      }
+    }
+
+    /* Extra small mobile */
+    @media (max-width: 380px) {
+      body {
+        padding: var(--space-2);
+        padding-bottom: 3rem;
+      }
+      .card {
+        padding: var(--space-4);
+        margin: var(--space-1) 0;
+      }
+      h1 { font-size: var(--text-xl); }
+      .subtitle { font-size: var(--text-sm); }
+      .feature-list { padding: var(--space-3); }
+      .discord-button {
+        font-size: var(--text-sm);
+        padding: var(--space-3) var(--space-5);
+        max-width: 280px;
+      }
     }
 
     @keyframes fadeInUp {
