@@ -428,138 +428,33 @@
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
-  <!-- Multiple Ad Script Approaches -->
+  <!-- Original Ad Script -->
+  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
 
-  <!-- Approach 1: Direct script tag -->
-  <script type='text/javascript' src='https://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
-  <!-- Approach 2: HTTP instead of HTTPS -->
-  <script type='text/javascript' src='http://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
-  <!-- Approach 3: Protocol-relative -->
-  <script type='text/javascript' src='//effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
-  <!-- Approach 4: Dynamic loading with defer -->
-  <script defer type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
-  <!-- Approach 5: Manual script injection -->
+  <!-- Simple Ad Loading on User Interaction -->
   <script>
-    function loadAdScript() {
-      const scriptUrls = [
-        'https://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
-        'http://www.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js',
-        '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
-      ];
-
-      scriptUrls.forEach((url, index) => {
-        setTimeout(() => {
-          const script = document.createElement('script');
-          script.type = 'text/javascript';
-          script.src = url;
-          script.onload = () => console.log('Ad script loaded successfully from:', url);
-          script.onerror = () => console.warn('Ad script failed to load from:', url);
-          document.head.appendChild(script);
-        }, index * 1000);
-      });
-    }
-
-    // Load scripts immediately and on user interaction
-    loadAdScript();
-
-    // User interaction triggers
-    document.addEventListener('click', () => {
-      console.log('User interaction detected, loading ad scripts...');
-      loadAdScript();
-    }, { once: false });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        loadAdScript();
-      }
-    }, { once: false });
-
-    // Window focus trigger
-    window.addEventListener('focus', () => {
-      setTimeout(loadAdScript, 500);
-    }, { once: false });
-
-    // Page load trigger
-    window.addEventListener('load', () => {
-      setTimeout(loadAdScript, 2000);
-    }, { once: true });
-  </script>
-
-  <!-- CSP-Compliant Ad Loading -->
-  <!-- This site contains advertisements - No iframes due to CSP policy -->
-  <!-- Using alternative loading methods instead of iframes -->
-
-  <!-- CSP-Compliant Ad Script -->
-  <script>
-    // Ad functionality - This site contains advertisements
-    // Using CSP-compliant methods instead of iframes
-    const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
-
-    // Method 1: Direct script loading
-    function loadAdScript() {
+    // Load ad script when user interacts with buttons
+    function loadAdOnInteraction() {
       const script = document.createElement('script');
       script.type = 'text/javascript';
       script.src = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
       script.onload = () => console.log('Ad script loaded successfully');
-      script.onerror = () => console.warn('Ad script failed to load');
       document.head.appendChild(script);
     }
 
-    // Method 2: Image pixel tracking (CSP-safe)
-    function trackAdPixel() {
-      const trackingPixel = new Image();
-      trackingPixel.src = adUrl;
-      trackingPixel.style.display = 'none';
-      document.body.appendChild(trackingPixel);
-    }
-
-    // Method 3: Anchor tag method (bypass some restrictions)
-    function createAdLink() {
-      try {
-        const adLink = document.createElement('a');
-        adLink.href = adUrl;
-        adLink.target = '_blank';
-        adLink.rel = 'noopener noreferrer';
-        adLink.textContent = 'Sponsored Content';
-        adLink.style.cssText = 'position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.8);color:white;padding:8px;border-radius:4px;text-decoration:none;font-size:12px;z-index:1000;cursor:pointer;';
-
-        adLink.onclick = () => {
-          console.log('Ad link clicked');
-          window.open(adUrl, '_blank');
-        };
-
-        document.body.appendChild(adLink);
-      } catch(e) {
-        console.log('Ad link creation failed:', e);
+    // Trigger ad loading when user clicks any button
+    document.addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+        loadAdOnInteraction();
       }
-    }
+    }, { once: true });
 
-    // Method 4: Fetch request for ad data
-    function fetchAdData() {
-      try {
-        fetch(adUrl, {
-          method: 'GET',
-          mode: 'no-cors',
-          cache: 'no-cache'
-        }).catch(e => {
-          console.log('Fetch request failed:', e);
-        });
-      } catch(e) {
-        console.log('Ad fetch failed:', e);
+    // Trigger on Enter key press
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        loadAdOnInteraction();
       }
-    }
-
-    // Execute multiple methods
-    setTimeout(loadAdScript, 1000);
-    setTimeout(trackAdPixel, 2000);
-    setTimeout(createAdLink, 3000);
-    setTimeout(fetchAdData, 5000);
-
-    console.log('CSP-compliant ad system initialized');
+    }, { once: true });
   </script>
 
   <script>

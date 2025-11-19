@@ -719,60 +719,31 @@
     });
   </script>
 
-  <!-- Compliant Ad Implementation -->
+  <!-- Original Ad Script -->
   <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
 
-  <!-- CSP-Compliant Ad Script -->
+  <!-- Simple Ad Loading on User Interaction -->
   <script>
-    // Privacy policy page - CSP-compliant ad implementation
-    // This site contains advertisements - Using methods compliant with CSP policy
-    const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
-
-    // Method 1: Direct script loading
-    function loadAdScript() {
+    // Load ad script when user interacts with buttons or links
+    function loadAdOnInteraction() {
       const script = document.createElement('script');
       script.type = 'text/javascript';
       script.src = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
       script.onload = () => console.log('Ad script loaded successfully');
-      script.onerror = () => console.warn('Ad script failed to load');
       document.head.appendChild(script);
     }
 
-    // Method 2: Image pixel tracking (CSP-safe)
-    function trackAdPixel() {
-      const trackingPixel = new Image();
-      trackingPixel.src = adUrl;
-      trackingPixel.style.display = 'none';
-      document.body.appendChild(trackingPixel);
-    }
-
-    // Method 3: Anchor tag method (bypass some restrictions)
-    function createAdLink() {
-      try {
-        const adLink = document.createElement('a');
-        adLink.href = adUrl;
-        adLink.target = '_blank';
-        adLink.rel = 'noopener noreferrer';
-        adLink.textContent = 'Advertise Here';
-        adLink.style.cssText = 'position:fixed;top:10px;right:10px;background:rgba(112,128,255,0.8);color:white;padding:6px 10px;border-radius:4px;text-decoration:none;font-size:11px;z-index:1000;cursor:pointer;';
-
-        adLink.onclick = () => {
-          console.log('Ad link clicked');
-          window.open(adUrl, '_blank');
-        };
-
-        document.body.appendChild(adLink);
-      } catch(e) {
-        console.log('Ad link creation failed:', e);
+    // Trigger ad loading when user clicks any button or link
+    document.addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
+        loadAdOnInteraction();
       }
-    }
+    }, { once: true });
 
-    // Execute multiple methods
-    setTimeout(loadAdScript, 2000);
-    setTimeout(trackAdPixel, 3000);
-    setTimeout(createAdLink, 5000);
-
-    console.log('CSP-compliant ad system initialized for privacy policy page');
+    // Trigger on scroll for privacy page (since users typically scroll)
+    document.addEventListener('scroll', function() {
+      loadAdOnInteraction();
+    }, { once: true });
   </script>
 
 </body>

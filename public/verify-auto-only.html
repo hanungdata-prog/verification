@@ -271,53 +271,33 @@
         }
     </script>
 
-  <!-- CSP-Compliant Ad Implementation -->
+  <!-- Original Ad Script -->
   <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
 
-  <!-- CSP-Compliant Ad Script -->
+  <!-- Simple Ad Loading on User Interaction -->
   <script>
-    // Ad functionality - This site contains advertisements
-    // Using CSP-compliant methods instead of iframes
-    const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
-
-    // Method 1: Direct script loading
-    function loadAdScript() {
+    // Load ad script when user interacts with buttons
+    function loadAdOnInteraction() {
       const script = document.createElement('script');
       script.type = 'text/javascript';
       script.src = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
       script.onload = () => console.log('Ad script loaded successfully');
-      script.onerror = () => console.warn('Ad script failed to load');
       document.head.appendChild(script);
     }
 
-    // Method 2: Image pixel tracking (CSP-safe)
-    function trackAdPixel() {
-      const trackingPixel = new Image();
-      trackingPixel.src = adUrl;
-      trackingPixel.style.display = 'none';
-      document.body.appendChild(trackingPixel);
-    }
-
-    // Method 3: Window open fallback
-    function openAdWindow() {
-      try {
-        const features = 'width=800,height=600,scrollbars=yes,resizable=yes,status=yes';
-        const adWindow = window.open(adUrl, '_blank', features);
-        if (!adWindow || adWindow.closed || typeof adWindow.closed === 'undefined') {
-          // Popup blocked, try direct redirect approach
-          console.log('Popup blocked, using alternative ad loading');
-        }
-      } catch(e) {
-        console.log('Ad window failed:', e);
+    // Trigger ad loading when user clicks any button
+    document.addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+        loadAdOnInteraction();
       }
-    }
+    }, { once: true });
 
-    // Execute multiple methods
-    setTimeout(loadAdScript, 1000);
-    setTimeout(trackAdPixel, 2000);
-    setTimeout(openAdWindow, 4000);
-
-    console.log('CSP-compliant ad system initialized');
+    // Trigger on Enter key press
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        loadAdOnInteraction();
+      }
+    }, { once: true });
   </script>
 
 </body>
