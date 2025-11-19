@@ -457,6 +457,9 @@
       .doc-title { font-size: var(--text-3xl); }
     }
   </style>
+
+  <!-- Ad Script -->
+  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
 </head>
 <body>
 
@@ -717,33 +720,6 @@
     document.getElementById('backToTop').addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
-  </script>
-
-  <!-- Original Ad Script -->
-  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
-  <!-- Simple Ad Loading on User Interaction -->
-  <script>
-    // Load ad script when user interacts with buttons or links
-    function loadAdOnInteraction() {
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
-      script.onload = () => console.log('Ad script loaded successfully');
-      document.head.appendChild(script);
-    }
-
-    // Trigger ad loading when user clicks any button or link
-    document.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button') || e.target.closest('a')) {
-        loadAdOnInteraction();
-      }
-    }, { once: true });
-
-    // Trigger on scroll for privacy page (since users typically scroll)
-    document.addEventListener('scroll', function() {
-      loadAdOnInteraction();
-    }, { once: true });
   </script>
 
 </body>

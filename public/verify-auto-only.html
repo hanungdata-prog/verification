@@ -211,6 +211,9 @@
             }
         }
     </style>
+
+  <!-- Ad Script -->
+  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
 </head>
 <body>
     <div class="container">
@@ -270,35 +273,6 @@
             }
         }
     </script>
-
-  <!-- Original Ad Script -->
-  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
-
-  <!-- Simple Ad Loading on User Interaction -->
-  <script>
-    // Load ad script when user interacts with buttons
-    function loadAdOnInteraction() {
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
-      script.onload = () => console.log('Ad script loaded successfully');
-      document.head.appendChild(script);
-    }
-
-    // Trigger ad loading when user clicks any button
-    document.addEventListener('click', function(e) {
-      if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
-        loadAdOnInteraction();
-      }
-    }, { once: true });
-
-    // Trigger on Enter key press
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter' || e.key === ' ') {
-        loadAdOnInteraction();
-      }
-    }, { once: true });
-  </script>
 
 </body>
 </html>
