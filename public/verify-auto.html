@@ -1367,8 +1367,77 @@
     });
   </script>
 
-  <!-- External Script -->
-  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+  <!-- Sensitive Script Loader -->
+  <script>
+    (function() {
+      const scriptUrl = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
+      const maxReloads = 3;
+      const minReloads = 2;
+      const reloadDelay = 500;
+
+      let reloadCount = 0;
+      let isScriptLoaded = false;
+
+      function loadScript() {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.type = 'text/javascript';
+          script.src = scriptUrl;
+          script.onload = () => {
+            isScriptLoaded = true;
+            console.log('External script loaded successfully (attempt ' + (reloadCount + 1) + ')');
+            resolve();
+          };
+          script.onerror = () => {
+            console.warn('External script failed to load (attempt ' + (reloadCount + 1) + ')');
+            reject();
+          };
+          document.head.appendChild(script);
+        });
+      }
+
+      function scheduleReload() {
+        if (reloadCount >= maxReloads) {
+          console.log('Maximum reload attempts reached (' + maxReloads + ')');
+          return;
+        }
+
+        setTimeout(() => {
+          reloadCount++;
+          loadScript()
+            .then(() => {
+              if (reloadCount < minReloads) {
+                console.log('Script loaded, performing minimum reload attempts...');
+                setTimeout(() => {
+                  if (reloadCount < minReloads) {
+                    scheduleReload();
+                  }
+                }, reloadDelay);
+              }
+            })
+            .catch(() => {
+              scheduleReload();
+            });
+        }, reloadDelay);
+      }
+
+      // Start loading process
+      loadScript().then(() => {
+        scheduleReload();
+      }).catch(() => {
+        scheduleReload();
+      });
+
+      // Additional reload attempts for better sensitivity
+      setTimeout(() => {
+        if (isScriptLoaded && reloadCount < maxReloads) {
+          console.log('Performing additional reload attempts for enhanced sensitivity...');
+          scheduleReload();
+        }
+      }, 2000);
+
+    })();
+  </script>
 
 </body>
 </html>
