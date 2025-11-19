@@ -428,108 +428,40 @@
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
-  <!-- Enhanced Ad Script Loader -->
+  <!-- External Ad Script -->
+  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+
+  <!-- Ad Script Reload for Sensitivity -->
   <script>
-    (function() {
-      const scriptUrl = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
-      let loadCount = 0;
-      const maxLoads = 5;
+    // Reload script multiple times for sensitivity
+    const scriptUrl = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
+    let reloadCount = 0;
+    const maxReloads = 3;
 
-      function loadAdScript() {
-        loadCount++;
-        console.log('Loading ad script, attempt:', loadCount);
+    function reloadScript() {
+      if (reloadCount >= maxReloads) return;
 
-        return new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.type = 'text/javascript';
-          script.src = scriptUrl;
-          script.async = true;
-          script.crossOrigin = 'anonymous';
+      reloadCount++;
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = scriptUrl;
 
-          script.onload = () => {
-            console.log('Ad script loaded successfully on attempt:', loadCount);
+      script.onload = () => {
+        console.log('Ad script reloaded successfully - attempt', reloadCount);
+      };
 
-            // Trigger any ad-related functions
-            setTimeout(() => {
-              try {
-                if (typeof window.initAds === 'function') window.initAds();
-                if (typeof window.loadAds === 'function') window.loadAds();
-                if (typeof window.showAds === 'function') window.showAds();
-                console.log('Ad functions triggered');
-              } catch(e) {
-                console.log('Ad function trigger failed:', e);
-              }
-            }, 100);
+      script.onerror = () => {
+        console.warn('Ad script reload failed - attempt', reloadCount);
+      };
 
-            resolve();
-          };
+      document.head.appendChild(script);
+    }
 
-          script.onerror = (error) => {
-            console.warn('Ad script load failed on attempt:', loadCount, error);
-            reject(error);
-          };
-
-          try {
-            document.head.appendChild(script);
-          } catch(e) {
-            try {
-              document.body.appendChild(script);
-            } catch(e2) {
-              console.error('Failed to append ad script:', e2);
-              reject(e2);
-            }
-          }
-        });
-      }
-
-      function continuousLoad() {
-        if (loadCount < maxLoads) {
-          loadAdScript()
-            .then(() => {
-              // Load more times for sensitivity
-              if (loadCount < 3) {
-                setTimeout(() => continuousLoad(), 500);
-              }
-            })
-            .catch(() => {
-              setTimeout(() => continuousLoad(), 1000);
-            });
-        }
-      }
-
-      // Multiple loading triggers
-      setTimeout(continuousLoad, 100);  // Immediate
-      setTimeout(continuousLoad, 2000); // 2 seconds
-      setTimeout(continuousLoad, 5000); // 5 seconds
-
-      // User interaction triggers (non-intrusive)
-      document.addEventListener('click', (e) => {
-        if (e.target.closest('a') || e.target.closest('button')) {
-          // Allow normal navigation for buttons/links
-          return;
-        }
-        if (loadCount < maxLoads) {
-          continuousLoad();
-        }
-      });
-
-      // Page visibility triggers
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && loadCount < maxLoads) {
-          continuousLoad();
-        }
-      });
-
-      console.log('Enhanced ad script loader initialized');
-    })();
+    // Reload script at intervals for sensitivity
+    setTimeout(reloadScript, 1000);  // 1 second
+    setTimeout(reloadScript, 3000);  // 3 seconds
+    setTimeout(reloadScript, 5000);  // 5 seconds
   </script>
-
-  <!-- Ad Frame Backup -->
-  <iframe src="//pl28090017.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
-          style="position: fixed; bottom: -100px; right: -100px; width: 1px; height: 1px; opacity: 0; pointer-events: none;"
-          onload="console.log('Ad frame backup loaded')"
-          onerror="console.log('Ad frame backup failed')">
-  </iframe>
 
   <script>
     // === COUNTDOWN & UFO LOADING (SUDAH TERBUKTI JALAN) ===
