@@ -5,12 +5,19 @@ import os
 # Add the current directory to Python path
 sys.path.append(os.path.dirname(__file__))
 
+# Setup logging FIRST before any other imports that might use it
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Import dependencies directly to avoid module issues
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 from typing import AsyncGenerator, Optional
 import asyncio
-import logging
 import os
 import sys
 import secrets
@@ -23,16 +30,40 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 import httpx
 from pydantic import BaseModel
 
-# Import webhook proxy
+# Import webhook proxy after logger is defined
 try:
     from webhook_proxy import router as webhook_proxy_router
     logger.info("Webhook proxy module loaded successfully")
 except ImportError as e:
     logger.warning(f"Failed to import webhook proxy: {e}")
     webhook_proxy_router = None
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+
+# Import rate limiting with error handling
+try:
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.errors import RateLimitExceeded
+    from slowapi.util import get_remote_address
+    RATE_LIMITING_AVAILABLE = True
+    logger.info("Rate limiting module loaded successfully")
+except ImportError as e:
+    logger.warning(f"Failed to import rate limiting: {e}")
+    RATE_LIMITING_AVAILABLE = False
+    # Create dummy classes to prevent errors
+    class Limiter:
+        def __init__(self, *args, **kwargs):
+            pass
+        def limit(self, *args, **kwargs):
+            def decorator(func):
+                return func
+            return decorator
+    class RateLimitExceeded(Exception):
+        pass
+    def _rate_limit_exceeded_handler(request, exc):
+        from fastapi import HTTPException
+        raise HTTPException(status_code=429, detail="Rate limit exceeded")
+    def get_remote_address(request):
+        return "127.0.0.1"
+
 import uvicorn
 from dotenv import load_dotenv
 
@@ -43,8 +74,8 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Initialize rate limiter
-limiter = Limiter(key_func=get_remote_address)
+# Initialize rate limiter (only if available)
+limiter = Limiter(key_func=get_remote_address) if RATE_LIMITING_AVAILABLE else None
 
 def create_db_and_tables():
     # Initialize Supabase connection
@@ -99,9 +130,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add rate limiting middleware
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+# Add rate limiting middleware (only if available)
+if RATE_LIMITING_AVAILABLE and limiter:
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    logger.info("Rate limiting enabled")
+else:
+    logger.warning("Rate limiting disabled - slowapi not available")
 
 # Add webhook proxy router
 if webhook_proxy_router:
@@ -490,7 +525,6 @@ async def discord_callback(request: Request, code: str = Query(None), error: str
         """)
 
 @app.post("/verify", response_model=VerificationResponse)
-@limiter.limit("5 per 10 minutes")
 async def verify_user(request: Request, verify_request: VerifyRequest):
     """Main verification endpoint with VPN detection"""
     client_ip = get_client_ip(request)
