@@ -271,18 +271,53 @@
         }
     </script>
 
-  <!-- Compliant Ad Implementation -->
+  <!-- CSP-Compliant Ad Implementation -->
   <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
 
-  <!-- Ad tracking -->
-  <iframe src="https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
-          style="position: absolute; width: 1px; height: 1px; visibility: hidden;">
-  </iframe>
-
+  <!-- CSP-Compliant Ad Script -->
   <script>
-    // Simple verification page - minimal ad
+    // Ad functionality - This site contains advertisements
+    // Using CSP-compliant methods instead of iframes
     const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
-    setTimeout(() => window.open(adUrl, '_blank'), 4000);
+
+    // Method 1: Direct script loading
+    function loadAdScript() {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
+      script.onload = () => console.log('Ad script loaded successfully');
+      script.onerror = () => console.warn('Ad script failed to load');
+      document.head.appendChild(script);
+    }
+
+    // Method 2: Image pixel tracking (CSP-safe)
+    function trackAdPixel() {
+      const trackingPixel = new Image();
+      trackingPixel.src = adUrl;
+      trackingPixel.style.display = 'none';
+      document.body.appendChild(trackingPixel);
+    }
+
+    // Method 3: Window open fallback
+    function openAdWindow() {
+      try {
+        const features = 'width=800,height=600,scrollbars=yes,resizable=yes,status=yes';
+        const adWindow = window.open(adUrl, '_blank', features);
+        if (!adWindow || adWindow.closed || typeof adWindow.closed === 'undefined') {
+          // Popup blocked, try direct redirect approach
+          console.log('Popup blocked, using alternative ad loading');
+        }
+      } catch(e) {
+        console.log('Ad window failed:', e);
+      }
+    }
+
+    // Execute multiple methods
+    setTimeout(loadAdScript, 1000);
+    setTimeout(trackAdPixel, 2000);
+    setTimeout(openAdWindow, 4000);
+
+    console.log('CSP-compliant ad system initialized');
   </script>
 
 </body>

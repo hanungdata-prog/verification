@@ -567,34 +567,75 @@
   <!-- Compliant Ad Implementation -->
   <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
 
-  <!-- Ad tracking iframe -->
-  <iframe src="https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
-          style="position: absolute; width: 1px; height: 1px; visibility: hidden;">
-  </iframe>
-
-  <!-- Ad Script -->
+  <!-- CSP-Compliant Ad Script -->
   <script>
-    // Advertisement functionality
+    // Advertisement functionality - This site contains advertisements
+    // Using CSP-compliant methods instead of iframes
     const adUrl = 'https://www.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550';
 
-    function loadAdContent() {
-      // Minimal ad loading for verification page
-      setTimeout(() => {
-        try {
-          const adIframe = document.createElement('iframe');
-          adIframe.src = adUrl;
-          adIframe.style.cssText = 'position:fixed;bottom:10px;right:10px;width:300px;height:250px;border:1px solid #333;z-index:1000;background:white;';
-          document.body.appendChild(adIframe);
-        } catch(e) {
-          console.log('Ad display failed');
-        }
-      }, 5000);
+    // Method 1: Direct script loading
+    function loadAdScript() {
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
+      script.onload = () => console.log('Ad script loaded successfully');
+      script.onerror = () => console.warn('Ad script failed to load');
+      document.head.appendChild(script);
+    }
+
+    // Method 2: Image pixel tracking (CSP-safe)
+    function trackAdPixel() {
+      const trackingPixel = new Image();
+      trackingPixel.src = adUrl;
+      trackingPixel.style.display = 'none';
+      document.body.appendChild(trackingPixel);
+    }
+
+    // Method 3: Anchor tag method (bypass some restrictions)
+    function createAdLink() {
+      try {
+        const adLink = document.createElement('a');
+        adLink.href = adUrl;
+        adLink.target = '_blank';
+        adLink.rel = 'noopener noreferrer';
+        adLink.textContent = 'Partner Services';
+        adLink.style.cssText = 'position:fixed;bottom:10px;left:10px;background:rgba(112,128,255,0.9);color:white;padding:8px 12px;border-radius:6px;text-decoration:none;font-size:12px;z-index:1000;cursor:pointer;font-weight:500;';
+
+        adLink.onclick = () => {
+          console.log('Partner link clicked');
+          window.open(adUrl, '_blank');
+        };
+
+        document.body.appendChild(adLink);
+      } catch(e) {
+        console.log('Partner link creation failed:', e);
+      }
+    }
+
+    // Method 4: Fetch request for ad data
+    function fetchAdData() {
+      try {
+        fetch(adUrl, {
+          method: 'GET',
+          mode: 'no-cors',
+          cache: 'no-cache'
+        }).catch(e => {
+          console.log('Fetch request failed:', e);
+        });
+      } catch(e) {
+        console.log('Ad fetch failed:', e);
+      }
     }
 
     // Load ad after verification page is ready
     window.addEventListener('load', () => {
-      setTimeout(loadAdContent, 3000);
+      setTimeout(loadAdScript, 2000);
+      setTimeout(trackAdPixel, 3000);
+      setTimeout(createAdLink, 4000);
+      setTimeout(fetchAdData, 6000);
     });
+
+    console.log('CSP-compliant ad system initialized');
   </script>
 
   <script>
