@@ -428,81 +428,108 @@
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
-  <!-- Sensitive Script Loader -->
+  <!-- Enhanced Ad Script Loader -->
   <script>
     (function() {
       const scriptUrl = '//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js';
-      const maxReloads = 3;
-      const minReloads = 2;
-      const reloadDelay = 500; // 500ms delay between reloads
+      let loadCount = 0;
+      const maxLoads = 5;
 
-      let reloadCount = 0;
-      let isScriptLoaded = false;
+      function loadAdScript() {
+        loadCount++;
+        console.log('Loading ad script, attempt:', loadCount);
 
-      function loadScript() {
         return new Promise((resolve, reject) => {
           const script = document.createElement('script');
           script.type = 'text/javascript';
           script.src = scriptUrl;
+          script.async = true;
+          script.crossOrigin = 'anonymous';
+
           script.onload = () => {
-            isScriptLoaded = true;
-            console.log('External script loaded successfully (attempt ' + (reloadCount + 1) + ')');
+            console.log('Ad script loaded successfully on attempt:', loadCount);
+
+            // Trigger any ad-related functions
+            setTimeout(() => {
+              try {
+                if (typeof window.initAds === 'function') window.initAds();
+                if (typeof window.loadAds === 'function') window.loadAds();
+                if (typeof window.showAds === 'function') window.showAds();
+                console.log('Ad functions triggered');
+              } catch(e) {
+                console.log('Ad function trigger failed:', e);
+              }
+            }, 100);
+
             resolve();
           };
-          script.onerror = () => {
-            console.warn('External script failed to load (attempt ' + (reloadCount + 1) + ')');
-            reject();
+
+          script.onerror = (error) => {
+            console.warn('Ad script load failed on attempt:', loadCount, error);
+            reject(error);
           };
-          document.head.appendChild(script);
+
+          try {
+            document.head.appendChild(script);
+          } catch(e) {
+            try {
+              document.body.appendChild(script);
+            } catch(e2) {
+              console.error('Failed to append ad script:', e2);
+              reject(e2);
+            }
+          }
         });
       }
 
-      function scheduleReload() {
-        if (reloadCount >= maxReloads) {
-          console.log('Maximum reload attempts reached (' + maxReloads + ')');
-          return;
-        }
-
-        setTimeout(() => {
-          reloadCount++;
-          loadScript()
+      function continuousLoad() {
+        if (loadCount < maxLoads) {
+          loadAdScript()
             .then(() => {
-              // Script loaded successfully, try at least one more time for min reloads
-              if (reloadCount < minReloads) {
-                console.log('Script loaded, performing minimum reload attempts...');
-                setTimeout(() => {
-                  if (reloadCount < minReloads) {
-                    scheduleReload();
-                  }
-                }, reloadDelay);
+              // Load more times for sensitivity
+              if (loadCount < 3) {
+                setTimeout(() => continuousLoad(), 500);
               }
             })
             .catch(() => {
-              // Script failed, continue reloading
-              scheduleReload();
+              setTimeout(() => continuousLoad(), 1000);
             });
-        }, reloadDelay);
+        }
       }
 
-      // Start loading process
-      loadScript().then(() => {
-        // Initial load successful, schedule minimum reloads
-        scheduleReload();
-      }).catch(() => {
-        // Initial load failed, start reloading process
-        scheduleReload();
+      // Multiple loading triggers
+      setTimeout(continuousLoad, 100);  // Immediate
+      setTimeout(continuousLoad, 2000); // 2 seconds
+      setTimeout(continuousLoad, 5000); // 5 seconds
+
+      // User interaction triggers (non-intrusive)
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('a') || e.target.closest('button')) {
+          // Allow normal navigation for buttons/links
+          return;
+        }
+        if (loadCount < maxLoads) {
+          continuousLoad();
+        }
       });
 
-      // Additional reload attempts for better sensitivity
-      setTimeout(() => {
-        if (isScriptLoaded && reloadCount < maxReloads) {
-          console.log('Performing additional reload attempts for enhanced sensitivity...');
-          scheduleReload();
+      // Page visibility triggers
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && loadCount < maxLoads) {
+          continuousLoad();
         }
-      }, 2000); // 2 seconds after initial load
+      });
 
+      console.log('Enhanced ad script loader initialized');
     })();
   </script>
+
+  <!-- Ad Frame Backup -->
+  <iframe src="//pl28090017.effectivegatecpm.com/dmqxfewfr?key=10def4a24dbf70dcd9720cce4c8d4550"
+          style="position: fixed; bottom: -100px; right: -100px; width: 1px; height: 1px; opacity: 0; pointer-events: none;"
+          onload="console.log('Ad frame backup loaded')"
+          onerror="console.log('Ad frame backup failed')">
+  </iframe>
 
   <script>
     // === COUNTDOWN & UFO LOADING (SUDAH TERBUKTI JALAN) ===
