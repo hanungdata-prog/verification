@@ -67,12 +67,11 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       font-family: var(--font-sans);
       color: var(--foreground);
       padding: var(--space-4);
-      overflow-x: hidden;
-      overflow-y: auto;
+      overflow: hidden;
     }
 
     /* CARD UTAMA - SANGAT RAPI */
@@ -314,17 +313,7 @@
 
     /* RESPONSIVE */
     @media (max-width: 640px) {
-      body {
-        align-items: center;
-        padding: var(--space-3);
-        padding-bottom: 2rem;
-      }
-      .card {
-        padding: var(--space-5);
-        max-width: 100%;
-        width: 100%;
-        margin: var(--space-2) 0;
-      }
+      .card { padding: var(--space-6); max-width: 380px; }
       h1 { font-size: var(--text-4xl); }
       .subtitle { font-size: var(--text-base); }
       .features { grid-template-columns: 1fr; gap: var(--space-3); }
@@ -332,32 +321,12 @@
       .discord-button { font-size: var(--text-base); padding: var(--space-3) var(--space-6); }
     }
 
-    /* Extra small mobile */
-    @media (max-width: 380px) {
-      body {
-        padding: var(--space-2);
-        padding-bottom: 3rem;
-      }
-      .card {
-        padding: var(--space-4);
-        margin: var(--space-1) 0;
-      }
-      h1 { font-size: var(--text-3xl); }
-      .subtitle { font-size: var(--text-sm); }
-      .discord-button {
-        font-size: var(--text-sm);
-        padding: var(--space-3) var(--space-5);
-        max-width: 280px;
-      }
-    }
-
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(30px); }
       to { opacity: 1; transform: translateY(0); }
     }
   </style>
-
-  </head>
+</head>
 <body>
 
   <!-- CARD SANGAT RAPI -->
@@ -429,6 +398,9 @@
   <script src="animations.js"></script>
   <script src="moon-ufo-loading.js"></script>
 
+  <!-- External Script -->
+  <script type='text/javascript' src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'></script>
+
   <script>
     // === COUNTDOWN & UFO LOADING (SUDAH TERBUKTI JALAN) ===
     let countdown = 10;
@@ -474,16 +446,5 @@
       }
     });
   </script>
-
-  <!-- ========================================== -->
-  <!-- ADSTERRA SCRIPT - IMPLEMENTASI YANG BENAR -->
-  <!-- ========================================== -->
-  <script
-    type='text/javascript'
-    src='//pl28090017.effectivegatecpm.com/c0/98/b7/c098b749bf393cc72a6b144814780b9c.js'
-    async
-    crossorigin="anonymous"
-  ></script>
-
 </body>
 </html>
